@@ -3,8 +3,8 @@
 Sosyal paylasim ve dayanisma odakli mobil uygulama.
 
 ## Ekipler
-- **Frontend** › mobile/ klasoru (Flutter)
-- **Backend** › backend/ klasoru (Node.js + Azure App Service + Firebase)
+- **Frontend** -> mobile/ klasoru (Flutter)
+- **Backend** -> backend/ klasoru (Java Spring Boot + Azure App Service + Firebase)
 
 ## Figma Tasarim
 https://www.figma.com/design/dyvhi5OZ94GmdG3akW64Li/Untitled?node-id=0-1&p=f
@@ -16,16 +16,23 @@ cd mobile
 flutter pub get
 flutter run
 
-### Backend (Node.js)
+### Backend (Java Spring Boot)
 cd backend
-npm install
-cp .env.example .env
-node src/server.js
+./mvnw spring-boot:run
+
+Windows icin:
+mvnw.cmd spring-boot:run
+
+### Gereksinimler
+- Java 17+
+- Maven (veya mvnw kullanin)
+- Flutter 3.x+
+- Android Studio (emulator icin)
 
 ## Firebase Kurulum
 1. Firebase Console - Yeni proje olustur
 2. Android uygulamasi ekle - google-services.json indir - mobile/android/app/ icine koy
-3. Proje ayarlari - Servis hesabi - yeni anahtar olustur - .env dosyasina yapistir
+3. Proje ayarlari - Servis hesabi - yeni anahtar olustur - application.properties dosyasina yapistir
 4. flutterfire configure komutunu calistir
 
 ## Azure Deploy
