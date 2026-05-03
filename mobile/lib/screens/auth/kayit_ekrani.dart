@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MaterialApp(
-    home: const KayitEkrani(),
+    home: KayitEkrani(),
     debugShowCheckedModeBanner: false,
   ));
 }

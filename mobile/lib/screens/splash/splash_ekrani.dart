@@ -27,8 +27,8 @@ class _SplashEkraniState extends State<SplashEkrani> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F5F5),
+    return const Scaffold(
+      backgroundColor: Color(0xFFF8F5F5),
       body: Center(
         child: Text(
           "VESTA",
