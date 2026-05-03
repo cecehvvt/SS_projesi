@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+
+class KarsilamaEkrani extends StatelessWidget {
+  const KarsilamaEkrani({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F5F5),
+
+      body: SafeArea(
+        child: Column(
+          children: [
+
+            const Spacer(),
+
+            const Text(
+              "VESTA",
+              style: TextStyle(
+                fontSize: 45,
+                fontWeight: FontWeight.bold,
+                fontFamily: "Serif",
+              ),
+            ),
+
+            const SizedBox(height: 80),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                // Giriş Yap Butonu
+                SizedBox(
+                  width: 150,
+                  height: 55,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFA8C8AE),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Scaffold(
+                            backgroundColor: Color(0xFFF8F5F5),
+                            body: Center(
+                              child: Text(
+                                "Giriş Ekranı",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Giriş Yap",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Kaydol Butonu
+                SizedBox(
+                  width: 150,
+                  height: 55,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade300,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const Scaffold(
+                backgroundColor: Color(0xFFF8F5F5),
+                body: Center(
+                  child: Text(
+                    "Kayıt Ekranı",
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+              ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Kaydol",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const Spacer(flex: 2),
+          ],
+        ),
+      ),
+    );
+  }
+}
