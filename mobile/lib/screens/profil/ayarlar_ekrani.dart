@@ -36,23 +36,23 @@ class AyarlarEkrani extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.green.shade200),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       backgroundColor: Colors.white,
                       child: Icon(Icons.person, color: Colors.green),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text('Ayşe Demir', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           Text('Hesabını yönetin ve tercihlerinizi düzenleyin.', style: TextStyle(fontSize: 11, color: Colors.black54)),
                         ],
                       ),
                     ),
-                    const Icon(Icons.verified_user, color: Colors.green),
+                    Icon(Icons.verified_user, color: Colors.green),
                   ],
                 ),
               ),
@@ -162,7 +162,7 @@ class AyarlarEkrani extends StatelessWidget {
           Switch(
             value: acikMi,
             onChanged: (bool value) {},
-            activeColor: Colors.white,
+            activeThumbColor: Colors.white,
             activeTrackColor: Colors.green,
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: Colors.grey.shade300,

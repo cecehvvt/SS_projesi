@@ -57,8 +57,8 @@ class IlanListesiEkrani extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.grey.shade300),
                   ),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.filter_alt_outlined, color: Colors.green, size: 20),
                       SizedBox(width: 4),
                       Text('Filtrele', style: TextStyle(color: Colors.green, fontSize: 12)),
@@ -89,11 +89,11 @@ class IlanListesiEkrani extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                     child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.favorite_border, size: 16, color: Colors.grey),
                           SizedBox(width: 4),
                           Text('Bağışladıklarım', style: TextStyle(color: Colors.grey, fontSize: 13)),

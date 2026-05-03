@@ -96,7 +96,7 @@ class IlanOlusturEkrani extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
               ],
             ),
             const SizedBox(height: 16),

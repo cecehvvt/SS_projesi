@@ -42,22 +42,22 @@ class ProfilEkrani extends StatelessWidget {
                     child: Icon(Icons.person, size: 40, color: Colors.grey),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Ayşe Demir', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 4),
+                        Text('Ayşe Demir', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4),
                         Row(
-                          children: const [
+                          children: [
                             Icon(Icons.verified_user, color: Colors.green, size: 14),
                             SizedBox(width: 4),
                             Text('Güvenli Kullanıcı', style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Row(
-                          children: const [
+                          children: [
                             Icon(Icons.location_on_outlined, size: 14, color: Colors.black54),
                             SizedBox(width: 4),
                             Text('Üsküdar, İstanbul', style: TextStyle(color: Colors.black54, fontSize: 12)),
@@ -87,7 +87,7 @@ class ProfilEkrani extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                       child: const Icon(Icons.eco, color: Colors.green, size: 20),
                     ),
                     const SizedBox(width: 12),
@@ -127,8 +127,8 @@ class ProfilEkrani extends StatelessWidget {
                       decoration: const BoxDecoration(
                         border: Border(bottom: BorderSide(color: Colors.green, width: 2)),
                       ),
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           Icon(Icons.inventory_2_outlined, size: 16, color: Colors.green),
                           SizedBox(width: 4),
                           Text('İlanlarım', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13)),

@@ -83,15 +83,15 @@ class TakasIlanEkrani extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.green.shade200),
               ),
-              child: Row(
+              child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.shield_outlined, color: Colors.green, size: 24),
-                  const SizedBox(width: 12),
+                  Icon(Icons.shield_outlined, color: Colors.green, size: 24),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Güvenli Takas', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13)),
                         SizedBox(height: 4),
                         Text(

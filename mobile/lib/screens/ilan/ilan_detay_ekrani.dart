@@ -85,8 +85,8 @@ class IlanDetayEkrani extends StatelessWidget {
                           color: Colors.red.shade100,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Row(
-                          children: const [
+                        child: const Row(
+                          children: [
                             Icon(Icons.alarm, color: Colors.red, size: 14),
                             SizedBox(width: 4),
                             Text('Acil', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
@@ -105,16 +105,16 @@ class IlanDetayEkrani extends StatelessWidget {
                   const SizedBox(height: 16),
                   
                   // Konum ve Zaman Bilgisi
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Icon(Icons.location_on_outlined, size: 18, color: Colors.black54),
                       SizedBox(width: 4),
                       Text('Üsküdar, İstanbul', style: TextStyle(color: Colors.black54, fontSize: 13)),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Icon(Icons.access_time, size: 18, color: Colors.black54),
                       SizedBox(width: 4),
                       Text('3 saat önce', style: TextStyle(color: Colors.black54, fontSize: 13)),
@@ -130,24 +130,24 @@ class IlanDetayEkrani extends StatelessWidget {
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 24,
                           backgroundColor: Color(0xFFD4EAE2),
                           child: Icon(Icons.person, color: Colors.teal),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Column(
                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text('İhtiyaç Sahibi', style: TextStyle(fontSize: 12, color: Colors.grey)),
                               Text('Rabia C.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                             ],
                           ),
                         ),
-                        const Icon(Icons.verified_user, color: Colors.green),
+                        Icon(Icons.verified_user, color: Colors.green),
                       ],
                     ),
                   ),
@@ -163,9 +163,9 @@ class IlanDetayEkrani extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.blue.shade100)
                     ),
-                    child: Column(
+                    child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.map, color: Colors.blue, size: 30),
                         SizedBox(height: 8),
                         Text('Harita Konumu (Temsili)', style: TextStyle(color: Colors.blue)),

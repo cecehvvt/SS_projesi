@@ -16,20 +16,20 @@ class SohbetEkrani extends StatelessWidget {
             // Geri dönme işlemi
           },
         ),
-        title: Row(
+        title: const Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 18,
               backgroundColor: Color(0xFFE0E0E0),
               child: Icon(Icons.person, color: Colors.grey),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Merve C.', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Merve C.', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
                 Row(
-                  children: const [
+                  children: [
                     Icon(Icons.shield, color: Colors.green, size: 12),
                     SizedBox(width: 4),
                     Text('Güvenli Sohbet', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
@@ -68,14 +68,14 @@ class SohbetEkrani extends StatelessWidget {
                   child: const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Bebek Bezi (2 Numara)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      const SizedBox(height: 2),
+                      Text('Bebek Bezi (2 Numara)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      SizedBox(height: 2),
                       Row(
-                        children: const [
+                        children: [
                           Icon(Icons.location_on_outlined, size: 12, color: Colors.black54),
                           SizedBox(width: 2),
                           Text('Üsküdar, İstanbul', style: TextStyle(fontSize: 11, color: Colors.black54)),
@@ -278,10 +278,10 @@ class SohbetEkrani extends StatelessWidget {
                         child: const Icon(Icons.location_on, color: Colors.green, size: 20),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text('Üsküdar Mah. Doğa Sok. No:15', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             Text('Üsküdar / İstanbul', style: TextStyle(fontSize: 11, color: Colors.black54)),
                           ],
