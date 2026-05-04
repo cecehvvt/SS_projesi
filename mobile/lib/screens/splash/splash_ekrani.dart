@@ -27,17 +27,14 @@ class _SplashEkraniState extends State<SplashEkrani> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFF8F5F5),
+    // Scaffold'un başındaki const kelimesini kaldırdık
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F5F5),
       body: Center(
-        child: Text(
-          "VESTA",
-          style: TextStyle(
-            fontSize: 42,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
-            fontFamily: "Serif",
-          ),
+        // Yazı yerine logomuzu ekledik
+        child: Image.asset(
+          'assets/images/vesta_logo.png',
+          width: 400, // Logonun büyüklüğünü buradan değiştirebilirsin
         ),
       ),
     );
