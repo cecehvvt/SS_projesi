@@ -9,13 +9,14 @@ import 'screens/auth/kayit_ekrani.dart';
 import 'screens/ilan/ilan_listesi_ekrani.dart';
 import 'screens/ilan/ilan_detay_ekrani.dart';
 import 'screens/ilan/ilan_olustur_ekrani.dart';
-import 'screens/arama/arama_ekrani.dart';        // ← YENİ (sayfa 14-15)
+import 'screens/arama/arama_ekrani.dart'; // ← YENİ (sayfa 14-15)
 import 'screens/mesajlar/mesajlar_ekrani.dart';
 import 'screens/mesajlar/sohbet_ekrani.dart';
 import 'screens/profil/profil_ekrani.dart';
 import 'screens/profil/profil_duzenle_ekrani.dart';
 import 'screens/profil/ayarlar_ekrani.dart';
-import 'models/ilan_model.dart';                 // ← IlanTuru enum için
+import 'models/ilan_model.dart'; // ← IlanTuru enum için
+import 'screens/ana_sayfa_yonetici.dart';
 
 void main() {
   runApp(const VestaApp());
@@ -52,14 +53,11 @@ class VestaApp extends StatelessWidget {
         '/ilan_olustur': (context) => const IlanOlusturEkrani(),
 
         // Arama — varsayılan Bağışlananlar (sayfa 14)
-        '/arama': (context) => const AramaEkrani(
-              baslangicTuru: IlanTuru.bagis,
-            ),
+        '/arama': (context) => const AramaEkrani(baslangicTuru: IlanTuru.bagis),
 
         // Arama — İhtiyaçlar sekmesiyle aç (sayfa 15)
-        '/arama_ihtiyac': (context) => const AramaEkrani(
-              baslangicTuru: IlanTuru.ihtiyac,
-            ),
+        '/arama_ihtiyac': (context) =>
+            const AramaEkrani(baslangicTuru: IlanTuru.ihtiyac),
 
         // Mesajlar
         '/mesajlar': (context) => const MesajlarEkrani(),
@@ -67,17 +65,15 @@ class VestaApp extends StatelessWidget {
 
         // Profil
         '/profil': (context) => const ProfilEkrani(),
-        '/profil_duzenle': (context) =>  ProfilDuzenleEkrani(), // ← YENİ
+        '/profil_duzenle': (context) => ProfilDuzenleEkrani(), // ← YENİ
         '/ayarlar': (context) => const AyarlarEkrani(),
+        '/ana_sayfa': (context) => const AnaSayfaYonetici(),
       },
 
       // ── Bilinmeyen route koruması ────────────
       onUnknownRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => const SplashEkrani(),
-        );
+        return MaterialPageRoute(builder: (context) => const SplashEkrani());
       },
     );
   }
 }
-
