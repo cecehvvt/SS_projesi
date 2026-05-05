@@ -115,13 +115,13 @@ class Renkler {
           style: ElevatedButton.styleFrom(
             backgroundColor: primary,
             foregroundColor: metinBeyaz,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
-            minimumSize: Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 50),
           ),
         ),
-        inputDecorationTheme: InputDecorationTheme(
+        inputDecorationTheme: const InputDecorationTheme(
           filled: true,
           fillColor: inputArkaplan,
           border: OutlineInputBorder(

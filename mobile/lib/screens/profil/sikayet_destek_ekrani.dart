@@ -50,7 +50,7 @@ class _SikayetDestekEkraniState extends State<SikayetDestekEkrani> {
             const SizedBox(height: 15),
 
             DropdownButtonFormField<String>(
-              value: seciliKategori,
+              initialValue: seciliKategori,
               items: [
                 "Kullanıcı Şikayeti",
                 "Ürün Şikayeti",

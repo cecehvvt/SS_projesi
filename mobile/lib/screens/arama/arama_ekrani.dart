@@ -85,13 +85,13 @@ class _AramaEkraniState extends State<AramaEkrani> {
       backgroundColor: Renkler.headerTeal,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Renkler.metinKoyu),
+        icon: const Icon(Icons.arrow_back, color: Renkler.metinKoyu),
         onPressed: () => Navigator.pop(context),
       ),
       centerTitle: true,
       title: Text(
         _aktifTur == IlanTuru.bagis ? 'Bağışlananlar' : 'İhtiyaçlar',
-        style: TextStyle(
+        style: const TextStyle(
           color: Renkler.metinKoyu,
           fontSize: 18,
           fontWeight: FontWeight.w600,
@@ -116,7 +116,7 @@ class _AramaEkraniState extends State<AramaEkrani> {
               child: TextField(
                 controller: _aramaController,
                 onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Ara(ürün,başlık,kategori,konum)',
                   hintStyle: TextStyle(
                     color: Renkler.metinAcik,
@@ -125,7 +125,7 @@ class _AramaEkraniState extends State<AramaEkrani> {
                   prefixIcon: Icon(Icons.search,
                       color: Renkler.metinAcik, size: 20),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
@@ -140,10 +140,10 @@ class _AramaEkraniState extends State<AramaEkrani> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.tune, size: 18, color: Renkler.metinOrta),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Text(
                     'Filtrele',
                     style: TextStyle(
@@ -220,12 +220,12 @@ class _AramaEkraniState extends State<AramaEkrani> {
   }
 
   Widget _buildBosHal() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.search_off, size: 64, color: Renkler.metinAcik),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             'Sonuç bulunamadı',
             style: TextStyle(color: Renkler.metinAcik, fontSize: 16),
@@ -338,7 +338,7 @@ class _IlanKarti extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       ilan.baslik,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Renkler.metinKoyu,
@@ -349,7 +349,7 @@ class _IlanKarti extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       ilan.aciklama,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color: Renkler.metinOrta,
                       ),
@@ -359,12 +359,12 @@ class _IlanKarti extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.person_outline,
+                        const Icon(Icons.person_outline,
                             size: 13, color: Renkler.metinAcik),
                         const SizedBox(width: 3),
                         Text(
                           ilan.ilanSahibiAdSoyad,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 11, color: Renkler.metinAcik),
                         ),
                       ],
@@ -372,12 +372,12 @@ class _IlanKarti extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined,
+                        const Icon(Icons.location_on_outlined,
                             size: 13, color: Renkler.metinAcik),
                         const SizedBox(width: 3),
                         Text(
                           ilan.konum,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 11, color: Renkler.metinAcik),
                         ),
                       ],
@@ -388,12 +388,12 @@ class _IlanKarti extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.access_time,
+                            const Icon(Icons.access_time,
                                 size: 13, color: Renkler.metinAcik),
                             const SizedBox(width: 3),
                             Text(
                               ilan.zamanOnce,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 11, color: Renkler.metinAcik),
                             ),
                           ],
@@ -497,7 +497,7 @@ class _FotoPlaceholder extends StatelessWidget {
       width: 110,
       height: 130,
       color: Renkler.inputArkaplan,
-      child: Icon(Icons.image_outlined, size: 36, color: Renkler.metinAcik),
+      child: const Icon(Icons.image_outlined, size: 36, color: Renkler.metinAcik),
     );
   }
 }
@@ -518,7 +518,7 @@ class _KategoriChip extends StatelessWidget {
       ),
       child: Text(
         kategori.ad,
-        style: TextStyle(
+        style: const TextStyle(
           color: Renkler.primary,
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -664,7 +664,7 @@ class _FiltreBottomSheetState extends State<_FiltreBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Filtrele',
             style: TextStyle(
               fontSize: 18,
@@ -673,7 +673,7 @@ class _FiltreBottomSheetState extends State<_FiltreBottomSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          Text('Kategori',
+          const Text('Kategori',
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -704,13 +704,13 @@ class _FiltreBottomSheetState extends State<_FiltreBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Sadece Acil İlanlar',
+              const Text('Sadece Acil İlanlar',
                   style: TextStyle(
                       fontSize: 14, color: Renkler.metinOrta)),
               Switch(
                 value: _sadaceAcil,
                 onChanged: (v) => setState(() => _sadaceAcil = v),
-                activeColor: Renkler.primary,
+                activeThumbColor: Renkler.primary,
               ),
             ],
           ),

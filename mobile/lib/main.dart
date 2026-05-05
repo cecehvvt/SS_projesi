@@ -67,7 +67,7 @@ class VestaApp extends StatelessWidget {
 
         // Profil
         '/profil': (context) => const ProfilEkrani(),
-        '/profil_duzenle': (context) => const ProfilDuzenleEkrani(), // ← YENİ
+        '/profil_duzenle': (context) =>  ProfilDuzenleEkrani(), // ← YENİ
         '/ayarlar': (context) => const AyarlarEkrani(),
       },
 
@@ -81,6 +81,3 @@ class VestaApp extends StatelessWidget {
   }
 }
 
-class ProfilDuzenleEkrani {
-  const ProfilDuzenleEkrani();
-}
