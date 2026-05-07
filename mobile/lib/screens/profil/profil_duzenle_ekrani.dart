@@ -267,7 +267,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: Colors.white,
+              activeThumbColor: Colors.white,
               activeTrackColor: const Color(0xFF00A344),
               inactiveThumbColor: Colors.white,
               inactiveTrackColor: Colors.grey.shade300,

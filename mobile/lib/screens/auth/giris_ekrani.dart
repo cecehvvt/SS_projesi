@@ -59,10 +59,14 @@ class _GirisEkraniState extends State<GirisEkrani> {
             const SizedBox(height: 6),
 
             // Şifremi Unuttum
+           
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Bizim yeni yarattığımız sayfaya gidiyor!
+                  Navigator.pushNamed(context, "/sifremi_unuttum");
+                },
                 style: TextButton.styleFrom(foregroundColor: Colors.black54),
                 child: const Text(
                   "Şifremi Unuttum",
@@ -70,7 +74,6 @@ class _GirisEkraniState extends State<GirisEkrani> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
 
             // Giriş Yap Butonu
             SizedBox(

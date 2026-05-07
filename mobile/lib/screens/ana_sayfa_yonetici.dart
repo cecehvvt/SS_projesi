@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'arama/arama_ekrani.dart';
 import 'favoriler/favoriler_ekrani.dart';
 import 'sepet/sepetim_ekrani.dart';
+import 'mesajlar/mesajlar_ekrani.dart'; 
+import 'ilan/ilan_olustur_ekrani.dart';
+import 'profil/profil_ekrani.dart'; // Profil ekranını sisteme dahil ettik
 
 class AnaSayfaYonetici extends StatefulWidget {
   const AnaSayfaYonetici({super.key});
@@ -11,15 +14,15 @@ class AnaSayfaYonetici extends StatefulWidget {
 }
 
 class _AnaSayfaYoneticiState extends State<AnaSayfaYonetici> {
-  int _seciliSayfa = 3;
+  int _seciliSayfa = 0; 
 
   final List<Widget> _sayfalar = [
-    AramaEkrani(),
-    Center(child: Text("Mesajlar")),
-    Center(child: Text("İlan Oluştur")),
-    FavorilerEkrani(),
-    SepetimEkrani(),
-    Center(child: Text("Profilim")),
+    const AramaEkrani(),
+    const MesajlarEkrani(), 
+    const IlanOlusturEkrani(),
+    const FavorilerEkrani(),
+    const SepetimEkrani(),
+    const ProfilEkrani(), // <-- Ve son parça da yerine oturdu!
   ];
 
   @override

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// DİKKAT: Alttaki import satırı kırmızı çizilirse üzerine tıklayıp 
+// ampulden doğru dosya yolunu seç veya dosya adının tam doğru olduğundan emin ol.
+import 'profil_duzenle_ekrani.dart'; 
 
 class ProfilEkrani extends StatelessWidget {
   const ProfilEkrani({super.key});
@@ -13,7 +16,8 @@ class ProfilEkrani extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
           onPressed: () {
-            // Geri dönme işlemi
+            // Geri tuşuna basınca bir önceki sayfaya döner
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -24,7 +28,13 @@ class ProfilEkrani extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              // Ayarlar butonuna basınca da düzenleme sayfasına gitsin
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilDuzenleEkrani()),
+              );
+            },
           ),
         ],
       ),
@@ -67,7 +77,13 @@ class ProfilEkrani extends StatelessWidget {
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      // İŞTE BURASI! Butona basınca bizim sayfaya ışınlıyoruz
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfilDuzenleEkrani()),
+                      );
+                    },
                     icon: const Icon(Icons.edit, size: 14, color: Colors.green),
                     label: const Text('Profili Düzenle', style: TextStyle(color: Colors.green, fontSize: 12)),
                   )
@@ -114,41 +130,17 @@ class ProfilEkrani extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               
-              // İlanlarım - Taleplerim Sekmeleri (Temsili)
+              // Sekmeler
               Container(
                 decoration: BoxDecoration(
                   border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      decoration: const BoxDecoration(
-                        border: Border(bottom: BorderSide(color: Colors.green, width: 2)),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.inventory_2_outlined, size: 16, color: Colors.green),
-                          SizedBox(width: 4),
-                          Text('İlanlarım', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13)),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.clean_hands_outlined, size: 16, color: Colors.grey.shade500),
-                        const SizedBox(width: 4),
-                        Text('Taleplerim', style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.swap_horiz, size: 16, color: Colors.grey.shade500),
-                        const SizedBox(width: 4),
-                        Text('Takaslarım', style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w500)),
-                      ],
-                    ),
+                    _TabBaslik(ikon: Icons.inventory_2_outlined, metin: 'İlanlarım', secili: true),
+                    _TabBaslik(ikon: Icons.clean_hands_outlined, metin: 'Taleplerim', secili: false),
+                    _TabBaslik(ikon: Icons.swap_horiz, metin: 'Takaslarım', secili: false),
                   ],
                 ),
               ),
@@ -186,7 +178,7 @@ class ProfilEkrani extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20), // Sayfa altı boşluğu
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -194,16 +186,12 @@ class ProfilEkrani extends StatelessWidget {
     );
   }
 
-  // İstatistikleri Oluşturan Yuvarlak İkonlu Widget
   Widget _buildIstatistik({required IconData ikon, required String sayi, required String baslik, required Color renk}) {
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: renk.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: renk.withOpacity(0.1), shape: BoxShape.circle),
           child: Icon(ikon, color: renk, size: 24),
         ),
         const SizedBox(height: 8),
@@ -214,7 +202,6 @@ class ProfilEkrani extends StatelessWidget {
     );
   }
 
-  // Kısa İlan Listesi Widget'ı
   Widget _buildMiniIlanKarti(String baslik, String kategori, String durum, Color durumRengi) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12.0),
@@ -229,10 +216,7 @@ class ProfilEkrani extends StatelessWidget {
           Container(
             width: 45,
             height: 45,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(8)),
             child: const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
           ),
           const SizedBox(width: 12),
@@ -248,10 +232,7 @@ class ProfilEkrani extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: durumRengi.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: durumRengi.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
             child: Text(durum, style: TextStyle(color: durumRengi, fontSize: 10, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
@@ -261,7 +242,6 @@ class ProfilEkrani extends StatelessWidget {
     );
   }
 
-  // En Alttaki Tıklanabilir Menü Satırları
   Widget _buildMenuSatiri(IconData ikon, String baslik, {bool hasBadge = false}) {
     return ListTile(
       leading: Icon(ikon, color: Colors.black87),
@@ -280,6 +260,31 @@ class ProfilEkrani extends StatelessWidget {
         ],
       ),
       onTap: () {},
+    );
+  }
+}
+
+// Sekme başlıkları için yardımcı küçük widget
+class _TabBaslik extends StatelessWidget {
+  final IconData ikon;
+  final String metin;
+  final bool secili;
+  const _TabBaslik({required this.ikon, required this.metin, required this.secili});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: secili ? Colors.green : Colors.transparent, width: 2)),
+      ),
+      child: Row(
+        children: [
+          Icon(ikon, size: 16, color: secili ? Colors.green : Colors.grey.shade500),
+          const SizedBox(width: 4),
+          Text(metin, style: TextStyle(fontWeight: secili ? FontWeight.bold : FontWeight.w500, color: secili ? Colors.green : Colors.grey.shade500, fontSize: 13)),
+        ],
+      ),
     );
   }
 }

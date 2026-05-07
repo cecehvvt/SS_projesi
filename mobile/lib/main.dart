@@ -6,16 +6,17 @@ import 'screens/splash/splash_ekrani.dart';
 import 'screens/auth/karsilama_ekrani.dart';
 import 'screens/auth/giris_ekrani.dart';
 import 'screens/auth/kayit_ekrani.dart';
+import 'screens/auth/sifremi_unuttum_ekrani.dart'; // ← YENİ: Sayfamızı içeri aldık
 import 'screens/ilan/ilan_listesi_ekrani.dart';
 import 'screens/ilan/ilan_detay_ekrani.dart';
 import 'screens/ilan/ilan_olustur_ekrani.dart';
-import 'screens/arama/arama_ekrani.dart'; // ← YENİ (sayfa 14-15)
+import 'screens/arama/arama_ekrani.dart'; 
 import 'screens/mesajlar/mesajlar_ekrani.dart';
 import 'screens/mesajlar/sohbet_ekrani.dart';
 import 'screens/profil/profil_ekrani.dart';
 import 'screens/profil/profil_duzenle_ekrani.dart';
 import 'screens/profil/ayarlar_ekrani.dart';
-import 'models/ilan_model.dart'; // ← IlanTuru enum için
+import 'models/ilan_model.dart'; 
 import 'screens/ana_sayfa_yonetici.dart';
 
 void main() {
@@ -46,6 +47,7 @@ class VestaApp extends StatelessWidget {
         '/welcome': (context) => const KarsilamaEkrani(),
         '/login': (context) => const GirisEkrani(),
         '/register': (context) => const KayitEkrani(),
+        '/sifremi_unuttum': (context) => const SifremiUnuttumEkrani(), // ← YENİ: Rotamızı ekledik!
 
         // İlan
         '/ilan_listesi': (context) => const IlanListesiEkrani(),
@@ -65,7 +67,7 @@ class VestaApp extends StatelessWidget {
 
         // Profil
         '/profil': (context) => const ProfilEkrani(),
-        '/profil_duzenle': (context) => ProfilDuzenleEkrani(), // ← YENİ
+        '/profil_duzenle': (context) => const ProfilDuzenleEkrani(), 
         '/ayarlar': (context) => const AyarlarEkrani(),
         '/ana_sayfa': (context) => const AnaSayfaYonetici(),
       },
