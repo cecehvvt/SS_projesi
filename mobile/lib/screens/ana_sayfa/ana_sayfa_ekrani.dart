@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'bagislananlar_ekrani.dart';
 import 'ihtiyaclar_ekrani.dart';
-import 'kategori_detay_ekrani.dart'; // Yeni akıllı sayfamız
+import 'kategori_detay_ekrani.dart';
 
 class AnaSayfaEkrani extends StatelessWidget {
   const AnaSayfaEkrani({super.key});
@@ -12,7 +12,7 @@ class AnaSayfaEkrani extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // 1. ÜST KISIM (Mint Yeşili Arka Plan ve Ana Butonlar)
+          // 1. ÜST KISIM (Nane Yeşili Arka Plan ve Navigasyon Butonları)
           Container(
             color: const Color(0xFFB2D3C2),
             padding: const EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 20),
@@ -28,9 +28,9 @@ class AnaSayfaEkrani extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            // BAĞIŞLANANLAR BUTONU
+                            // BAĞIŞLANANLAR BUTONU (Etkileşimli Beyaz Buton)
                             _anaMenuButonu(context, "Bağışlananlar", const BagislananlarEkrani()),
-                            // İHTİYAÇLAR BUTONU
+                            // İHTİYAÇLAR BUTONU (Etkileşimli Beyaz Buton)
                             _anaMenuButonu(context, "İhtiyaçlar", const IhtiyaclarEkrani()),
                           ],
                         ),
@@ -69,7 +69,7 @@ class AnaSayfaEkrani extends StatelessWidget {
                   const Text("Kategoriler", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
 
-                  // 6 KATEGORİ - HEPSİ AKILLI SAYFAYA BAĞLI
+                  // 6 AKILLI KATEGORİ KUTUSU
                   GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -91,6 +91,7 @@ class AnaSayfaEkrani extends StatelessWidget {
                   const Text("Öne Çıkan İlanlar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
 
+                  // ÖNE ÇIKAN İLANLAR - RESİMLER "ilanlar" KLASÖRÜNDEN GELİYOR
                   GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -99,10 +100,10 @@ class AnaSayfaEkrani extends StatelessWidget {
                     mainAxisSpacing: 15,
                     crossAxisSpacing: 15,
                     children: [
-                      _ilanKarti("Kışlık Mont", "İstanbul, Beyoğlu . 2 km", "Ahmet Y.", "Bağış", "Talep et", const Color(0xFFA5D6A7)),
-                      _ilanKarti("Bebek Beşiği", "İstanbul, Beyoğlu . 2 km", "Zeynep A.", "Bağış", "Talep et", const Color(0xFFA5D6A7)),
-                      _ilanKarti("Atkı", "İstanbul, Kadıköy . 5 km", "Merve K.", "İhtiyaç", "Yardım et", Colors.red.shade300),
-                      _ilanKarti("Çalışma Masası", "İstanbul, Beyoğlu . 2 km", "Mehmet T.", "İhtiyaç", "Yardım et", Colors.red.shade300),
+                      _ilanKarti("Kışlık Mont", "İstanbul, Beyoğlu . 2 km", "Ahmet Y.", "Bağış", "Talep et", const Color(0xFFA5D6A7), "assets/images/ilanlar/mont2.png"),
+                      _ilanKarti("Bebek Beşiği", "İstanbul, Beyoğlu . 2 km", "Zeynep A.", "Bağış", "Talep et", const Color(0xFFA5D6A7), "assets/images/ilanlar/besik.png"), 
+                      _ilanKarti("Atkı", "İstanbul, Kadıköy . 5 km", "Merve K.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/atki.png"),
+                      _ilanKarti("Çalışma Masası", "İstanbul, Beyoğlu . 2 km", "Mehmet T.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/masa2.png"),
                     ],
                   ),
                 ],
@@ -114,7 +115,7 @@ class AnaSayfaEkrani extends StatelessWidget {
     );
   }
 
-  // Üstteki Bağışlananlar/İhtiyaçlar butonları için yardımcı widget
+  // Üst menü butonları için yardımcı fonksiyon
   Widget _anaMenuButonu(BuildContext context, String baslik, Widget sayfa) {
     return Expanded(
       child: Material(
@@ -133,7 +134,7 @@ class AnaSayfaEkrani extends StatelessWidget {
     );
   }
 
-  // 6 Kategori kutusu için akıllı yardımcı widget
+  // Kategori kutuları için yardımcı fonksiyon
   Widget _kategoriKutusu(BuildContext context, String ekrandakiAd, String gercekAd, IconData ikon, Color kutuRenk, Color sayfaRenk, Color sekmeRenk) {
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -161,7 +162,8 @@ class AnaSayfaEkrani extends StatelessWidget {
     );
   }
 
-  Widget _ilanKarti(String baslik, String konum, String kisi, String tip, String butonYazisi, Color butonRengi) {
+  // İlan kartları için yardımcı fonksiyon (Resimli)
+  Widget _ilanKarti(String baslik, String konum, String kisi, String tip, String butonYazisi, Color butonRengi, String resimYolu) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -172,13 +174,33 @@ class AnaSayfaEkrani extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              width: double.infinity,
-              child: const Icon(Icons.image, color: Colors.white54, size: 40),
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: Image.asset(
+                    resimYolu,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        width: double.infinity,
+                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 8, left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: butonRengi, borderRadius: BorderRadius.circular(8)),
+                    child: Text(tip, style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                  ),
+                ),
+                const Positioned(top: 8, right: 8, child: Icon(Icons.favorite_border, size: 20)),
+              ],
             ),
           ),
           Padding(
@@ -186,7 +208,7 @@ class AnaSayfaEkrani extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
                 Row(
                   children: [

@@ -89,9 +89,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() { isTumuSecili = true; });
-                      },
+                      onTap: () => setState(() => isTumuSecili = true),
                       child: Container(
                         decoration: BoxDecoration(
                           color: isTumuSecili ? const Color(0xFFDFF0E6) : Colors.transparent,
@@ -116,9 +114,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() { isTumuSecili = false; });
-                      },
+                      onTap: () => setState(() => isTumuSecili = false),
                       child: Container(
                         decoration: BoxDecoration(
                           color: !isTumuSecili ? const Color(0xFFDFF0E6) : Colors.transparent,
@@ -147,16 +143,43 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
           ),
           const SizedBox(height: 16),
 
-          // İLAN LİSTESİ
+          // İLAN LİSTESİ (GÜNCELLENMİŞ RESİMLİ)
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                _detayliIlanKarti("Bebek & Çocuk", "Bebek Arabası", "Az kullanılmış, temizdir. İhtiyacı olan bir aileye vermek istiyorum.", "Zeynep Ş.", "Üsküdar, İstanbul", "5 saat önce", "4 km"),
+                _detayliIlanKarti(
+                  "Bebek & Çocuk", 
+                  "Bebek Arabası", 
+                  "Az kullanılmış, temizdir. İhtiyacı olan bir aileye vermek istiyorum.", 
+                  "Zeynep Ş.", 
+                  "Üsküdar, İstanbul", 
+                  "5 saat önce", 
+                  "4 km",
+                  "assets/images/ilanlar/bebek_arabasi.png"
+                ),
                 const SizedBox(height: 16),
-                _detayliIlanKarti("Ev & Yaşam", "Çalışma Masası", "Temiz ve sağlamdır. İhtiyaç sahibi birine vermek istiyorum.", "Ali B.", "Beyoğlu, İstanbul", "4 saat önce", "6 km"),
+                _detayliIlanKarti(
+                  "Ev & Yaşam", 
+                  "Çalışma Masası", 
+                  "Temiz ve sağlamdır. İhtiyaç sahibi birine vermek istiyorum.", 
+                  "Ali B.", 
+                  "Beyoğlu, İstanbul", 
+                  "4 saat önce", 
+                  "6 km",
+                  "assets/images/ilanlar/masa.png"
+                ),
                 const SizedBox(height: 16),
-                _detayliIlanKarti("Kadın Giyim", "Kışlık Mont", "Kışlık mont ihtiyacım var. Bedeni M veya L olabilir", "Yusuf E.", "Beyoğlu, İstanbul", "2 saat önce", "6 km"),
+                _detayliIlanKarti(
+                  "Kadın Giyim", 
+                  "Kışlık Mont", 
+                  "Kışlık mont ihtiyacım var. Bedeni M veya L olabilir", 
+                  "Yusuf E.", 
+                  "Beyoğlu, İstanbul", 
+                  "2 saat önce", 
+                  "6 km",
+                  "assets/images/ilanlar/mont2.png" // <-- RESİM DEĞİŞTİRİLDİ
+                ),
                 const SizedBox(height: 20), 
               ],
             ),
@@ -164,11 +187,11 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
         ],
       ),
       
-      // ALT MENÜ (Bottom Navigation Bar) - YENİ EKLENEN KISIM
+      // ALT MENÜ
       bottomNavigationBar: Container(
         height: 65,
         decoration: BoxDecoration(
-          color: const Color(0xFFAFD6C4), // Tasarımdaki üst/alt menü rengi
+          color: const Color(0xFFAFD6C4),
           border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
         ),
         child: Row(
@@ -176,7 +199,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
           children: [
             _altMenuElemani(Icons.home_outlined, "Anasayfa"),
             _altMenuElemani(Icons.chat_bubble_outline, "Mesajlar"),
-            _altMenuElemani(Icons.add_circle_outline, "İlan Oluştur", ikonBoyutu: 28), // İlan oluştur ikonu biraz daha büyük
+            _altMenuElemani(Icons.add_circle_outline, "İlan Oluştur", ikonBoyutu: 28),
             _altMenuElemani(Icons.favorite_border, "Favoriler"),
             _altMenuElemani(Icons.shopping_bag_outlined, "Sepetim"),
             _altMenuElemani(Icons.person_outline, "Profilim"),
@@ -186,7 +209,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
     );
   }
 
-  // Alt Menü Elemanı Yardımcı Widget'ı
   Widget _altMenuElemani(IconData ikon, String baslik, {double ikonBoyutu = 24}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -198,8 +220,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
     );
   }
 
-  // İlan Kartı Widget'ı
-  Widget _detayliIlanKarti(String kategori, String baslik, String detay, String kisi, String konum, String sure, String mesafe) {
+  Widget _detayliIlanKarti(String kategori, String baslik, String detay, String kisi, String konum, String sure, String mesafe, String resimYolu) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -215,14 +236,21 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
           children: [
             Stack(
               children: [
-                Container(
-                  width: 110,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    resimYolu,
+                    width: 110,
+                    height: 140,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 110, height: 140,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                      );
+                    },
                   ),
-                  child: const Center(child: Icon(Icons.image, color: Colors.grey, size: 40)),
                 ),
                 Positioned(
                   bottom: 8, left: 8,
@@ -291,7 +319,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(70, 28),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           backgroundColor: const Color(0xFF2E7D32),
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
