@@ -100,7 +100,19 @@ class AnaSayfaEkrani extends StatelessWidget {
                     mainAxisSpacing: 15,
                     crossAxisSpacing: 15,
                     children: [
-                      _ilanKarti("Kışlık Mont", "İstanbul, Beyoğlu . 2 km", "Ahmet Y.", "Bağış", "Talep et", const Color(0xFFA5D6A7), "assets/images/ilanlar/mont2.png"),
+                      // YENİ: Kışlık Mont'a tıklanınca İlan Detay Ekranına gidecek
+                      _ilanKarti(
+                        "Kışlık Mont", 
+                        "İstanbul, Beyoğlu . 2 km", 
+                        "Ahmet Y.", 
+                        "Bağış", 
+                        "Talep et", 
+                        const Color(0xFFA5D6A7), 
+                        "assets/images/ilanlar/mont2.png",
+                        onTap: () {
+                          Navigator.pushNamed(context, '/ilan_detay'); // Sihirli dokunuş!
+                        }
+                      ),
                       _ilanKarti("Bebek Beşiği", "İstanbul, Beyoğlu . 2 km", "Zeynep A.", "Bağış", "Talep et", const Color(0xFFA5D6A7), "assets/images/ilanlar/besik.png"), 
                       _ilanKarti("Atkı", "İstanbul, Kadıköy . 5 km", "Merve K.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/atki.png"),
                       _ilanKarti("Çalışma Masası", "İstanbul, Beyoğlu . 2 km", "Mehmet T.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/masa2.png"),
@@ -162,74 +174,77 @@ class AnaSayfaEkrani extends StatelessWidget {
     );
   }
 
-  // İlan kartları için yardımcı fonksiyon (Resimli)
-  Widget _ilanKarti(String baslik, String konum, String kisi, String tip, String butonYazisi, Color butonRengi, String resimYolu) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: Image.asset(
-                    resimYolu,
+  // İlan kartları için yardımcı fonksiyon (YENİ: onTap eklendi)
+  Widget _ilanKarti(String baslik, String konum, String kisi, String tip, String butonYazisi, Color butonRengi, String resimYolu, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap, // Eğer tıklanma özelliği verildiyse çalıştırır
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    child: Image.asset(
+                      resimYolu,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          width: double.infinity,
+                          child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 8, left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: butonRengi, borderRadius: BorderRadius.circular(8)),
+                      child: Text(tip, style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                    ),
+                  ),
+                  const Positioned(top: 8, right: 8, child: Icon(Icons.favorite_border, size: 20)),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined, size: 12, color: Colors.black54),
+                      Expanded(child: Text(konum, style: const TextStyle(fontSize: 10, color: Colors.black54), overflow: TextOverflow.ellipsis)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
                     width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey.shade200,
-                        width: double.infinity,
-                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
-                      );
-                    },
+                    height: 26,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(backgroundColor: butonRengi, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                      child: Text(butonYazisi, style: const TextStyle(color: Colors.black87, fontSize: 11)),
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: 8, left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: butonRengi, borderRadius: BorderRadius.circular(8)),
-                    child: Text(tip, style: const TextStyle(fontSize: 10, color: Colors.black87)),
-                  ),
-                ),
-                const Positioned(top: 8, right: 8, child: Icon(Icons.favorite_border, size: 20)),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 12, color: Colors.black54),
-                    Expanded(child: Text(konum, style: const TextStyle(fontSize: 10, color: Colors.black54), overflow: TextOverflow.ellipsis)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: double.infinity,
-                  height: 26,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: butonRengi, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                    child: Text(butonYazisi, style: const TextStyle(color: Colors.black87, fontSize: 11)),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

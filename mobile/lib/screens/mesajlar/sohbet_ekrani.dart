@@ -12,16 +12,14 @@ class SohbetEkrani extends StatelessWidget {
         elevation: 1, // Altına hafif bir çizgi/gölge atsın
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () {
-            // Geri dönme işlemi
-          },
+          onPressed: () => Navigator.pop(context), // YENİ: Geri dönme aktif
         ),
         title: const Row(
           children: [
             CircleAvatar(
               radius: 18,
               backgroundColor: Color(0xFFE0E0E0),
-              child: Icon(Icons.person, color: Colors.grey),
+              child: Icon(Icons.person, color: Colors.white),
             ),
             SizedBox(width: 10),
             Column(
@@ -41,7 +39,7 @@ class SohbetEkrani extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
+            icon: const Icon(Icons.add_comment_outlined, color: Colors.black), // YENİ: Tasarıma uygun ikon
             onPressed: () {},
           ),
         ],
@@ -57,15 +55,18 @@ class SohbetEkrani extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Ürün Resmi
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
+                // YENİ: Gerçek Ürün Resmi Eklendi
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/images/ilanlar/bez.png', // Bebek bezi resmimiz
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 40, height: 40, color: Colors.grey.shade200, child: const Icon(Icons.image_outlined, color: Colors.grey),
+                    ),
                   ),
-                  child: const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(

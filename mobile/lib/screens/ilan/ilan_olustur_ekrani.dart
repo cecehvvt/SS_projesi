@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'bagis_ilani_olustur_ekrani.dart'; // Yeşil sayfamızı bağladık
+import 'ihtiyac_ilani_olustur_ekrani.dart'; // Mor sayfamızı bağladık
+import '../../widgets/alt_menu.dart'; // Alt menüyü bağladık
 
 class IlanOlusturEkrani extends StatelessWidget {
   const IlanOlusturEkrani({super.key});
@@ -12,9 +15,7 @@ class IlanOlusturEkrani extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () {
-            // Geri dönme işlemi
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'İlan Oluştur',
@@ -33,34 +34,40 @@ class IlanOlusturEkrani extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             
-            // Bağış İlanı Oluştur Kartı
+            // Bağış İlanı Oluştur Kartı (YEŞİL)
             _buildSecimKarti(
               context: context,
               baslik: 'Bağış İlanı Oluştur',
               aciklama: 'Kullanmadığınız eşyaları\nbaşkalarıyla paylaşın',
               ikon: Icons.volunteer_activism,
-              arkaPlanRengi: const Color(0xFFE8F5E9), // Açık yeşil tonu
+              arkaPlanRengi: const Color(0xFFE8F5E9),
               ikonRengi: const Color(0xFF2E7D32),
+              // YENİ EKLENEN HEDEF SAYFA
+              hedefSayfa: const BagisIlaniOlusturEkrani(), 
             ),
             
             const SizedBox(height: 24),
             
-            // İhtiyaç İlanı Oluştur Kartı
+            // İhtiyaç İlanı Oluştur Kartı (MOR)
             _buildSecimKarti(
               context: context,
               baslik: 'İhtiyaç İlanı Oluştur',
               aciklama: 'İhtiyacınız olan eşyaları\ntalep edin.',
-              ikon: Icons.clean_hands_outlined, // Figma'daki ikona benzer bir ikon
-              arkaPlanRengi: const Color(0xFFF3E5F5), // Açık mor/pembe tonu
+              ikon: Icons.clean_hands_outlined, 
+              arkaPlanRengi: const Color(0xFFF3E5F5),
               ikonRengi: const Color(0xFF8E24AA),
+              // YENİ EKLENEN HEDEF SAYFA
+              hedefSayfa: const IhtiyacIlaniOlusturEkrani(), 
             ),
           ],
         ),
       ),
+      // ALT MENÜYÜ EKLİYORUZ Kİ BURADAN DA DİĞER SAYFALARA GEÇİLEBİLSİN
+      bottomNavigationBar: const VestaAltMenu(),
     );
   }
 
-  // Tıklanabilir Seçim Kartı Şablonu
+  // Tıklanabilir Seçim Kartı Şablonu (hedefSayfa parametresi eklendi)
   Widget _buildSecimKarti({
     required BuildContext context,
     required String baslik,
@@ -68,12 +75,14 @@ class IlanOlusturEkrani extends StatelessWidget {
     required IconData ikon,
     required Color arkaPlanRengi,
     required Color ikonRengi,
+    required Widget hedefSayfa, // Buraya gidilecek sayfayı veriyoruz
   }) {
     return GestureDetector(
       onTap: () {
-        // Tıklanınca ilgili form sayfasına gidecek (İleride eklenecek)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$baslik seçildi!')),
+        // Tıklanınca parametre olarak gelen sayfaya geçiş yap
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => hedefSayfa),
         );
       },
       child: Container(

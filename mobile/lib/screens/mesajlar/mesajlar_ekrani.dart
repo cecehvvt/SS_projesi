@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'sohbet_ekrani.dart'; // Merve C.'ye tıklayınca gideceğimiz sayfa
+import '../../widgets/alt_menu.dart'; // Alt menümüz
 
 class MesajlarEkrani extends StatelessWidget {
   const MesajlarEkrani({super.key});
@@ -12,9 +14,7 @@ class MesajlarEkrani extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () {
-            // Geri dönme işlemi
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Mesajlar',
@@ -28,66 +28,176 @@ class MesajlarEkrani extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          children: [
-            // Arama Çubuğu
-            Container(
+      body: Column(
+        children: [
+          // ARAMA ÇUBUĞU
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
               height: 45,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.shade100, // Tasarımdaki açık gri arka plan
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const TextField(
                 decoration: InputDecoration(
-                  hintText: 'Sohbet ara...',
-                  hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
-                  prefixIcon: Icon(Icons.search, color: Colors.black54),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  hintText: "Sohbet ara...",
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+          ),
+          
+          // SOHBET LİSTESİ
+          Expanded(
+            child: ListView(
+              children: [
+                // 1. SOHBET (MERVE C. - SOHBET EKRANINA GİDER)
+                _mesajListesiKarti(
+                  context: context,
+                  isim: "Merve C.",
+                  sonMesaj: "Tamam, yarın saat 15:00'te buluşalım.",
+                  konum: "Üsküdar, İstanbul",
+                  saat: "10:35",
+                  okunmadiMi: true, // Mesaj metni daha siyah ve kalın
+                  urunResimYolu: "assets/images/ilanlar/bez.png", // Klasöründeki bez resmi
+                  hedefSayfa: const SohbetEkrani(), // TIKLANINCA GİDECEĞİ YER
+                ),
+                
+                // 2. SOHBET (ALİ C.)
+                _mesajListesiKarti(
+                  context: context,
+                  isim: "Ali C.",
+                  sonMesaj: "Mont hala duruyor mu?",
+                  konum: "Beyoğlu, İstanbul",
+                  saat: "18:42",
+                  okunmadiMi: false, // Gri mesaj metni
+                  urunResimYolu: "assets/images/ilanlar/mont2.png", // Klasöründeki mont resmi
+                ),
+                
+                // 3. SOHBET (MEHMET A.)
+                _mesajListesiKarti(
+                  context: context,
+                  isim: "Mehmet A.",
+                  sonMesaj: "Kitap için görüşebilir miyiz?",
+                  konum: "Kadıköy, İstanbul",
+                  saat: "Dün",
+                  okunmadiMi: false,
+                  urunResimYolu: "", // Resim yoksa gri kutu çıkar
+                ),
+
+                // 4. SOHBET (SEDA T.)
+                _mesajListesiKarti(
+                  context: context,
+                  isim: "Seda T.",
+                  sonMesaj: "Süpürge için teşekkür ederim çok iyi oldu.",
+                  konum: "Kadıköy, İstanbul",
+                  saat: "Dün",
+                  okunmadiMi: false,
+                  urunResimYolu: "",
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      // ALT MENÜYÜ EKLİYORUZ
+      bottomNavigationBar: const VestaAltMenu(),
+    );
+  }
+
+  // SOHBET SATIRI WIDGET'I (Tıklanabilir)
+  Widget _mesajListesiKarti({
+    required BuildContext context,
+    required String isim,
+    required String sonMesaj,
+    required String konum,
+    required String saat,
+    required bool okunmadiMi,
+    required String urunResimYolu,
+    Widget? hedefSayfa, // Eğer sayfa verilmişse ona gider, verilmemişse hiçbir şey yapmaz
+  }) {
+    return InkWell(
+      onTap: () {
+        if (hedefSayfa != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => hedefSayfa),
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.grey.shade300, width: 1)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // PROFİL FOTOĞRAFI
+            const CircleAvatar(
+              radius: 24,
+              backgroundColor: Color(0xFFF0F0F0),
+              child: Icon(Icons.person, color: Colors.grey, size: 28),
+            ),
+            const SizedBox(width: 12),
             
-            // Mesaj Listesi
+            // ORTA KISIM (İsim, Mesaj, Konum)
             Expanded(
-              child: ListView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMesajKarti(
-                    isim: 'Merve C.',
-                    sonMesaj: 'Tamam, yarın saat 15:00\'te buluşalım.',
-                    zaman: '10:35',
-                    okunmadi: true,
-                    konum: 'Üsküdar, İstanbul',
+                  Text(
+                    isim, 
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
-                  const Divider(height: 1),
-                  _buildMesajKarti(
-                    isim: 'Ali C.',
-                    sonMesaj: 'Mont hala duruyor mu?',
-                    zaman: '18:42',
-                    okunmadi: false,
-                    konum: 'Beyoğlu, İstanbul',
+                  const SizedBox(height: 4),
+                  Text(
+                    sonMesaj, 
+                    style: TextStyle(
+                      fontSize: 13, 
+                      color: okunmadiMi ? Colors.black87 : Colors.grey.shade600,
+                      fontWeight: okunmadiMi ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const Divider(height: 1),
-                  _buildMesajKarti(
-                    isim: 'Mehmet A.',
-                    sonMesaj: 'Kitap için görüşebilir miyiz?',
-                    zaman: 'Dün',
-                    okunmadi: false,
-                    konum: 'Kadıköy, İstanbul',
-                  ),
-                  const Divider(height: 1),
-                  _buildMesajKarti(
-                    isim: 'Seda T.',
-                    sonMesaj: 'Süpürge için teşekkür ederim çok iyi oldu.',
-                    zaman: 'Dün',
-                    okunmadi: false,
-                    konum: 'Kadıköy, İstanbul',
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined, size: 12, color: Colors.green),
+                      const SizedBox(width: 4),
+                      Text(konum, style: const TextStyle(fontSize: 11, color: Colors.green)),
+                    ],
                   ),
                 ],
               ),
+            ),
+            
+            const SizedBox(width: 8),
+            
+            // SAĞ KISIM (Saat ve Ürün Resmi)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(saat, style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: okunmadiMi ? FontWeight.bold : FontWeight.normal)),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: urunResimYolu.isNotEmpty
+                      ? Image.asset(
+                          urunResimYolu,
+                          width: 45,
+                          height: 45,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => _bosResimKutusu(),
+                        )
+                      : _bosResimKutusu(),
+                ),
+              ],
             ),
           ],
         ),
@@ -95,87 +205,16 @@ class MesajlarEkrani extends StatelessWidget {
     );
   }
 
-  // Mesaj Kartı Tasarım Şablonu
-  Widget _buildMesajKarti({
-    required String isim,
-    required String sonMesaj,
-    required String zaman,
-    required bool okunmadi,
-    required String konum,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        children: [
-          // Profil Fotoğrafı (Şimdilik Gri İkon)
-          const CircleAvatar(
-            radius: 28,
-            backgroundColor: Color(0xFFF5F5F5),
-            child: Icon(Icons.person, size: 30, color: Colors.grey),
-          ),
-          const SizedBox(width: 12),
-          // Mesaj İçeriği
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isim,
-                      style: TextStyle(
-                        fontWeight: okunmadi ? FontWeight.bold : FontWeight.w600,
-                        fontSize: 15,
-                        color: Colors.black87
-                      ),
-                    ),
-                    Text(
-                      zaman,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: okunmadi ? Colors.black87 : Colors.grey,
-                        fontWeight: okunmadi ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sonMesaj,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: okunmadi ? Colors.black87 : Colors.grey.shade600,
-                    fontWeight: okunmadi ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 12, color: Colors.green),
-                    const SizedBox(width: 4),
-                    Text(konum, style: const TextStyle(fontSize: 11, color: Colors.green)),
-                  ],
-                )
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Konuşulan Ürün Fotoğrafı (Şimdilik Placeholder)
-          Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300)
-            ),
-            child: const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
-          ),
-        ],
+  // Resim yoksa gösterilecek gri yer tutucu
+  Widget _bosResimKutusu() {
+    return Container(
+      width: 45,
+      height: 45,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(8),
       ),
+      child: const Icon(Icons.image_outlined, color: Colors.grey, size: 20),
     );
   }
 }

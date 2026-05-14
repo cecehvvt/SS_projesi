@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import '../../widgets/alt_menu.dart'; // Alt menüyü import ettik
+import 'sikayet_destek_ekrani.dart'; // YENİ: Geçiş yapılacak sayfa
 
-class AyarlarEkrani extends StatelessWidget {
+class AyarlarEkrani extends StatefulWidget {
   const AyarlarEkrani({super.key});
+
+  @override
+  State<AyarlarEkrani> createState() => _AyarlarEkraniState();
+}
+
+class _AyarlarEkraniState extends State<AyarlarEkrani> {
+  // Switch'lerin durumlarını tutmak için değişkenler
+  bool profilGorumumu = true;
+  bool mesajAlma = true;
+  bool konumGosterimi = false;
+  bool karanlikMod = false;
+  bool bildirimler = true;
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +26,7 @@ class AyarlarEkrani extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () {
-            // Geri dönme işlemi
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Ayarlar',
@@ -32,7 +44,7 @@ class AyarlarEkrani extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9), // Hafif yeşil
+                  color: const Color(0xFFE8F5E9), 
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.green.shade200),
                 ),
@@ -60,31 +72,43 @@ class AyarlarEkrani extends StatelessWidget {
 
               // Hesap Ayarları Bölümü
               _buildBolumBasligi(Icons.person_outline, 'Hesap Ayarları'),
-              _buildMenuElemani('Profilimi Düzenle'),
-              _buildMenuElemani('Şifre Değiştir'),
-              _buildMenuElemani('Telefon Numaram'),
-              _buildMenuElemani('E-posta Adresim'),
+              _buildMenuElemani(context, 'Profilimi Düzenle'),
+              _buildMenuElemani(context, 'Şifre Değiştir'),
+              _buildMenuElemani(context, 'Telefon Numaram'),
+              _buildMenuElemani(context, 'E-posta Adresim'),
               const Divider(height: 32),
 
               // Gizlilik Ayarları Bölümü
               _buildBolumBasligi(Icons.lock_outline, 'Gizlilik Ayarları'),
-              _buildSwitchElemani('Profil başkalarının görmesine izin ver', true),
-              _buildSwitchElemani('Mesaj almayı etkinleştir', true),
-              _buildSwitchElemani('Konumu ilanlarda göster', false),
+              _buildSwitchElemani('Profil başkalarının görmesine izin ver', profilGorumumu, (val) => setState(() => profilGorumumu = val)),
+              _buildSwitchElemani('Mesaj almayı etkinleştir', mesajAlma, (val) => setState(() => mesajAlma = val)),
+              _buildSwitchElemani('Konumu ilanlarda göster', konumGosterimi, (val) => setState(() => konumGosterimi = val)),
               const Divider(height: 32),
 
               // Şikayet ve Destek Bölümü
               _buildBolumBasligi(Icons.headset_mic_outlined, 'Şikayet ve Destek'),
-              _buildMenuElemani('Kullanıcıyı Şikayet Et'),
-              _buildMenuElemani('Yardım & Destek'),
-              _buildMenuElemani('Kullanım Koşulları'),
+              _buildMenuElemani(context, 'Kullanıcıyı Şikayet Et'),
+              
+              // YENİ: Rota bağlanan Yardım & Destek butonu
+              _buildMenuElemani(
+                context, 
+                'Yardım & Destek',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SikayetDestekEkrani()),
+                  );
+                }
+              ),
+              
+              _buildMenuElemani(context, 'Kullanım Koşulları'),
               const Divider(height: 32),
 
               // Uygulama Tercihleri Bölümü
               _buildBolumBasligi(Icons.settings_outlined, 'Uygulama Tercihleri'),
-              _buildSwitchElemani('Karanlık Mod', false),
-              _buildSwitchElemani('Bildirimler', true),
-              _buildMenuElemani('Dil Seçimi', sagTarafYazisi: 'Türkçe'),
+              _buildSwitchElemani('Karanlık Mod', karanlikMod, (val) => setState(() => karanlikMod = val)),
+              _buildSwitchElemani('Bildirimler', bildirimler, (val) => setState(() => bildirimler = val)),
+              _buildMenuElemani(context, 'Dil Seçimi', sagTarafYazisi: 'Türkçe'),
               
               const SizedBox(height: 32),
 
@@ -112,6 +136,8 @@ class AyarlarEkrani extends StatelessWidget {
           ),
         ),
       ),
+      // Alt menüyü ekliyoruz
+      bottomNavigationBar: const VestaAltMenu(),
     );
   }
 
@@ -129,30 +155,33 @@ class AyarlarEkrani extends StatelessWidget {
     );
   }
 
-  // Normal Menü Satırları (Sağında ok veya yazı olanlar)
-  Widget _buildMenuElemani(String baslik, {String? sagTarafYazisi}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(baslik, style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500)),
-          Row(
-            children: [
-              if (sagTarafYazisi != null) ...[
-                Text(sagTarafYazisi, style: const TextStyle(fontSize: 13, color: Colors.black54)),
-                const SizedBox(width: 8),
+  // YENİ: Tıklanabilir (InkWell) Menü Satırları
+  Widget _buildMenuElemani(BuildContext context, String baslik, {String? sagTarafYazisi, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(baslik, style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500)),
+            Row(
+              children: [
+                if (sagTarafYazisi != null) ...[
+                  Text(sagTarafYazisi, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                  const SizedBox(width: 8),
+                ],
+                const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
               ],
-              const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // Aç-Kapat (Switch) Menü Satırları
-  Widget _buildSwitchElemani(String baslik, bool acikMi) {
+  // YENİ: Çalışan (Stateful) Switch Elemanı
+  Widget _buildSwitchElemani(String baslik, bool acikMi, Function(bool) onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
       child: Row(
@@ -161,7 +190,7 @@ class AyarlarEkrani extends StatelessWidget {
           Expanded(child: Text(baslik, style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500))),
           Switch(
             value: acikMi,
-            onChanged: (bool value) {},
+            onChanged: onChanged, // Artık tıklanınca açılıp kapanıyor
             activeThumbColor: Colors.white,
             activeTrackColor: Colors.green,
             inactiveThumbColor: Colors.white,

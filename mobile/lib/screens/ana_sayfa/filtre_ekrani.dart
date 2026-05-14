@@ -60,7 +60,7 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(color: const Color(0xFFE8F5E9), shape: BoxShape.circle),
+                        decoration: const BoxDecoration(color: Color(0xFFE8F5E9), shape: BoxShape.circle),
                         child: const Icon(Icons.filter_list, color: Colors.black87),
                       ),
                       const SizedBox(width: 12),
@@ -89,9 +89,9 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
                   const SizedBox(height: 24),
 
                   // ACİLİYET BÖLÜMÜ
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children: [
                       Text("Aciliyet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       Text("(Sadece ihtiyaçlar için)", style: TextStyle(fontSize: 12, color: Colors.black54)),
                       Icon(Icons.info, size: 18, color: Colors.black87)
@@ -144,14 +144,14 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, color: Colors.black87),
-                        const SizedBox(width: 8),
-                        const Expanded(child: Text("İstanbul, Türkiye", style: TextStyle(fontSize: 14))),
-                        Text("Değiştir", style: TextStyle(color: const Color(0xFF2E7D32), fontSize: 13, fontWeight: FontWeight.w600)),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.black87),
+                        Icon(Icons.location_on_outlined, color: Colors.black87),
+                        SizedBox(width: 8),
+                        Expanded(child: Text("İstanbul, Türkiye", style: TextStyle(fontSize: 14))),
+                        Text("Değiştir", style: TextStyle(color: Color(0xFF2E7D32), fontSize: 13, fontWeight: FontWeight.w600)),
+                        SizedBox(width: 4),
+                        Icon(Icons.arrow_forward_ios, size: 12, color: Colors.black87),
                       ],
                     ),
                   ),
@@ -173,9 +173,9 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.filter_list, color: Colors.white, size: 20),
                         SizedBox(width: 8),
                         Text("Filtreleri Uygula (3)", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),

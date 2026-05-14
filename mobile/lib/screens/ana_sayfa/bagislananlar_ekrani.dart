@@ -76,8 +76,8 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
                     ),
-                    child: Row(
-                      children: const [
+                    child: const Row(
+                      children: [
                         Icon(Icons.filter_alt_outlined, color: Colors.green),
                         SizedBox(width: 6),
                         Text("Filtrele", style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
