@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'filtre_ekrani.dart'; // Filtre ekranını buraya bağladık
 
 class BagislananlarEkrani extends StatefulWidget {
   const BagislananlarEkrani({super.key});
@@ -56,20 +57,32 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  height: 45,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.filter_alt_outlined, color: Colors.green),
-                      SizedBox(width: 6),
-                      Text("Filtrele", style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
-                    ],
+                
+                // FİLTRELE BUTONU (Tıklanabilir yapıldı)
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true, // Tam ekran açılması için
+                      backgroundColor: Colors.transparent, // Arka plan ovalliği için
+                      builder: (context) => const FiltreEkrani(),
+                    );
+                  },
+                  child: Container(
+                    height: 45,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.filter_alt_outlined, color: Colors.green),
+                        SizedBox(width: 6),
+                        Text("Filtrele", style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -143,7 +156,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
           ),
           const SizedBox(height: 16),
 
-          // İLAN LİSTESİ (GÜNCELLENMİŞ RESİMLİ)
+          // İLAN LİSTESİ
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -178,7 +191,7 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                   "Beyoğlu, İstanbul", 
                   "2 saat önce", 
                   "6 km",
-                  "assets/images/ilanlar/mont2.png" // <-- RESİM DEĞİŞTİRİLDİ
+                  "assets/images/ilanlar/mont2.png" 
                 ),
                 const SizedBox(height: 20), 
               ],

@@ -8,29 +8,22 @@ class FavorilerEkrani extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFB2D3C2), // Figma'daki yeşil ton
+        backgroundColor: const Color(0xFFAFD6C4), 
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () {
-            // Burası seni ana sayfaya veya bir önceki sayfaya götürür
-            Navigator.maybePop(context);
-          },
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Favorilerim',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
-          // 1. İlan: Bebek Bezi
+          // 1. İlan: Bebek Bezi (Yerel resim kullanıldı)
           FavoriteProductCard(
             title: 'Bebek Bezi (2 Numara)',
             category: 'Bebek & Çocuk',
@@ -38,11 +31,10 @@ class FavorilerEkrani extends StatelessWidget {
             user: 'Merve C.',
             location: 'Üsküdar, İstanbul',
             time: '2 saat önce',
-            imageUrl:
-                'https://via.placeholder.com/150', // Şimdilik yer tutucu görsel
+            imageUrl: 'assets/images/ilanlar/bez.png', 
           ),
           SizedBox(height: 16),
-          // 2. İlan: Elektrikli Isıtıcı
+          // 2. İlan: Elektrikli Isıtıcı (Yerel resim kullanıldı)
           FavoriteProductCard(
             title: 'Elektrikli Isıtıcı',
             category: 'Ev & Yaşam',
@@ -50,13 +42,43 @@ class FavorilerEkrani extends StatelessWidget {
             user: 'Ali K.',
             location: 'Beyoğlu, İstanbul',
             time: '5 saat önce',
-            imageUrl: 'https://via.placeholder.com/150',
+            imageUrl: 'assets/images/ilanlar/isitici.png',
           ),
           SizedBox(height: 24),
           // Bilgi Kutusu
           InfoBox(),
         ],
       ),
+      // ALT MENÜ EKLENDİ
+      bottomNavigationBar: Container(
+        height: 65,
+        decoration: BoxDecoration(
+          color: const Color(0xFFAFD6C4),
+          border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _altMenuElemani(Icons.home_outlined, "Anasayfa"),
+            _altMenuElemani(Icons.chat_bubble_outline, "Mesajlar"),
+            _altMenuElemani(Icons.add_circle_outline, "İlan Oluştur", ikonBoyutu: 28),
+            _altMenuElemani(Icons.favorite_border, "Favoriler"),
+            _altMenuElemani(Icons.shopping_bag_outlined, "Sepetim"),
+            _altMenuElemani(Icons.person_outline, "Profilim"),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _altMenuElemani(IconData ikon, String baslik, {double ikonBoyutu = 24}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(ikon, color: Colors.black87, size: ikonBoyutu),
+        const SizedBox(height: 2),
+        Text(baslik, style: const TextStyle(color: Colors.black87, fontSize: 10, fontWeight: FontWeight.w600)),
+      ],
     );
   }
 }
@@ -84,23 +106,23 @@ class FavoriteProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ürün Görseli
+          // Ürün Görseli (Image.network yerine Image.asset yapıldı)
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(
+            child: Image.asset(
               imageUrl,
               width: 80,
-              height: 80,
+              height: 100,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 80, height: 100, color: Colors.grey.shade200, child: const Icon(Icons.image_not_supported),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -109,68 +131,55 @@ class FavoriteProductCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  category,
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: const Color(0xFFDFF0E6), borderRadius: BorderRadius.circular(4)),
+                      child: Text(category, style: TextStyle(color: Colors.green.shade700, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                    const Icon(Icons.favorite, color: Colors.black87, size: 20),
+                  ],
                 ),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
+                const SizedBox(height: 6),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 4),
+                Text(description, style: const TextStyle(fontSize: 11, color: Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.person_outline, size: 14, color: Colors.black87),
+                    const SizedBox(width: 4),
+                    Text(user, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 12,
-                      color: Colors.grey,
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(location, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      location,
-                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2E7D32),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        minimumSize: const Size(60, 26),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 0,
+                      ),
+                      child: const Text('İncele', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
-                Text(
-                  time,
-                  style: const TextStyle(color: Colors.grey, fontSize: 10),
-                ),
               ],
             ),
-          ),
-          // Favori İkonu ve Buton
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Icon(Icons.favorite, color: Colors.red, size: 20),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2E7D32),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  minimumSize: const Size(60, 25),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text(
-                  'İncele',
-                  style: TextStyle(fontSize: 10, color: Colors.white),
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -184,19 +193,19 @@ class InfoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1FAF6),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFF2FAF6),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.info_outline, size: 20, color: Colors.black54),
-          SizedBox(width: 10),
+          const Icon(Icons.info_outline, size: 28, color: Colors.black87),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               'Favoriye aldığınız ilanlar yayından kaldırıldığında listeden otomatik olarak silinir.',
-              style: TextStyle(fontSize: 11, color: Colors.black54),
+              style: TextStyle(color: Colors.black87.withOpacity(0.7), fontSize: 11),
             ),
           ),
         ],
@@ -204,3 +213,4 @@ class InfoBox extends StatelessWidget {
     );
   }
 }
+

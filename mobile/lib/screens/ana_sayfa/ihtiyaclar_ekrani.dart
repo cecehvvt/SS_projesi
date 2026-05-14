@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'filtre_ekrani.dart'; // Filtre ekranını buraya bağladık
 
 class IhtiyaclarEkrani extends StatefulWidget {
   const IhtiyaclarEkrani({super.key});
@@ -31,7 +32,7 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
 
       body: Column(
         children: [
-          // ARAMA BÖLÜMÜ
+          // ARAMA VE FİLTRE İKONU BÖLÜMÜ
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -54,7 +55,19 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Icon(Icons.filter_alt_outlined, color: Colors.black54, size: 28),
+                
+                // FİLTRELE İKONU (Tıklanabilir yapıldı)
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true, // Tam ekran açılması için
+                      backgroundColor: Colors.transparent, // Arka plan ovalliği için
+                      builder: (context) => const FiltreEkrani(),
+                    );
+                  },
+                  child: const Icon(Icons.filter_alt_outlined, color: Colors.black54, size: 30),
+                ),
               ],
             ),
           ),
