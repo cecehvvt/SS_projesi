@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'filtre_ekrani.dart'; // Filtre ekranını buraya bağladık
+import 'filtre_ekrani.dart';
 
 class IhtiyaclarEkrani extends StatefulWidget {
   const IhtiyaclarEkrani({super.key});
@@ -9,15 +9,12 @@ class IhtiyaclarEkrani extends StatefulWidget {
 }
 
 class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
-  String seciliSekme = "İhtiyaçlar";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4D8CD), // Tasarımdaki şeftali tonu
+        backgroundColor: const Color(0xFFF4D8CD),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
@@ -29,10 +26,8 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
         ),
         centerTitle: true,
       ),
-
       body: Column(
         children: [
-          // ARAMA VE FİLTRE İKONU BÖLÜMÜ
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -55,95 +50,57 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                
-                // FİLTRELE İKONU (Tıklanabilir yapıldı)
                 GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
-                      isScrollControlled: true, // Tam ekran açılması için
-                      backgroundColor: Colors.transparent, // Arka plan ovalliği için
-                      builder: (context) => const FiltreEkrani(),
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const FiltreEkrani.ihtiyac(),
                     );
                   },
-                  child: const Icon(Icons.filter_alt_outlined, color: Colors.black54, size: 30),
+                  child: const Icon(
+                    Icons.filter_alt_outlined,
+                    color: Colors.black54,
+                    size: 30,
+                  ),
                 ),
               ],
             ),
           ),
-
-          // SEKMELER
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              height: 40,
-              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
-              child: Row(
-                children: ["Tümü", "Bağışlananlar", "İhtiyaçlar"].map((tab) {
-                  bool secili = seciliSekme == tab;
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => seciliSekme = tab),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: secili ? const Color(0xFFF9E8E1) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Center(
-                          child: Text(
-                            tab,
-                            style: TextStyle(
-                              fontSize: 12, 
-                              fontWeight: secili ? FontWeight.bold : FontWeight.normal,
-                              color: secili ? Colors.brown : Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // İHTİYAÇ LİSTESİ
+          const SizedBox(height: 8),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                // YENİ: Bebek Bezi kartına tıklanabilirlik (onTap) eklendi
                 _ihtiyacKarti(
-                  "Bebek Bezi", 
-                  "4 Numara bebek bezine acil ihtiyacımız var. 2 paket olsa yeterli.", 
-                  "Rabia C.", 
-                  "Üsküdar, İstanbul", 
-                  "3 saat önce", 
+                  "Bebek Bezi",
+                  "4 Numara bebek bezine acil ihtiyacımız var. 2 paket olsa yeterli.",
+                  "Rabia C.",
+                  "Üsküdar, İstanbul",
+                  "3 saat önce",
                   "assets/images/ilanlar/bez.png",
                   isAcil: true,
                   onTap: () {
-                    // Sihirli dokunuş: İhtiyaç detay sayfasına yönlendirir!
                     Navigator.pushNamed(context, '/ihtiyac_detay');
-                  }
+                  },
                 ),
                 _ihtiyacKarti(
-                  "Elektrikli Isıtıcı", 
-                  "Evimiz çok soğuk oluyor, bebeğimiz için ısıtıcıya ihtiyacımız var.", 
-                  "Fatma Y.", 
-                  "Beyoğlu, İstanbul", 
-                  "3 saat önce", 
+                  "Elektrikli Isıtıcı",
+                  "Evimiz çok soğuk oluyor, bebeğimiz için ısıtıcıya ihtiyacımız var.",
+                  "Fatma Y.",
+                  "Beyoğlu, İstanbul",
+                  "3 saat önce",
                   "assets/images/ilanlar/isitici.png",
-                  isAcil: true
+                  isAcil: true,
                 ),
                 _ihtiyacKarti(
-                  "Akıllı Telefon", 
-                  "Öğrenciyim, derslerim için çalışan bir telefona ihtiyacım var.", 
-                  "Murat G.", 
-                  "Beşiktaş, İstanbul", 
-                  "5 saat önce", 
+                  "Akıllı Telefon",
+                  "Öğrenciyim, derslerim için çalışan bir telefona ihtiyacım var.",
+                  "Murat G.",
+                  "Beşiktaş, İstanbul",
+                  "5 saat önce",
                   "assets/images/ilanlar/telefon.png",
-                  isAcil: false
                 ),
               ],
             ),
@@ -153,22 +110,36 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
     );
   }
 
-  // YENİ: onTap parametresi eklendi ve GestureDetector ile sarıldı
-  Widget _ihtiyacKarti(String baslik, String aciklama, String kisi, String konum, String sure, String resimYolu, {bool isAcil = false, VoidCallback? onTap}) {
+  Widget _ihtiyacKarti(
+    String baslik,
+    String aciklama,
+    String kisi,
+    String konum,
+    String sure,
+    String resimYolu, {
+    bool isAcil = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
-      onTap: onTap, // Kartın tamamını tıklanabilir yapar
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isAcil ? Colors.orange.shade200 : Colors.grey.shade200),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+          border: Border.all(
+            color: isAcil ? Colors.orange.shade200 : Colors.grey.shade200,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
+            ),
+          ],
         ),
         child: Row(
           children: [
-            // ÜRÜN RESMİ
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
@@ -177,12 +148,14 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                 height: 110,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  width: 90, height: 110, color: Colors.grey.shade100, child: const Icon(Icons.image_not_supported),
+                  width: 90,
+                  height: 110,
+                  color: Colors.grey.shade100,
+                  child: const Icon(Icons.image_not_supported),
                 ),
               ),
             ),
             const SizedBox(width: 12),
-            // DETAYLAR
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,17 +163,41 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text(
+                        baslik,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
                       if (isAcil)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.red.shade400, borderRadius: BorderRadius.circular(4)),
-                          child: const Text("ACİL", style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade400,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            "ACİL",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(aciklama, style: const TextStyle(fontSize: 12, color: Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(
+                    aciklama,
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -208,7 +205,13 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                       const SizedBox(width: 4),
                       Text(kisi, style: const TextStyle(fontSize: 11)),
                       const Spacer(),
-                      Text(sure, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                      Text(
+                        sure,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -217,23 +220,39 @@ class _IhtiyaclarEkraniState extends State<IhtiyaclarEkrani> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 2),
-                          Text(konum, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                          Text(
+                            konum,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ],
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          // İleride direkt yardım etme işlemi için burası kullanılabilir
-                          if(onTap != null) onTap();
-                        },
+                        onPressed: onTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange.shade400,
                           minimumSize: const Size(80, 28),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           elevation: 0,
                         ),
-                        child: const Text("Yardım Et", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          "Yardım Et",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),

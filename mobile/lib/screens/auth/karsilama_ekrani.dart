@@ -13,14 +13,7 @@ class KarsilamaEkrani extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-            const Text(
-              "VESTA",
-              style: TextStyle(
-                fontSize: 45,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Serif",
-              ),
-            ),
+            Image.asset('assets/images/vesta_logo.png', width: 260),
             const SizedBox(height: 80),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -39,9 +32,7 @@ class KarsilamaEkrani extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const GirisEkrani(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const GirisEkrani()),
                       );
                     },
                     child: const Text(
@@ -65,9 +56,7 @@ class KarsilamaEkrani extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const KayitEkrani(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const KayitEkrani()),
                       );
                     },
                     child: const Text(

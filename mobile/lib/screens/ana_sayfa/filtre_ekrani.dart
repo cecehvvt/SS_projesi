@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 
+enum FiltreTuru { ihtiyac, bagis }
+
 class FiltreEkrani extends StatefulWidget {
-  const FiltreEkrani({super.key});
+  final FiltreTuru tur;
+
+  const FiltreEkrani.ihtiyac({super.key}) : tur = FiltreTuru.ihtiyac;
+  const FiltreEkrani.bagis({super.key}) : tur = FiltreTuru.bagis;
 
   @override
   State<FiltreEkrani> createState() => _FiltreEkraniState();
 }
 
 class _FiltreEkraniState extends State<FiltreEkrani> {
-  double _mesafe = 15.0; // Varsayılan mesafe
-  bool _sadeceFotografli = false;
-  bool _iletisimeGecilenleriGizle = false;
+  double _mesafe = 15.0;
+  String? _ihtiyacKategorisi;
+  String? _aciliyet;
+  String? _ihtiyacDurumu;
+  String? _urunTuru;
+  String? _kondisyon;
+  String? _uygunluk;
+
+  bool get _ihtiyacFiltresi => widget.tur == FiltreTuru.ihtiyac;
 
   @override
   Widget build(BuildContext context) {
+    final Color vurguRengi = _ihtiyacFiltresi
+        ? const Color(0xFFD46A3A)
+        : const Color(0xFF2E7D32);
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9, // Ekranın %90'ını kaplasın
+      height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -23,12 +38,15 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. ÜST BAR (Sürükleme çizgisi, Geri, Başlık, Temizle)
           const SizedBox(height: 12),
           Center(
             child: Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
           Padding(
@@ -37,148 +55,70 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.black,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
-                const Text("Filtrele", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  _ihtiyacFiltresi ? "İhtiyaç Filtreleri" : "Bağış Filtreleri",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 TextButton(
-                  onPressed: () {},
-                  child: const Text("Temizle", style: TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.bold, fontSize: 15)),
-                )
+                  onPressed: _temizle,
+                  child: Text(
+                    "Temizle",
+                    style: TextStyle(
+                      color: vurguRengi,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // BİLGİ KUTUSU
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(color: Color(0xFFE8F5E9), shape: BoxShape.circle),
-                        child: const Icon(Icons.filter_list, color: Colors.black87),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text("İhtiyaçlarınıza uygun ilanları\nkolayca bulabilirsiniz.", style: TextStyle(color: Colors.black87, fontSize: 13)),
-                      )
-                    ],
-                  ),
+                  _bilgiKutusu(vurguRengi),
                   const SizedBox(height: 24),
-
-                  // KATEGORİ BÖLÜMÜ
-                  const Text("Kategori", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8, runSpacing: 10,
-                    children: [
-                      _kategoriButonu("Kadın Giyim", Icons.checkroom),
-                      _kategoriButonu("Erkek Giyim", Icons.accessibility_new),
-                      _kategoriButonu("Bebek&Çocuk", Icons.child_care),
-                      _kategoriButonu("Elektronik", Icons.tv),
-                      _kategoriButonu("Ev & Yaşam", Icons.home_outlined),
-                      _kategoriButonu("Kitap&Kırtasiye", Icons.menu_book),
-                      _kategoriButonu("Diğer", Icons.more_horiz),
-                    ],
-                  ),
+                  if (_ihtiyacFiltresi)
+                    ..._ihtiyacAlanlari(vurguRengi)
+                  else
+                    ..._bagisAlanlari(vurguRengi),
                   const SizedBox(height: 24),
-
-                  // ACİLİYET BÖLÜMÜ
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Aciliyet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text("(Sadece ihtiyaçlar için)", style: TextStyle(fontSize: 12, color: Colors.black54)),
-                      Icon(Icons.info, size: 18, color: Colors.black87)
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _aciliyetButonu("Acil", Icons.error_outline, const Color(0xFFFFEBEE), const Color(0xFFD32F2F)),
-                      const SizedBox(width: 8),
-                      _aciliyetButonu("Orta", Icons.access_time, const Color(0xFFFFF8E1), const Color(0xFFF57F17)),
-                      const SizedBox(width: 8),
-                      _aciliyetButonu("Normal", Icons.check_circle_outline, const Color(0xFFE8F5E9), const Color(0xFF2E7D32)),
-                    ],
-                  ),
+                  _konumAlani(vurguRengi),
                   const SizedBox(height: 30),
-
-                  // MESAFE (SLIDER) BÖLÜMÜ
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("0 km", style: TextStyle(color: Colors.black54, fontSize: 13)),
-                      Text("${_mesafe.toInt()} km", style: const TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.bold, fontSize: 15)),
-                      const Text("50 km", style: TextStyle(color: Colors.black54, fontSize: 13)),
-                    ],
-                  ),
-                  SliderTheme(
-                    data: SliderThemeData(
-                      activeTrackColor: const Color(0xFF2E7D32),
-                      inactiveTrackColor: Colors.grey.shade300,
-                      thumbColor: const Color(0xFF2E7D32),
-                      trackHeight: 6,
-                    ),
-                    child: Slider(
-                      value: _mesafe,
-                      min: 0,
-                      max: 50,
-                      onChanged: (value) => setState(() => _mesafe = value),
-                    ),
-                  ),
-                  const Text("Seçtiğiniz konuma 15 km çevresindeki ilanlar gösterilecek.", style: TextStyle(fontSize: 11, color: Colors.black87)),
-                  const SizedBox(height: 24),
-
-                  // KONUM BÖLÜMÜ
-                  const Text("Konum", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.location_on_outlined, color: Colors.black87),
-                        SizedBox(width: 8),
-                        Expanded(child: Text("İstanbul, Türkiye", style: TextStyle(fontSize: 14))),
-                        Text("Değiştir", style: TextStyle(color: Color(0xFF2E7D32), fontSize: 13, fontWeight: FontWeight.w600)),
-                        SizedBox(width: 4),
-                        Icon(Icons.arrow_forward_ios, size: 12, color: Colors.black87),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // DİĞER FİLTRELER BÖLÜMÜ
-                  const Text("Diğer Filtreler", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 8),
-                  _filtreSecenegi("Sadece fotoğraflı ilanları göster.", _sadeceFotografli, (val) => setState(() => _sadeceFotografli = val!)),
-                  const SizedBox(height: 8),
-                  _filtreSecenegi("Daha önce iletişime geçtiğim ilanları gizle.", _iletisimeGecilenleriGizle, (val) => setState(() => _iletisimeGecilenleriGizle = val!)),
-                  const SizedBox(height: 30),
-
-                  // ALT BUTONLAR
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF009F3C),
+                      backgroundColor: vurguRengi,
                       minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.filter_list, color: Colors.white, size: 20),
                         SizedBox(width: 8),
-                        Text("Filtreleri Uygula (3)", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(
+                          "Filtreleri Uygula",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -187,10 +127,19 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
-                      side: const BorderSide(color: Color(0xFF009F3C)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: vurguRengi),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text("İptal", style: TextStyle(color: Color(0xFF009F3C), fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "İptal",
+                      style: TextStyle(
+                        color: vurguRengi,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],
@@ -202,66 +151,234 @@ class _FiltreEkraniState extends State<FiltreEkrani> {
     );
   }
 
-  // Kategori Butonu Tasarımı
-  Widget _kategoriButonu(String baslik, IconData ikon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(ikon, size: 16, color: Colors.black87),
-          const SizedBox(width: 6),
-          Text(baslik, style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 12, fontWeight: FontWeight.w600)),
-        ],
-      ),
+  Widget _bilgiKutusu(Color renk) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: renk.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.filter_list, color: Colors.black87),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            _ihtiyacFiltresi
+                ? "İhtiyaç ilanlarını size uygun alanlarla filtreleyin."
+                : "Bağış ilanlarını ürün bilgilerine göre filtreleyin.",
+            style: const TextStyle(color: Colors.black87, fontSize: 13),
+          ),
+        ),
+      ],
     );
   }
 
-  // Aciliyet Butonu Tasarımı
-  Widget _aciliyetButonu(String baslik, IconData ikon, Color bgColor, Color textColor) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: textColor.withOpacity(0.5)),
+  List<Widget> _ihtiyacAlanlari(Color renk) {
+    return [
+      _secimBolumu(
+        baslik: "İhtiyaç Kategorisi",
+        seciliDeger: _ihtiyacKategorisi,
+        renk: renk,
+        secenekler: const [
+          "Giyim",
+          "Bebek & Çocuk",
+          "Elektronik",
+          "Ev & Yaşam",
+          "Eğitim",
+          "Diğer",
+        ],
+        onSelected: (deger) => setState(() => _ihtiyacKategorisi = deger),
+      ),
+      const SizedBox(height: 24),
+      _secimBolumu(
+        baslik: "Aciliyet",
+        seciliDeger: _aciliyet,
+        renk: renk,
+        secenekler: const ["Acil", "Orta", "Normal"],
+        onSelected: (deger) => setState(() => _aciliyet = deger),
+      ),
+      const SizedBox(height: 24),
+      _secimBolumu(
+        baslik: "Durum",
+        seciliDeger: _ihtiyacDurumu,
+        renk: renk,
+        secenekler: const ["Açık", "Yardım bekliyor", "Karşılandı"],
+        onSelected: (deger) => setState(() => _ihtiyacDurumu = deger),
+      ),
+    ];
+  }
+
+  List<Widget> _bagisAlanlari(Color renk) {
+    return [
+      _secimBolumu(
+        baslik: "Ürün Türü",
+        seciliDeger: _urunTuru,
+        renk: renk,
+        secenekler: const [
+          "Giyim",
+          "Bebek & Çocuk",
+          "Elektronik",
+          "Mobilya",
+          "Kitap & Kırtasiye",
+          "Diğer",
+        ],
+        onSelected: (deger) => setState(() => _urunTuru = deger),
+      ),
+      const SizedBox(height: 24),
+      _secimBolumu(
+        baslik: "Kondisyon",
+        seciliDeger: _kondisyon,
+        renk: renk,
+        secenekler: const [
+          "Yeni",
+          "Az kullanılmış",
+          "İyi",
+          "Onarım gerekebilir",
+        ],
+        onSelected: (deger) => setState(() => _kondisyon = deger),
+      ),
+      const SizedBox(height: 24),
+      _secimBolumu(
+        baslik: "Uygunluk",
+        seciliDeger: _uygunluk,
+        renk: renk,
+        secenekler: const ["Uygun", "Rezerve", "Teslim edildi"],
+        onSelected: (deger) => setState(() => _uygunluk = deger),
+      ),
+    ];
+  }
+
+  Widget _secimBolumu({
+    required String baslik,
+    required String? seciliDeger,
+    required Color renk,
+    required List<String> secenekler,
+    required ValueChanged<String> onSelected,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          baslik,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 10,
+          children: secenekler.map((secenek) {
+            final bool secili = seciliDeger == secenek;
+            return ChoiceChip(
+              label: Text(secenek),
+              selected: secili,
+              onSelected: (_) => onSelected(secenek),
+              selectedColor: renk.withValues(alpha: 0.18),
+              backgroundColor: Colors.grey.shade100,
+              labelStyle: TextStyle(
+                color: secili ? renk : Colors.black87,
+                fontSize: 12,
+                fontWeight: secili ? FontWeight.bold : FontWeight.w600,
+              ),
+              side: BorderSide(color: secili ? renk : Colors.grey.shade300),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _konumAlani(Color renk) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Konum",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(ikon, size: 16, color: textColor),
-            const SizedBox(width: 6),
-            Text(baslik, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold)),
+            const Text(
+              "0 km",
+              style: TextStyle(color: Colors.black54, fontSize: 13),
+            ),
+            Text(
+              "${_mesafe.toInt()} km",
+              style: TextStyle(
+                color: renk,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+            const Text(
+              "50 km",
+              style: TextStyle(color: Colors.black54, fontSize: 13),
+            ),
           ],
         ),
-      ),
+        SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: renk,
+            inactiveTrackColor: Colors.grey.shade300,
+            thumbColor: renk,
+            trackHeight: 6,
+          ),
+          child: Slider(
+            value: _mesafe,
+            min: 0,
+            max: 50,
+            onChanged: (value) => setState(() => _mesafe = value),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.location_on_outlined, color: Colors.black87),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  "İstanbul, Türkiye",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+              Text(
+                "Değiştir",
+                style: TextStyle(
+                  color: renk,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.arrow_forward_ios,
+                size: 12,
+                color: Colors.black87,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  // Checkbox Tasarımı
-  Widget _filtreSecenegi(String metin, bool deger, Function(bool?) onChanged) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Theme(
-        data: ThemeData(unselectedWidgetColor: Colors.black87),
-        child: CheckboxListTile(
-          value: deger,
-          onChanged: onChanged,
-          title: Text(metin, style: const TextStyle(fontSize: 13, color: Colors.black87)),
-          controlAffinity: ListTileControlAffinity.leading,
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          activeColor: const Color(0xFF2E7D32),
-        ),
-      ),
-    );
+  void _temizle() {
+    setState(() {
+      _mesafe = 15.0;
+      _ihtiyacKategorisi = null;
+      _aciliyet = null;
+      _ihtiyacDurumu = null;
+      _urunTuru = null;
+      _kondisyon = null;
+      _uygunluk = null;
+    });
   }
 }
