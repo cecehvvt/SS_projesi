@@ -13,13 +13,6 @@ class ProfilEkrani extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () {
-            // Geri tuşuna basınca bir önceki sayfaya döner
-            Navigator.pop(context);
-          },
-        ),
         title: const Text(
           'Profilim',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),

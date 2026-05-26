@@ -10,10 +10,6 @@ class FavorilerEkrani extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFAFD6C4), 
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           'Favorilerim',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),

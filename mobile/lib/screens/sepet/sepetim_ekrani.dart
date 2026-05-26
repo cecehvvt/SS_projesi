@@ -7,18 +7,18 @@ class SepetimEkrani extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      
+
       // ÜST BAR (Mint Yeşili)
       appBar: AppBar(
         backgroundColor: const Color(0xFFAFD6C4),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           "Sepetim",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
       ),
@@ -38,7 +38,7 @@ class SepetimEkrani extends StatelessWidget {
                   resimYolu: "assets/images/ilanlar/bez.png",
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 2. ÜRÜN: KIŞLIK MONT
                 _sepetKarti(
                   baslik: "Kışlık Mont",
@@ -51,19 +51,29 @@ class SepetimEkrani extends StatelessWidget {
 
                 // BİLGİ KUTUSU
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF2FAF6), // Çok açık mint/beyaz
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
+                      const Icon(
+                        Icons.shopping_cart,
+                        color: Colors.black,
+                        size: 28,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           "Takip ettiğiniz ilanlarınız sadece\nsizin tarafınızdan görüntülenebilir.",
-                          style: TextStyle(color: Colors.black87.withOpacity(0.7), fontSize: 11),
+                          style: TextStyle(
+                            color: Colors.black87.withOpacity(0.7),
+                            fontSize: 11,
+                          ),
                         ),
                       ),
                     ],
@@ -80,14 +90,20 @@ class SepetimEkrani extends StatelessWidget {
         height: 65,
         decoration: BoxDecoration(
           color: const Color(0xFFAFD6C4),
-          border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
+          border: Border(
+            top: BorderSide(color: Colors.grey.shade300, width: 1),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _altMenuElemani(Icons.home_outlined, "Anasayfa"),
             _altMenuElemani(Icons.chat_bubble_outline, "Mesajlar"),
-            _altMenuElemani(Icons.add_circle_outline, "İlan Oluştur", ikonBoyutu: 26),
+            _altMenuElemani(
+              Icons.add_circle_outline,
+              "İlan Oluştur",
+              ikonBoyutu: 26,
+            ),
             _altMenuElemani(Icons.favorite_border, "Favoriler"),
             _altMenuElemani(Icons.shopping_bag_outlined, "Sepetim"),
             _altMenuElemani(Icons.person_outline, "Profilim"),
@@ -98,13 +114,24 @@ class SepetimEkrani extends StatelessWidget {
   }
 
   // Alt menü yardımcı widget'ı
-  Widget _altMenuElemani(IconData ikon, String baslik, {double ikonBoyutu = 24}) {
+  Widget _altMenuElemani(
+    IconData ikon,
+    String baslik, {
+    double ikonBoyutu = 24,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(ikon, color: Colors.black87, size: ikonBoyutu),
         const SizedBox(height: 2),
-        Text(baslik, style: const TextStyle(color: Colors.black87, fontSize: 10, fontWeight: FontWeight.w600)),
+        Text(
+          baslik,
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
@@ -124,7 +151,11 @@ class SepetimEkrani extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
@@ -141,23 +172,34 @@ class SepetimEkrani extends StatelessWidget {
                   height: 120,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    width: 100, height: 120, color: Colors.grey.shade200, child: const Icon(Icons.image_not_supported),
+                    width: 100,
+                    height: 120,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.image_not_supported),
                   ),
                 ),
               ),
               // Resim üzerindeki siyah transparan konum etiketi
               Positioned(
-                bottom: 8, left: 8,
+                bottom: 8,
+                left: 8,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(6)),
-                  child: const Icon(Icons.location_on, color: Colors.white, size: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 14,
+                  ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(width: 16),
-          
+
           // DETAYLAR VE BUTONLAR KISMI
           Expanded(
             child: Column(
@@ -166,16 +208,32 @@ class SepetimEkrani extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(
+                      baslik,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
                     const Icon(Icons.favorite, color: Colors.black, size: 22),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: Colors.black87),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: Colors.black87,
+                    ),
                     const SizedBox(width: 4),
-                    Text(konum, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                    Text(
+                      konum,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -183,13 +241,25 @@ class SepetimEkrani extends StatelessWidget {
                   children: [
                     const Icon(Icons.person, size: 14, color: Colors.black87),
                     const SizedBox(width: 4),
-                    Text(kisi, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                    Text(
+                      kisi,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text("Talep Tarihi: $tarih", style: TextStyle(fontSize: 11, color: Colors.black87.withOpacity(0.8))),
+                Text(
+                  "Talep Tarihi: $tarih",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.black87.withOpacity(0.8),
+                  ),
+                ),
                 const SizedBox(height: 12),
-                
+
                 // KALDIR VE MESAJA GİT BUTONLARI
                 Row(
                   children: [
@@ -200,9 +270,18 @@ class SepetimEkrani extends StatelessWidget {
                           minimumSize: const Size(0, 32),
                           padding: EdgeInsets.zero,
                           side: BorderSide(color: Colors.grey.shade300),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                        child: const Text("Kaldır", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.w600)),
+                        child: const Text(
+                          "Kaldır",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -213,18 +292,29 @@ class SepetimEkrani extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(0, 32),
                           padding: EdgeInsets.zero,
-                          backgroundColor: const Color(0xFF2E7D32), // Tasarımdaki koyu yeşil
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          backgroundColor: const Color(
+                            0xFF2E7D32,
+                          ), // Tasarımdaki koyu yeşil
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           elevation: 0,
                         ),
-                        child: const Text("Mesaja Git", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          "Mesaja Git",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

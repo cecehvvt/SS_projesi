@@ -59,7 +59,6 @@ class _GirisEkraniState extends State<GirisEkrani> {
             const SizedBox(height: 6),
 
             // Şifremi Unuttum
-           
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -81,7 +80,11 @@ class _GirisEkraniState extends State<GirisEkrani> {
               height: 54,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, "/ana_sayfa");
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    "/ana_sayfa",
+                    (route) => false,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7EA68A),
@@ -140,8 +143,10 @@ class _GirisEkraniState extends State<GirisEkrani> {
           hintText: hint,
           hintStyle: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 15),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 17,
+          ),
         ),
       ),
     );
@@ -161,8 +166,10 @@ class _GirisEkraniState extends State<GirisEkrani> {
           hintText: "Şifre",
           hintStyle: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 15),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 17,
+          ),
           suffixIcon: IconButton(
             onPressed: () => setState(() => _sifreGizli = !_sifreGizli),
             icon: Icon(
