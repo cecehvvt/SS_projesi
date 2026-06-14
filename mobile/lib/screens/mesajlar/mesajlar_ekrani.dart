@@ -12,10 +12,6 @@ class MesajlarEkrani extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           'Mesajlar',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -50,7 +46,7 @@ class MesajlarEkrani extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // SOHBET LİSTESİ
           Expanded(
             child: ListView(
@@ -63,10 +59,11 @@ class MesajlarEkrani extends StatelessWidget {
                   konum: "Üsküdar, İstanbul",
                   saat: "10:35",
                   okunmadiMi: true, // Mesaj metni daha siyah ve kalın
-                  urunResimYolu: "assets/images/ilanlar/bez.png", // Klasöründeki bez resmi
+                  urunResimYolu:
+                      "assets/images/ilanlar/bez.png", // Klasöründeki bez resmi
                   hedefSayfa: const SohbetEkrani(), // TIKLANINCA GİDECEĞİ YER
                 ),
-                
+
                 // 2. SOHBET (ALİ C.)
                 _mesajListesiKarti(
                   context: context,
@@ -75,9 +72,10 @@ class MesajlarEkrani extends StatelessWidget {
                   konum: "Beyoğlu, İstanbul",
                   saat: "18:42",
                   okunmadiMi: false, // Gri mesaj metni
-                  urunResimYolu: "assets/images/ilanlar/mont2.png", // Klasöründeki mont resmi
+                  urunResimYolu:
+                      "assets/images/ilanlar/mont2.png", // Klasöründeki mont resmi
                 ),
-                
+
                 // 3. SOHBET (MEHMET A.)
                 _mesajListesiKarti(
                   context: context,
@@ -118,7 +116,8 @@ class MesajlarEkrani extends StatelessWidget {
     required String saat,
     required bool okunmadiMi,
     required String urunResimYolu,
-    Widget? hedefSayfa, // Eğer sayfa verilmişse ona gider, verilmemişse hiçbir şey yapmaz
+    Widget?
+    hedefSayfa, // Eğer sayfa verilmişse ona gider, verilmemişse hiçbir şey yapmaz
   }) {
     return InkWell(
       onTap: () {
@@ -132,7 +131,9 @@ class MesajlarEkrani extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey.shade300, width: 1)),
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,23 +145,28 @@ class MesajlarEkrani extends StatelessWidget {
               child: Icon(Icons.person, color: Colors.grey, size: 28),
             ),
             const SizedBox(width: 12),
-            
+
             // ORTA KISIM (İsim, Mesaj, Konum)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isim, 
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    isim,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    sonMesaj, 
+                    sonMesaj,
                     style: TextStyle(
-                      fontSize: 13, 
+                      fontSize: 13,
                       color: okunmadiMi ? Colors.black87 : Colors.grey.shade600,
-                      fontWeight: okunmadiMi ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: okunmadiMi
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -168,22 +174,41 @@ class MesajlarEkrani extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 12, color: Colors.green),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 12,
+                        color: Colors.green,
+                      ),
                       const SizedBox(width: 4),
-                      Text(konum, style: const TextStyle(fontSize: 11, color: Colors.green)),
+                      Text(
+                        konum,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.green,
+                        ),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(width: 8),
-            
+
             // SAĞ KISIM (Saat ve Ürün Resmi)
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(saat, style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: okunmadiMi ? FontWeight.bold : FontWeight.normal)),
+                Text(
+                  saat,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade700,
+                    fontWeight: okunmadiMi
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -193,7 +218,8 @@ class MesajlarEkrani extends StatelessWidget {
                           width: 45,
                           height: 45,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _bosResimKutusu(),
+                          errorBuilder: (context, error, stackTrace) =>
+                              _bosResimKutusu(),
                         )
                       : _bosResimKutusu(),
                 ),

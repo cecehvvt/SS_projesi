@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'bagislananlar_ekrani.dart';
 import 'ihtiyaclar_ekrani.dart';
 import 'kategori_detay_ekrani.dart';
+import 'filtre_ekrani.dart';
 
 class AnaSayfaEkrani extends StatelessWidget {
   const AnaSayfaEkrani({super.key});
@@ -15,7 +16,12 @@ class AnaSayfaEkrani extends StatelessWidget {
           // 1. ÜST KISIM (Nane Yeşili Arka Plan ve Navigasyon Butonları)
           Container(
             color: const Color(0xFFB2D3C2),
-            padding: const EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 20),
+            padding: const EdgeInsets.only(
+              top: 60,
+              left: 16,
+              right: 16,
+              bottom: 20,
+            ),
             child: Column(
               children: [
                 Row(
@@ -29,15 +35,37 @@ class AnaSayfaEkrani extends StatelessWidget {
                         child: Row(
                           children: [
                             // BAĞIŞLANANLAR BUTONU (Etkileşimli Beyaz Buton)
-                            _anaMenuButonu(context, "Bağışlananlar", const BagislananlarEkrani()),
+                            _anaMenuButonu(
+                              context,
+                              "Bağışlananlar",
+                              const BagislananlarEkrani(),
+                            ),
                             // İHTİYAÇLAR BUTONU (Etkileşimli Beyaz Buton)
-                            _anaMenuButonu(context, "İhtiyaçlar", const IhtiyaclarEkrani()),
+                            _anaMenuButonu(
+                              context,
+                              "İhtiyaçlar",
+                              const IhtiyaclarEkrani(),
+                            ),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Icon(Icons.filter_alt_outlined, color: Colors.black87, size: 28),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const FiltreEkrani(),
+                        );
+                      },
+                      child: Icon(
+                        Icons.filter_alt_outlined,
+                        color: Colors.black87,
+                        size: 28,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 15),
@@ -66,7 +94,10 @@ class AnaSayfaEkrani extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Kategoriler", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Kategoriler",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
 
                   // 6 AKILLI KATEGORİ KUTUSU
@@ -78,17 +109,68 @@ class AnaSayfaEkrani extends StatelessWidget {
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                     children: [
-                      _kategoriKutusu(context, "Kadın\nGiyim", "Kadın Giyim", Icons.checkroom, Colors.blue.shade50, const Color(0xFFAFD6C4), const Color(0xFFDFF0E6)),
-                      _kategoriKutusu(context, "Erkek\nGiyim", "Erkek Giyim", Icons.accessibility_new, Colors.blue.shade100, const Color(0xFFAFD6C4), const Color(0xFFDFF0E6)),
-                      _kategoriKutusu(context, "Çocuk &\nBebek", "Çocuk & Bebek", Icons.child_care, Colors.blue.shade50, const Color(0xFFF4D8CD), const Color(0xFFF9E8E1)),
-                      _kategoriKutusu(context, "Elektronik", "Elektronik", Icons.tv, Colors.blue.shade100, const Color(0xFFD1C4E9), const Color(0xFFEDE7F6)),
-                      _kategoriKutusu(context, "Ev &\nYaşam", "Ev & Yaşam", Icons.home_outlined, Colors.blue.shade50, const Color(0xFFC8E6C9), const Color(0xFFE8F5E9)),
-                      _kategoriKutusu(context, "Kırtasiye &\nDiğer", "Kırtasiye & Diğer", Icons.edit, Colors.blue.shade100, const Color(0xFFB3E5FC), const Color(0xFFE1F5FE)),
+                      _kategoriKutusu(
+                        context,
+                        "Kadın\nGiyim",
+                        "Kadın Giyim",
+                        Icons.checkroom,
+                        Colors.blue.shade50,
+                        const Color(0xFFAFD6C4),
+                        const Color(0xFFDFF0E6),
+                      ),
+                      _kategoriKutusu(
+                        context,
+                        "Erkek\nGiyim",
+                        "Erkek Giyim",
+                        Icons.accessibility_new,
+                        Colors.blue.shade50,
+                        const Color(0xFFAFD6C4),
+                        const Color(0xFFDFF0E6),
+                      ),
+                      _kategoriKutusu(
+                        context,
+                        "Çocuk &\nBebek",
+                        "Çocuk & Bebek",
+                        Icons.child_care,
+                        Colors.blue.shade50,
+                        const Color(0xFFF4D8CD),
+                        const Color(0xFFF9E8E1),
+                      ),
+                      _kategoriKutusu(
+                        context,
+                        "Elektronik",
+                        "Elektronik",
+                        Icons.tv,
+                        Colors.blue.shade50,
+                        const Color(0xFFD1C4E9),
+                        const Color(0xFFEDE7F6),
+                      ),
+                      _kategoriKutusu(
+                        context,
+                        "Ev &\nYaşam",
+                        "Ev & Yaşam",
+                        Icons.home_outlined,
+                        Colors.blue.shade50,
+                        const Color(0xFFC8E6C9),
+                        const Color(0xFFE8F5E9),
+                      ),
+                      _kategoriKutusu(
+                        context,
+                        "Kırtasiye &\nDiğer",
+                        "Kırtasiye & Diğer",
+                        Icons.edit,
+                        Colors.blue.shade50,
+                        const Color(0xFFB3E5FC),
+                        const Color(0xFFE1F5FE),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 25),
 
-                  const Text("Öne Çıkan İlanlar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Öne Çıkan İlanlar",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
 
                   // ÖNE ÇIKAN İLANLAR - RESİMLER "ilanlar" KLASÖRÜNDEN GELİYOR
@@ -102,20 +184,47 @@ class AnaSayfaEkrani extends StatelessWidget {
                     children: [
                       // YENİ: Kışlık Mont'a tıklanınca İlan Detay Ekranına gidecek
                       _ilanKarti(
-                        "Kışlık Mont", 
-                        "İstanbul, Beyoğlu . 2 km", 
-                        "Ahmet Y.", 
-                        "Bağış", 
-                        "Talep et", 
-                        const Color(0xFFA5D6A7), 
+                        "Kışlık Mont",
+                        "İstanbul, Beyoğlu . 2 km",
+                        "Ahmet Y.",
+                        "Bağış",
+                        "Talep et",
+                        const Color(0xFFA5D6A7),
                         "assets/images/ilanlar/mont2.png",
                         onTap: () {
-                          Navigator.pushNamed(context, '/ilan_detay'); // Sihirli dokunuş!
-                        }
+                          Navigator.pushNamed(
+                            context,
+                            '/ilan_detay',
+                          ); // Sihirli dokunuş!
+                        },
                       ),
-                      _ilanKarti("Bebek Beşiği", "İstanbul, Beyoğlu . 2 km", "Zeynep A.", "Bağış", "Talep et", const Color(0xFFA5D6A7), "assets/images/ilanlar/besik.png"), 
-                      _ilanKarti("Atkı", "İstanbul, Kadıköy . 5 km", "Merve K.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/atki.png"),
-                      _ilanKarti("Çalışma Masası", "İstanbul, Beyoğlu . 2 km", "Mehmet T.", "İhtiyaç", "Yardım et", Colors.red.shade300, "assets/images/ilanlar/masa2.png"),
+                      _ilanKarti(
+                        "Bebek Beşiği",
+                        "İstanbul, Beyoğlu . 2 km",
+                        "Zeynep A.",
+                        "Bağış",
+                        "Talep et",
+                        const Color(0xFFA5D6A7),
+                        "assets/images/ilanlar/besik.png",
+                      ),
+                      _ilanKarti(
+                        "Atkı",
+                        "İstanbul, Kadıköy . 5 km",
+                        "Merve K.",
+                        "İhtiyaç",
+                        "Yardım et",
+                        Colors.red.shade300,
+                        "assets/images/ilanlar/atki.png",
+                      ),
+                      _ilanKarti(
+                        "Çalışma Masası",
+                        "İstanbul, Beyoğlu . 2 km",
+                        "Mehmet T.",
+                        "İhtiyaç",
+                        "Yardım et",
+                        Colors.red.shade300,
+                        "assets/images/ilanlar/masa2.png",
+                      ),
                     ],
                   ),
                 ],
@@ -135,11 +244,20 @@ class AnaSayfaEkrani extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
           splashColor: const Color(0xFF1B4D3E).withOpacity(0.4),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => sayfa)),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => sayfa),
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             alignment: Alignment.center,
-            child: Text(baslik, style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+            child: Text(
+              baslik,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),
@@ -147,7 +265,15 @@ class AnaSayfaEkrani extends StatelessWidget {
   }
 
   // Kategori kutuları için yardımcı fonksiyon
-  Widget _kategoriKutusu(BuildContext context, String ekrandakiAd, String gercekAd, IconData ikon, Color kutuRenk, Color sayfaRenk, Color sekmeRenk) {
+  Widget _kategoriKutusu(
+    BuildContext context,
+    String ekrandakiAd,
+    String gercekAd,
+    IconData ikon,
+    Color kutuRenk,
+    Color sayfaRenk,
+    Color sekmeRenk,
+  ) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -161,13 +287,20 @@ class AnaSayfaEkrani extends StatelessWidget {
         ),
       ),
       child: Container(
-        decoration: BoxDecoration(color: kutuRenk, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+          color: kutuRenk,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(ikon, size: 20),
             const SizedBox(width: 4),
-            Text(ekrandakiAd, style: const TextStyle(fontSize: 11), textAlign: TextAlign.center),
+            Text(
+              ekrandakiAd,
+              style: const TextStyle(fontSize: 11),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -175,7 +308,16 @@ class AnaSayfaEkrani extends StatelessWidget {
   }
 
   // İlan kartları için yardımcı fonksiyon (YENİ: onTap eklendi)
-  Widget _ilanKarti(String baslik, String konum, String kisi, String tip, String butonYazisi, Color butonRengi, String resimYolu, {VoidCallback? onTap}) {
+  Widget _ilanKarti(
+    String baslik,
+    String konum,
+    String kisi,
+    String tip,
+    String butonYazisi,
+    Color butonRengi,
+    String resimYolu, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap, // Eğer tıklanma özelliği verildiyse çalıştırır
       child: Container(
@@ -191,7 +333,9 @@ class AnaSayfaEkrani extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
                     child: Image.asset(
                       resimYolu,
                       width: double.infinity,
@@ -200,20 +344,40 @@ class AnaSayfaEkrani extends StatelessWidget {
                         return Container(
                           color: Colors.grey.shade200,
                           width: double.infinity,
-                          child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                          ),
                         );
                       },
                     ),
                   ),
                   Positioned(
-                    top: 8, left: 8,
+                    top: 8,
+                    left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: butonRengi, borderRadius: BorderRadius.circular(8)),
-                      child: Text(tip, style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: butonRengi,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        tip,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ),
                   ),
-                  const Positioned(top: 8, right: 8, child: Icon(Icons.favorite_border, size: 20)),
+                  const Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Icon(Icons.favorite_border, size: 20),
+                  ),
                 ],
               ),
             ),
@@ -222,12 +386,33 @@ class AnaSayfaEkrani extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(
+                    baslik,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 12, color: Colors.black54),
-                      Expanded(child: Text(konum, style: const TextStyle(fontSize: 10, color: Colors.black54), overflow: TextOverflow.ellipsis)),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 12,
+                        color: Colors.black54,
+                      ),
+                      Expanded(
+                        child: Text(
+                          konum,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.black54,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -236,13 +421,25 @@ class AnaSayfaEkrani extends StatelessWidget {
                     height: 26,
                     child: ElevatedButton(
                       onPressed: () {},
-                      style: ElevatedButton.styleFrom(backgroundColor: butonRengi, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                      child: Text(butonYazisi, style: const TextStyle(color: Colors.black87, fontSize: 11)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: butonRengi,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        butonYazisi,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 11,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
