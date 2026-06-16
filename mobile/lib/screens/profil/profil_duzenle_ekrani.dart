@@ -8,7 +8,6 @@ class ProfilDuzenleEkrani extends StatefulWidget {
 }
 
 class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
-  // Switch'lerin (Aç/Kapa) durumlarını tutan değişkenler
   bool profilGorsun = true;
   bool mesajGelsin = true;
   bool konumGoster = false;
@@ -16,7 +15,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7), // Tasarımdaki açık gri arka plan
+      backgroundColor: const Color(0xFFF4F5F7),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -34,7 +33,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         child: Column(
           children: [
-            // ─── PROFİL FOTOĞRAFI BÖLÜMÜ ───
             Center(
               child: Column(
                 children: [
@@ -44,16 +42,27 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                       const CircleAvatar(
                         radius: 45,
                         backgroundColor: Color(0xFFE0E0E0),
-                        child: Icon(Icons.person_outline, size: 50, color: Colors.black87),
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 50,
+                          color: Colors.black87,
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.shade300, width: 1),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
                         ),
-                        child: const Icon(Icons.camera_alt_outlined, size: 18, color: Colors.black),
+                        child: const Icon(
+                          Icons.camera_alt_outlined,
+                          size: 18,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -67,8 +76,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 24),
 
-            // ─── FORM ALANLARI ───
-            // Ad Soyad ve Kullanıcı Adı (Yan Yana)
             Row(
               children: [
                 Expanded(
@@ -90,7 +97,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 12),
 
-            // Hakkımda
             _buildTextField(
               label: 'Hakkımda',
               hint: 'Paylaşmayı ve yardımlaşmayı çok seviyorum.',
@@ -99,7 +105,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 12),
 
-            // Konum
             _buildTextField(
               label: 'Konum',
               hint: 'Üsküdar, İstanbul',
@@ -108,7 +113,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 12),
 
-            // Telefon Numara
             _buildTextField(
               label: 'Telefon Numara',
               hint: '+90 5XX XXX XX XX',
@@ -116,7 +120,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 12),
 
-            // E-posta
             _buildTextField(
               label: 'E-posta',
               hint: 'ayse.demir34@gmail.com',
@@ -124,7 +127,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             ),
             const SizedBox(height: 24),
 
-            // ─── GİZLİLİK AYARLARI KARTI ───
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -136,7 +138,11 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.lock_outline, color: Color(0xFF00A344), size: 22),
+                      Icon(
+                        Icons.lock_outline,
+                        color: Color(0xFF00A344),
+                        size: 22,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'Gizlilik Ayarları',
@@ -149,21 +155,41 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildSwitchRow('Profil başkalarının görmesini izin ver', Icons.visibility_outlined, profilGorsun, (val) {
-                    setState(() { profilGorsun = val; });
-                  }),
-                  _buildSwitchRow('Mesaj almayı etkinleştir', Icons.chat_bubble_outline, mesajGelsin, (val) {
-                    setState(() { mesajGelsin = val; });
-                  }),
-                  _buildSwitchRow('Konumu ilanlarda göster', Icons.location_on_outlined, konumGoster, (val) {
-                    setState(() { konumGoster = val; });
-                  }),
+                  _buildSwitchRow(
+                    'Profil başkalarının görmesini izin ver',
+                    Icons.visibility_outlined,
+                    profilGorsun,
+                    (val) {
+                      setState(() {
+                        profilGorsun = val;
+                      });
+                    },
+                  ),
+                  _buildSwitchRow(
+                    'Mesaj almayı etkinleştir',
+                    Icons.chat_bubble_outline,
+                    mesajGelsin,
+                    (val) {
+                      setState(() {
+                        mesajGelsin = val;
+                      });
+                    },
+                  ),
+                  _buildSwitchRow(
+                    'Konumu ilanlarda göster',
+                    Icons.location_on_outlined,
+                    konumGoster,
+                    (val) {
+                      setState(() {
+                        konumGoster = val;
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // ─── ŞİFRE DEĞİŞTİR KARTI ───
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -171,13 +197,15 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
               ),
               child: const ListTile(
                 leading: Icon(Icons.lock_outline, color: Colors.black87),
-                title: Text('Şifre Değiştir', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                title: Text(
+                  'Şifre Değiştir',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
                 trailing: Icon(Icons.chevron_right, color: Colors.black54),
               ),
             ),
             const SizedBox(height: 24),
 
-            // ─── KAYDET BUTONU ───
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -186,7 +214,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                   // Kaydetme işlemleri buraya yazılacak
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00A344), // Tasarımdaki Vesta Yeşili
+                  backgroundColor: const Color(0xFF00A344),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -194,7 +222,11 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                 ),
                 child: const Text(
                   'Kaydet',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -205,7 +237,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
     );
   }
 
-  // Özel Text Field Oluşturucu Metot
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -226,33 +257,49 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
             decoration: InputDecoration(
               labelText: label,
               labelStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-              floatingLabelBehavior: FloatingLabelBehavior.always, // Etiket hep üstte dursun
+              floatingLabelBehavior: FloatingLabelBehavior.always,
               hintText: hint,
-              hintStyle: const TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w500),
-              prefixIcon: icon != null ? Icon(icon, color: Colors.black54, size: 20) : null,
-              suffixIcon: trailingIcon != null ? Icon(trailingIcon, color: Colors.black54, size: 20) : null,
+              hintStyle: const TextStyle(
+                color: Colors.black87,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              prefixIcon: icon != null
+                  ? Icon(icon, color: Colors.black54, size: 20)
+                  : null,
+              suffixIcon: trailingIcon != null
+                  ? Icon(trailingIcon, color: Colors.black54, size: 20)
+                  : null,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
               contentPadding: EdgeInsets.symmetric(
-                  vertical: maxLines > 1 ? 16 : 10,
-                  horizontal: icon != null ? 0 : 16),
+                vertical: maxLines > 1 ? 16 : 10,
+                horizontal: icon != null ? 0 : 16,
+              ),
             ),
           ),
           if (isCounter)
             const Positioned(
               bottom: 8,
               right: 12,
-              child: Text('35 / 150', style: TextStyle(color: Colors.grey, fontSize: 10)),
+              child: Text(
+                '35 / 150',
+                style: TextStyle(color: Colors.grey, fontSize: 10),
+              ),
             ),
         ],
       ),
     );
   }
 
-  // Özel Switch (Aç/Kapa) Satırı Oluşturucu Metot
-  Widget _buildSwitchRow(String title, IconData icon, bool value, Function(bool) onChanged) {
+  Widget _buildSwitchRow(
+    String title,
+    IconData icon,
+    bool value,
+    Function(bool) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
@@ -260,10 +307,13 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
           Icon(icon, size: 20, color: Colors.black87),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(title, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
+            ),
           ),
           Transform.scale(
-            scale: 0.8, // Switch'i tasarımdaki gibi biraz küçültüyoruz
+            scale: 0.8,
             child: Switch(
               value: value,
               onChanged: onChanged,

@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+
 import '../auth/karsilama_ekrani.dart';
 
 class SplashEkrani extends StatefulWidget {
@@ -9,32 +9,76 @@ class SplashEkrani extends StatefulWidget {
   State<SplashEkrani> createState() => _SplashEkraniState();
 }
 
-class _SplashEkraniState extends State<SplashEkrani> {
+class _SplashEkraniState extends State<SplashEkrani>
+    with SingleTickerProviderStateMixin {
+  static const _backgroundColor = Color(0xFFF8F5F5);
+  static const _logoWidth = 168.0;
+
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  late final Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    );
+    _opacity = TweenSequence<double>([
+      TweenSequenceItem(tween: ConstantTween<double>(1), weight: 72),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1,
+          end: 0,
+        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+        weight: 28,
+      ),
+    ]).animate(_controller);
+    _scale = Tween<double>(begin: 1, end: 1.045).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    );
 
-    Timer(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(milliseconds: 250), () async {
+      if (!mounted) return;
+      await _controller.forward();
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const KarsilamaEkrani(),
-        ),
+        MaterialPageRoute(builder: (context) => const KarsilamaEkrani()),
       );
     });
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Scaffold'un başındaki const kelimesini kaldırdık
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F5F5),
+      backgroundColor: _backgroundColor,
       body: Center(
-        // Yazı yerine logomuzu ekledik
-        child: Image.asset(
-          'assets/images/vesta_logo.png',
-          width: 400, // Logonun büyüklüğünü buradan değiştirebilirsin
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _opacity.value,
+              child: Transform.scale(scale: _scale.value, child: child),
+            );
+          },
+          child: SizedBox(
+            width: double.infinity,
+            child: Center(
+              child: Image.asset(
+                'assets/images/vesta_logo.png',
+                width: _logoWidth,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
         ),
       ),
     );

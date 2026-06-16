@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'filtre_ekrani.dart'; // Filtre ekranını buraya bağladık
+import 'filtre_ekrani.dart';
 
 class BagislananlarEkrani extends StatefulWidget {
   const BagislananlarEkrani({super.key});
@@ -36,7 +36,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
 
       body: Column(
         children: [
-          // ARAMA VE FİLTRE ÇUBUĞU
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -62,14 +61,12 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
                 ),
                 const SizedBox(width: 12),
 
-                // FİLTRELE BUTONU (Tıklanabilir yapıldı)
                 GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
-                      isScrollControlled: true, // Tam ekran açılması için
-                      backgroundColor:
-                          Colors.transparent, // Arka plan ovalliği için
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
                       builder: (context) => const FiltreEkrani.bagis(),
                     );
                   },
@@ -100,7 +97,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
             ),
           ),
 
-          // TÜMÜ / BAĞIŞLADIKLARIM SEKMELERİ
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
@@ -191,7 +187,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
           ),
           const SizedBox(height: 16),
 
-          // İLAN LİSTESİ
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -235,7 +230,6 @@ class _BagislananlarEkraniState extends State<BagislananlarEkrani> {
         ],
       ),
 
-      // ALT MENÜ
       bottomNavigationBar: Container(
         height: 65,
         decoration: BoxDecoration(

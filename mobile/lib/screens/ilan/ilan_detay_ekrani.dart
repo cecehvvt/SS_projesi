@@ -1,288 +1,358 @@
 import 'package:flutter/material.dart';
 
-class IlanDetayEkrani extends StatelessWidget {
-  const IlanDetayEkrani({super.key});
+import '../../models/app_listing.dart';
+import '../../services/ilan_service.dart';
+import '../../utils/listing_taxonomy.dart';
+import '../../widgets/listing_image.dart';
+import '../mesajlar/sohbet_ekrani.dart';
+
+class IlanDetayEkrani extends StatefulWidget {
+  final String? listingId;
+
+  const IlanDetayEkrani({super.key, this.listingId});
+
+  @override
+  State<IlanDetayEkrani> createState() => _IlanDetayEkraniState();
+}
+
+class _IlanDetayEkraniState extends State<IlanDetayEkrani> {
+  final _service = const IlanService();
+  late final Future<AppListing>? _future = widget.listingId == null
+      ? null
+      : _service.getListing(widget.listingId!);
 
   @override
   Widget build(BuildContext context) {
+    if (_future == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('Goruntulenecek ilan secilmedi.')),
+      );
+    }
+    return FutureBuilder<AppListing>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text('Ilan detayi yuklenemedi.')),
+          );
+        }
+        return _DetailContent(
+          listing: snapshot.data!,
+          onDelete: _deleteListing,
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteListing(AppListing listing) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ilani sil'),
+        content: const Text('Bu ilani silmek istediginize emin misiniz?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Vazgec'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Sil'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _service.deleteListing(listing.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Ilan silindi.')));
+      Navigator.pop(context);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ilan silinemedi. Lutfen tekrar deneyin.'),
+        ),
+      );
+    }
+  }
+}
+
+class _DetailContent extends StatefulWidget {
+  final AppListing listing;
+  final ValueChanged<AppListing> onDelete;
+
+  const _DetailContent({required this.listing, required this.onDelete});
+
+  @override
+  State<_DetailContent> createState() => _DetailContentState();
+}
+
+class _DetailContentState extends State<_DetailContent> {
+  int _imageIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final listing = widget.listing;
+    final isOwner = listing.ownerId == 'user-1';
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ÜST RESİM VE İKONLAR (Geri ve Favori)
-            Stack(
-              children: [
-                // Ürün Resmi
-                Container(
-                  height: 300,
-                  width: double.infinity,
-                  color: Colors.grey.shade100,
-                  child: Image.asset(
-                    'assets/images/ilanlar/mont2.png', // Anasayfadaki mont resmi
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 50, color: Colors.grey),
-                  ),
-                ),
-                // Geri Butonu
-                Positioned(
-                  top: 50,
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.black87),
-                    ),
-                  ),
-                ),
-                // Favori Butonu
-                Positioned(
-                  top: 50,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: const Icon(Icons.favorite_border, size: 20, color: Colors.black87),
-                  ),
-                ),
-              ],
-            ),
-            
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ETİKETLER (Bağışlanan Ürün, Kadın Giyim)
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(4)),
-                        child: const Text('Bağışlanan Ürün', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 11, fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.checkroom, size: 14, color: Colors.black87),
-                            SizedBox(width: 4),
-                            Text('Kadın Giyim', style: TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // BAŞLIK VE AÇIKLAMA
-                  const Text('Kışlık Mont', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Kahverengi kışlık mont. Çok az kullanıldı, temiz ve sorunsuzdur. Bedeni M uyumludur.',
-                    style: TextStyle(fontSize: 13, color: Colors.black87, height: 1.4),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // BİLGİ SATIRI (Konum, Saat, Görüntülenme)
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      const Text('Üsküdar, İstanbul', style: TextStyle(fontSize: 11, color: Colors.black54)),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.access_time, size: 14, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      const Text('3 saat önce', style: TextStyle(fontSize: 11, color: Colors.black54)),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.visibility_outlined, size: 14, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      const Text('56 görüntüleme', style: TextStyle(fontSize: 11, color: Colors.black54)),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // KULLANICI BİLGİ KARTI
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Bağışlayan Kişi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            const CircleAvatar(radius: 20, backgroundColor: Color(0xFFF0F0F0), child: Icon(Icons.person, color: Colors.grey)),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Ahmet Y.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: const [
-                                      Icon(Icons.calendar_today, size: 10, color: Colors.black54),
-                                      SizedBox(width: 4),
-                                      Text('Üyelik tarihi: Şubat 2026', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: const [
-                                      Icon(Icons.volunteer_activism, size: 10, color: Colors.black54),
-                                      SizedBox(width: 4),
-                                      Text('Bağışlanan ürün sayısı: 5', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // GÜVENLİK ROZETLERİ
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(color: const Color(0xFFF3F0E6), borderRadius: BorderRadius.circular(8)),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.card_giftcard, size: 20, color: Colors.black87),
-                              SizedBox(width: 8),
-                              Expanded(child: Text("Ücretsiz Bağış\nBu ürün tamamen ücretsizdir.", style: TextStyle(fontSize: 9))),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(8)),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.shield_outlined, size: 20, color: Colors.orange),
-                              SizedBox(width: 8),
-                              Expanded(child: Text("Güvenli Teslimat\nKişisel bilgilerinizi koruyun.", style: TextStyle(fontSize: 9))),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // KONUM HARİTASI
-                  const Text('Konum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 8),
-                  Container(
-                    height: 120,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50, // Harita resmi yoksa mavi bir arka plan
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Stack(
-                      children: [
-                        // Eğer elinde harita.png varsa buraya Image.asset ekleyebilirsin
-                        const Center(child: Icon(Icons.map_outlined, size: 40, color: Colors.blue)),
-                        Positioned(
-                          bottom: 12, right: 12,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
-                            child: Row(
-                              children: const [
-                                Icon(Icons.location_on, color: Colors.red, size: 16),
-                                SizedBox(width: 4),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Üsküdar, İstanbul', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-                                    Text('(Yaklaşık 1.2 km)', style: TextStyle(fontSize: 9, color: Colors.black54)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 80), // Butonlar için alttan boşluk
-                ],
-              ),
-            ),
-          ],
-        ),
+      appBar: AppBar(
+        title: const Text('Ilan Detayi'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
       ),
-      
-      // ALTTAKİ SABİT BUTONLAR (Mesaj Gönder & Sepete Ekle)
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade200)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: const [
-                Icon(Icons.info_outline, size: 14, color: Colors.green),
-                SizedBox(width: 4),
-                Text('İlgileniyorsanız bağışlayan kişiyle mesajlaşarak iletişime geçebilirsiniz.', style: TextStyle(fontSize: 10, color: Colors.black54)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
+      body: ListView(
+        children: [
+          SizedBox(
+            height: 320,
+            child: Stack(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // Buradan Sohbet Ekranına Gidecek
-                      Navigator.pushNamed(context, '/sohbet');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF009F3C),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 18),
-                    label: const Text('Mesaj Gönder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                PageView.builder(
+                  itemCount: listing.imageUrls.isEmpty
+                      ? 1
+                      : listing.imageUrls.length,
+                  onPageChanged: (index) => setState(() => _imageIndex = index),
+                  itemBuilder: (context, index) => ListingImage(
+                    source: listing.imageUrls.isEmpty
+                        ? ''
+                        : listing.imageUrls[index],
+                    width: double.infinity,
+                    height: 320,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade400),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                if (listing.imageUrls.length > 1)
+                  Positioned(
+                    bottom: 12,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${_imageIndex + 1}/${listing.imageUrls.length}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
-                    icon: const Icon(Icons.bookmark_border, color: Colors.black87, size: 18),
-                    label: const Text('Sepete Ekle', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
                   ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _Chip(text: ListingTaxonomy.typeLabel(listing.listingType)),
+                    _Chip(text: '${listing.category} / ${listing.subCategory}'),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  listing.title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 16,
+                      color: Colors.black54,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      listing.location,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                _InfoRow(label: 'Urun durumu', value: listing.condition),
+                _InfoRow(
+                  label: 'Teslim yontemi',
+                  value: listing.deliveryMethod,
+                ),
+                _InfoRow(label: 'Iletisim', value: listing.contactPreference),
+                if (listing.listingType == 'takas' &&
+                    listing.desiredSwapItem != null)
+                  _InfoRow(
+                    label: 'Istenen takas urunu',
+                    value: listing.desiredSwapItem!,
+                  ),
+                const SizedBox(height: 18),
+                const Text(
+                  'Aciklama',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(listing.description, style: const TextStyle(height: 1.45)),
+                const SizedBox(height: 18),
+                _OwnerCard(listing: listing),
+                const SizedBox(height: 24),
+                if (isOwner)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Duzenleme ekrani sonraki adimda baglanacak.',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.edit_outlined),
+                          label: const Text('Duzenle'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => widget.onDelete(listing),
+                          icon: const Icon(Icons.delete_outline),
+                          label: const Text('Sil'),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  FilledButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SohbetEkrani(
+                          karsiKullaniciId: listing.ownerId,
+                          karsiKullaniciAd: listing.ownerName,
+                          ilanId: listing.id,
+                          ilanBaslik: listing.title,
+                          ilanKonum: listing.location,
+                          ilanFotoUrl: listing.firstImage,
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Mesaj Gonder'),
+                  ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String text;
+
+  const _Chip({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(text),
+      backgroundColor: const Color(0xFFE8F5EE),
+      labelStyle: const TextStyle(
+        color: Color(0xFF2E7D32),
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(label, style: const TextStyle(color: Colors.black54)),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OwnerCard extends StatelessWidget {
+  final AppListing listing;
+
+  const _OwnerCard({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(child: Icon(Icons.person_outline)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  listing.ownerName,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Iletisim uygulama ici mesajlasma ile yurutulur.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

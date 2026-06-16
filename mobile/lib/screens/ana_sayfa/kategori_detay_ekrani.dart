@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'filtre_ekrani.dart';
+
+import '../../models/app_listing.dart';
+import '../../services/ilan_service.dart';
+import '../../widgets/listing_card.dart';
+import '../ilan/ilan_detay_ekrani.dart';
 
 class KategoriDetayEkrani extends StatefulWidget {
   final String baslik;
@@ -20,446 +24,130 @@ class KategoriDetayEkrani extends StatefulWidget {
 }
 
 class _KategoriDetayEkraniState extends State<KategoriDetayEkrani> {
-  String seciliSekme = "Tümü";
+  final _service = const IlanService();
+  late Future<List<AppListing>> _future = _service.getListings(
+    category: widget.baslik,
+  );
 
-  // 6 KATEGORİNİN EKSİKSİZ 4'ER ÜRÜNLÜ TAM LİSTESİ
-  List<Map<String, String>> _verileriGetir() {
-    switch (widget.baslik) {
-      case "Kadın Giyim":
-        return [
-          {
-            "baslik": "Kışlık Kaban",
-            "detay": "M Beden",
-            "kisi": "Zeynep A.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/kaban.png",
-          },
-          {
-            "baslik": "Triko Kazak",
-            "detay": "S Beden",
-            "kisi": "Cemre F.",
-            "sure": "3 saat önce",
-            "resim": "assets/images/ilanlar/kazak.png",
-          },
-          {
-            "baslik": "Kot Pantolon",
-            "detay": "S Beden",
-            "kisi": "Elif A.",
-            "sure": "3 saat önce",
-            "resim": "assets/images/ilanlar/kadin_kot.png",
-          },
-          {
-            "baslik": "Elbise",
-            "detay": "S Beden",
-            "kisi": "Sibel A.",
-            "sure": "3 saat önce",
-            "resim": "assets/images/ilanlar/elbise.png",
-          },
-        ];
-      case "Erkek Giyim":
-        return [
-          {
-            "baslik": "Kışlık Mont",
-            "detay": "L Beden",
-            "kisi": "Ahmet A.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/erkek_mont.png",
-          },
-          {
-            "baslik": "Kot Pantolon",
-            "detay": "38 Beden",
-            "kisi": "Taha A.",
-            "sure": "7 saat önce",
-            "resim": "assets/images/ilanlar/erkek_kot.png",
-          },
-          {
-            "baslik": "Gömlek",
-            "detay": "M Beden",
-            "kisi": "Yılmaz A.",
-            "sure": "2 gün önce",
-            "resim": "assets/images/ilanlar/gomlek.png",
-          },
-          {
-            "baslik": "Sweatshirt",
-            "detay": "XXL Beden",
-            "kisi": "Mehmet T.",
-            "sure": "1 saat önce",
-            "resim": "assets/images/ilanlar/sweatshirt.png",
-          },
-        ];
-      case "Çocuk & Bebek":
-        return [
-          {
-            "baslik": "Bebek Arabası",
-            "detay": "0-3 yaş",
-            "kisi": "Seda A.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/bebek_arabasi.png",
-          },
-          {
-            "baslik": "Bebek Kıyafet Takımı",
-            "detay": "0-6 ay",
-            "kisi": "Taha A.",
-            "sure": "7 saat önce",
-            "resim": "assets/images/ilanlar/bebek_takim.png",
-          },
-          {
-            "baslik": "Oyuncak",
-            "detay": "2-5 yaş",
-            "kisi": "Selda A.",
-            "sure": "5 saat önce",
-            "resim": "assets/images/ilanlar/oyuncak.png",
-          },
-          {
-            "baslik": "Mama Sandalyesi",
-            "detay": "6-36 ay",
-            "kisi": "Ayça T.",
-            "sure": "1 gün önce",
-            "resim": "assets/images/ilanlar/mama_sandalyesi.png",
-          },
-        ];
-      case "Elektronik":
-        return [
-          {
-            "baslik": "Dizüstü Bilgisayar",
-            "detay": "MSI Gaming",
-            "kisi": "Seda A.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/laptop.png",
-          },
-          {
-            "baslik": "Akıllı Telefon",
-            "detay": "iPhone 13",
-            "kisi": "Kemal A.",
-            "sure": "7 saat önce",
-            "resim": "assets/images/ilanlar/telefon.png",
-          },
-          {
-            "baslik": "Kulaklık",
-            "detay": "JBL Tune",
-            "kisi": "Can A.",
-            "sure": "5 saat önce",
-            "resim": "assets/images/ilanlar/kulaklik.png",
-          },
-          {
-            "baslik": "Tablet",
-            "detay": "iPad Air",
-            "kisi": "Eda T.",
-            "sure": "1 gün önce",
-            "resim": "assets/images/ilanlar/tablet.png",
-          },
-        ];
-      case "Ev & Yaşam":
-        return [
-          {
-            "baslik": "Çalışma Masası",
-            "detay": "Beyaz Ahşap",
-            "kisi": "Murat A.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/masa.png",
-          },
-          {
-            "baslik": "Koltuk Takımı",
-            "detay": "3+2+1",
-            "kisi": "Arda A.",
-            "sure": "7 saat önce",
-            "resim": "assets/images/ilanlar/koltuk.png",
-          },
-          {
-            "baslik": "Halı",
-            "detay": "Yün Halı",
-            "kisi": "Ceylin A.",
-            "sure": "5 saat önce",
-            "resim": "assets/images/ilanlar/hali.png",
-          },
-          {
-            "baslik": "Kitaplık",
-            "detay": "5 Raflı",
-            "kisi": "Tarık T.",
-            "sure": "1 gün önce",
-            "resim": "assets/images/ilanlar/kitaplik.png",
-          },
-        ];
-      case "Kırtasiye & Diğer":
-        return [
-          {
-            "baslik": "Okul Çantası",
-            "detay": "Pembe Sırt Çantası",
-            "kisi": "Samet T.",
-            "sure": "2 saat önce",
-            "resim": "assets/images/ilanlar/canta.png",
-          },
-          {
-            "baslik": "Defter",
-            "detay": "A4 Kareli",
-            "kisi": "Esma B.",
-            "sure": "7 saat önce",
-            "resim": "assets/images/ilanlar/defter.png",
-          },
-          {
-            "baslik": "Kalem Seti",
-            "detay": "24 Renk",
-            "kisi": "Ekin Z.",
-            "sure": "5 saat önce",
-            "resim": "assets/images/ilanlar/kalem.png",
-          },
-          {
-            "baslik": "Bisiklet",
-            "detay": "26 Jant",
-            "kisi": "Alev D.",
-            "sure": "1 gün önce",
-            "resim": "assets/images/ilanlar/bisiklet.png",
-          },
-        ];
-      default:
-        return [];
-    }
+  void _reload() {
+    setState(() {
+      _future = _service.getListings(category: widget.baslik);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ilanlar = _verileriGetir();
-
     return Scaffold(
-      backgroundColor: widget.anaRenk,
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(widget.ikon, color: Colors.black87),
-            const SizedBox(width: 8),
-            Text(
-              widget.baslik,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        centerTitle: true,
+        title: Text(widget.baslik),
+        actions: [
+          IconButton(
+            tooltip: 'Yenile',
+            onPressed: _reload,
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
       ),
-      body: Container(
-        margin: const EdgeInsets.only(top: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        child: Column(
-          children: [
-            // ARAMA VE FİLTRE
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "${widget.baslik} içinde ara...",
-                          prefixIcon: const Icon(Icons.search),
-                          border: InputBorder.none,
-                        ),
-                      ),
+      body: RefreshIndicator(
+        onRefresh: () async => _reload(),
+        child: FutureBuilder<List<AppListing>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return _StateMessage(
+                icon: Icons.error_outline,
+                title: 'Ilanlar yuklenemedi',
+                message: 'Lutfen tekrar dene.',
+                onRetry: _reload,
+              );
+            }
+            final listings = snapshot.data ?? const [];
+            if (listings.isEmpty) {
+              return _StateMessage(
+                icon: widget.ikon,
+                title: 'Bu kategoride ilan yok',
+                message: 'Yeni ilanlar eklendiginde burada gorunecek.',
+                onRetry: _reload,
+              );
+            }
+            return GridView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: listings.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.70,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+              ),
+              itemBuilder: (context, index) {
+                final listing = listings[index];
+                return ListingCard(
+                  listing: listing,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => IlanDetayEkrani(listingId: listing.id),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => const FiltreEkrani(),
-                      );
-                    },
-                    child: Icon(
-                      Icons.filter_alt_outlined,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // SEKMELER
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: ["Tümü", "Bağışlananlar", "İhtiyaçlar"].map((tab) {
-                    bool secili = seciliSekme == tab;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => seciliSekme = tab),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: secili
-                                ? widget.sekmeRenk
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Center(
-                            child: Text(
-                              tab,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: secili
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // LİSTE (GERÇEK RESİMLİ)
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: ilanlar.length,
-                itemBuilder: (context, index) =>
-                    _kategoriIlanKarti(ilanlar[index]),
-              ),
-            ),
-          ],
+                );
+              },
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  Widget _kategoriIlanKarti(Map<String, String> ilan) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
-        ],
-      ),
-      child: Row(
-        children: [
-          // GERÇEK RESİM BURADA!
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              ilan["resim"]!,
-              width: 85,
-              height: 105,
-              fit: BoxFit.cover,
-              // Resim klasörde yoksa veya isim yanlışsa gri kutu göstersin diye koruma
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 85,
-                  height: 105,
-                  color: Colors.grey.shade200,
-                  child: const Icon(
-                    Icons.image_not_supported,
-                    color: Colors.grey,
-                  ),
-                );
-              },
-            ),
+class _StateMessage extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final VoidCallback onRetry;
+
+  const _StateMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        const SizedBox(height: 140),
+        Icon(icon, size: 52, color: Colors.grey),
+        const SizedBox(height: 16),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.black54),
+        ),
+        const SizedBox(height: 18),
+        Center(
+          child: OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Yenile'),
           ),
-          const SizedBox(width: 12),
-          // Detaylar
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      ilan["baslik"]!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.favorite_border,
-                      size: 18,
-                      color: Colors.black54,
-                    ),
-                  ],
-                ),
-                Text(
-                  ilan["detay"]!,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.person_outline, size: 12),
-                    const SizedBox(width: 4),
-                    Text(ilan["kisi"]!, style: const TextStyle(fontSize: 11)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 12),
-                        const SizedBox(width: 4),
-                        Text(
-                          ilan["sure"]!,
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50),
-                        minimumSize: const Size(60, 26),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        "Takip Et",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

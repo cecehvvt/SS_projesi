@@ -33,7 +33,11 @@ class SifremiUnuttumEkrani extends StatelessWidget {
                 color: Colors.green.shade50,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.mark_email_read_outlined, size: 60, color: Colors.green),
+              child: const Icon(
+                Icons.mark_email_read_outlined,
+                size: 60,
+                color: Colors.green,
+              ),
             ),
             const SizedBox(height: 24),
             const Text(
@@ -48,7 +52,6 @@ class SifremiUnuttumEkrani extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // E-posta Kutusu
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -68,7 +71,6 @@ class SifremiUnuttumEkrani extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Kod Gönder Butonu
             SizedBox(
               width: double.infinity,
               height: 54,
@@ -76,23 +78,30 @@ class SifremiUnuttumEkrani extends StatelessWidget {
                 onPressed: () {
                   // Şimdilik sadece uyarı versin
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Şifre sıfırlama bağlantısı gönderildi!')),
+                    const SnackBar(
+                      content: Text('Şifre sıfırlama bağlantısı gönderildi!'),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF558B6E), // Tasarımdaki yeşil tonu
+                  backgroundColor: const Color(0xFF558B6E),
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: const Text(
                   "Kod Gönder",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
 
-            // Güvenlik Uyarı Kartı
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -102,37 +111,54 @@ class SifremiUnuttumEkrani extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.verified_user_outlined, color: Colors.green, size: 30),
+                  Icon(
+                    Icons.verified_user_outlined,
+                    color: Colors.green,
+                    size: 30,
+                  ),
                   SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Güvenliğin bizim için önemli", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text(
+                          "Güvenliğin bizim için önemli",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                         SizedBox(height: 4),
-                        Text("E-posta adresini başkalarıyla paylaşmayız.", style: TextStyle(fontSize: 12, color: Colors.black87)),
+                        Text(
+                          "E-posta adresini başkalarıyla paylaşmayız.",
+                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                        ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 30),
 
-            // Veya Çizgisi
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade400)),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text("Veya", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    "Veya",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 Expanded(child: Divider(color: Colors.grey.shade400)),
               ],
             ),
             const SizedBox(height: 30),
 
-            // Girişe Dön Butonu
             SizedBox(
               width: double.infinity,
               height: 54,
@@ -141,11 +167,17 @@ class SifremiUnuttumEkrani extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back, color: Colors.black87),
                 label: const Text(
                   "Girişe Dön",
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.grey.shade300),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

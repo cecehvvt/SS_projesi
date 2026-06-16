@@ -1,436 +1,433 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class SohbetEkrani extends StatelessWidget {
-  const SohbetEkrani({super.key});
+import '../../models/mesaj_model.dart';
+import '../../services/mesaj_service.dart';
+import '../../widgets/listing_image.dart';
+
+class SohbetEkrani extends StatefulWidget {
+  final String karsiKullaniciId;
+  final String karsiKullaniciAd;
+  final String? ilanId;
+  final String? ilanBaslik;
+  final String? ilanKonum;
+  final String? ilanFotoUrl;
+
+  const SohbetEkrani({
+    super.key,
+    this.karsiKullaniciId = '',
+    this.karsiKullaniciAd = 'Vesta kullanicisi',
+    this.ilanId,
+    this.ilanBaslik,
+    this.ilanKonum,
+    this.ilanFotoUrl,
+  });
+
+  factory SohbetEkrani.fromSummary(SohbetOzeti sohbet) {
+    return SohbetEkrani(
+      karsiKullaniciId: sohbet.karsiKullaniciId,
+      karsiKullaniciAd: sohbet.karsiKullaniciAd,
+      ilanId: sohbet.ilanId,
+      ilanBaslik: sohbet.ilanBaslik,
+      ilanKonum: sohbet.ilanKonum,
+      ilanFotoUrl: sohbet.ilanFotoUrl,
+    );
+  }
+
+  @override
+  State<SohbetEkrani> createState() => _SohbetEkraniState();
+}
+
+class _SohbetEkraniState extends State<SohbetEkrani> {
+  static const _currentUserId = 'user-1';
+
+  final _service = const MesajService();
+  final _controller = TextEditingController();
+  final _scrollController = ScrollController();
+  List<MesajModel> _messages = [];
+  Timer? _pollTimer;
+  bool _loading = true;
+  bool _sending = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+    _pollTimer = Timer.periodic(
+      const Duration(seconds: 3),
+      (_) => _loadMessages(silent: true),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final canChat = widget.karsiKullaniciId.isNotEmpty;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Hafif gri arka plan
+      backgroundColor: const Color(0xFFF7F8F8),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 1, // Altına hafif bir çizgi/gölge atsın
-        title: const Row(
+        foregroundColor: Colors.black87,
+        elevation: 1,
+        title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 18,
-              backgroundColor: Color(0xFFE0E0E0),
-              child: Icon(Icons.person, color: Colors.white),
+              backgroundColor: Color(0xFFE8F5EE),
+              child: Icon(Icons.person_outline, color: Color(0xFF2E7D32)),
             ),
-            SizedBox(width: 10),
-            Column(
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.karsiKullaniciAd,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const Text(
+                    'Guvenli sohbet',
+                    style: TextStyle(fontSize: 11, color: Color(0xFF2E7D32)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: canChat
+          ? Column(
+              children: [
+                if (widget.ilanBaslik != null) _ListingHeader(widget: widget),
+                Expanded(child: _buildMessages()),
+                _Composer(
+                  controller: _controller,
+                  sending: _sending,
+                  onSend: _send,
+                ),
+              ],
+            )
+          : const _NoChatSelected(),
+    );
+  }
+
+  Widget _buildMessages() {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 42, color: Colors.grey),
+              const SizedBox(height: 12),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: _loadMessages,
+                child: const Text('Tekrar dene'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (_messages.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Bu ilan icin henuz mesaj yok. Ilk mesaji yazabilirsin.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black54),
+          ),
+        ),
+      );
+    }
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      itemCount: _messages.length,
+      itemBuilder: (context, index) {
+        final message = _messages[index];
+        return _MessageBubble(
+          message: message,
+          mine: message.gondericId == _currentUserId,
+        );
+      },
+    );
+  }
+
+  Future<void> _loadMessages({bool silent = false}) async {
+    if (widget.karsiKullaniciId.isEmpty) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+    if (!silent && mounted) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
+    try {
+      final messages = await _service.getMesajlar(
+        karsiKullaniciId: widget.karsiKullaniciId,
+        ilanId: widget.ilanId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _messages = messages;
+        _loading = false;
+        _error = null;
+      });
+      _scrollToBottom();
+    } catch (error) {
+      if (!mounted || silent) return;
+      setState(() {
+        _loading = false;
+        _error = 'Mesajlar yuklenemedi. Lutfen tekrar dene.';
+      });
+    }
+  }
+
+  Future<void> _send() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _sending) return;
+    setState(() => _sending = true);
+    try {
+      final message = await _service.mesajGonder(
+        aliciId: widget.karsiKullaniciId,
+        ilanId: widget.ilanId,
+        icerik: text,
+      );
+      _controller.clear();
+      setState(() {
+        _messages = [..._messages, message];
+      });
+      _scrollToBottom();
+    } on MesajServiceException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+}
+
+class _ListingHeader extends StatelessWidget {
+  final SohbetEkrani widget;
+
+  const _ListingHeader({required this.widget});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+          ListingImage(
+            source: widget.ilanFotoUrl ?? '',
+            width: 48,
+            height: 48,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Merve C.',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  widget.ilanBaslik ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                if (widget.ilanKonum != null) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    widget.ilanKonum!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Composer extends StatelessWidget {
+  final TextEditingController controller;
+  final bool sending;
+  final VoidCallback onSend;
+
+  const _Composer({
+    required this.controller,
+    required this.sending,
+    required this.onSend,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
+      ),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: controller,
+                minLines: 1,
+                maxLines: 4,
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => onSend(),
+                decoration: InputDecoration(
+                  hintText: 'Mesajini yaz...',
+                  filled: true,
+                  fillColor: const Color(0xFFF1F3F3),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.shield, color: Colors.green, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'Güvenli Sohbet',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton.filled(
+              onPressed: sending ? null : onSend,
+              icon: sending
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.send),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  final MesajModel message;
+  final bool mine;
+
+  const _MessageBubble({required this.message, required this.mine});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 300),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: mine ? const Color(0xFFDDF2E7) : Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: Radius.circular(mine ? 16 : 4),
+            bottomRight: Radius.circular(mine ? 4 : 16),
+          ),
+          border: mine ? null : Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: mine
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Text(message.icerik, style: const TextStyle(height: 1.35)),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  message.saatFormati,
+                  style: const TextStyle(fontSize: 11, color: Colors.black54),
                 ),
+                if (mine) ...[
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.done_all,
+                    size: 15,
+                    color: Color(0xFF2E7D32),
+                  ),
+                ],
               ],
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.add_comment_outlined,
-              color: Colors.black,
-            ), // YENİ: Tasarıma uygun ikon
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Üstteki Konuşulan Ürün Bilgi Kartı
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-            ),
-            child: Row(
-              children: [
-                // YENİ: Gerçek Ürün Resmi Eklendi
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    'assets/images/ilanlar/bez.png', // Bebek bezi resmimiz
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 40,
-                      height: 40,
-                      color: Colors.grey.shade200,
-                      child: const Icon(
-                        Icons.image_outlined,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Bebek Bezi (2 Numara)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            size: 12,
-                            color: Colors.black54,
-                          ),
-                          SizedBox(width: 2),
-                          Text(
-                            'Üsküdar, İstanbul',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'İlanı Görüntüle >',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Mesajlaşma Alanı
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Tarih Ayracı
-                Center(
-                  child: Text(
-                    'Bugün',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Karşı Tarafın Mesajı
-                _buildMesajBalonu(
-                  mesaj:
-                      'Merhaba, ilanınızı gördüm. Bebek bezine ihtiyacım var. Hala uygun mu?',
-                  saat: '10:35',
-                  benimMesajimMi: false,
-                ),
-
-                // Benim Mesajım
-                _buildMesajBalonu(
-                  mesaj:
-                      'Merhaba, evet hala uygun. 1 paket açılmamış, 80 adet bez var. Size nasıl yardımcı olabilirim?',
-                  saat: '10:37',
-                  benimMesajimMi: true,
-                ),
-
-                // Karşı Tarafın Mesajı
-                _buildMesajBalonu(
-                  mesaj: 'Çok sevindim. Nereden ve ne zaman teslim alabiliriz?',
-                  saat: '10:45',
-                  benimMesajimMi: false,
-                ),
-
-                // Benim Konum/Adres Mesajım
-                _buildMesajBalonu(
-                  mesaj:
-                      'Yarın saat 15:00 civarı uygun olur. Tam adresi paylaşır mısınız?',
-                  saat: '10:48',
-                  benimMesajimMi: true,
-                ),
-
-                // Karşı Tarafın Adres Mesajı
-                _buildMesajBalonu(
-                  mesaj: 'Tabii, adresi size konum olarak göndereceğim.',
-                  saat: '10:50',
-                  benimMesajimMi: false,
-                ),
-
-                // Konum Kartı (Özel Tasarım)
-                _buildKonumKarti(saat: '10:51'),
-
-                // Benim Onay Mesajım
-                _buildMesajBalonu(
-                  mesaj: 'Teşekkür ederim, görüşmek üzere.',
-                  saat: '10:55',
-                  benimMesajimMi: true,
-                ),
-              ],
-            ),
-          ),
-
-          // Alt Mesaj Yazma Alanı
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey.shade300)),
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.add_circle_outline,
-                      color: Colors.grey,
-                      size: 28,
-                    ),
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Mesajınızı yazın...',
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.green, size: 24),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
+}
 
-  // Normal Mesaj Balonu Şablonu
-  Widget _buildMesajBalonu({
-    required String mesaj,
-    required String saat,
-    required bool benimMesajimMi,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Row(
-        mainAxisAlignment: benimMesajimMi
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!benimMesajimMi) ...[
-            const CircleAvatar(
-              radius: 12,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 14, color: Colors.white),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: benimMesajimMi ? const Color(0xFFD4EAE2) : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: benimMesajimMi
-                      ? const Radius.circular(16)
-                      : const Radius.circular(0),
-                  bottomRight: benimMesajimMi
-                      ? const Radius.circular(0)
-                      : const Radius.circular(16),
-                ),
-                border: benimMesajimMi
-                    ? null
-                    : Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: benimMesajimMi
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    mesaj,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        saat,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      if (benimMesajimMi) ...[
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.done_all,
-                          size: 14,
-                          color: Colors.green,
-                        ), // Okundu işareti
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (benimMesajimMi)
-            const SizedBox(width: 20), // Benim mesajımsa sağdan biraz boşluk
-        ],
-      ),
-    );
-  }
+class _NoChatSelected extends StatelessWidget {
+  const _NoChatSelected();
 
-  // Özel Konum Paylaşma Kartı Şablonu
-  Widget _buildKonumKarti({required String saat}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const CircleAvatar(
-            radius: 12,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, size: 14, color: Colors.white),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(0),
-                  bottomRight: Radius.circular(16),
-                ),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.green,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Üsküdar Mah. Doğa Sok. No:15',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'Üsküdar / İstanbul',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Konumu Görüntüle >',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    saat,
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Text(
+          'Sohbet baslatmak icin Mesajlar ekranindan bir ilan sec.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black54),
+        ),
       ),
     );
   }

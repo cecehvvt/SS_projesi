@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'giris_ekrani.dart';
 import 'kayit_ekrani.dart';
 
@@ -13,18 +14,28 @@ class KarsilamaEkrani extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-            Image.asset('assets/images/vesta_logo.png', width: 260),
+            SizedBox(
+              width: double.infinity,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/vesta_logo.png',
+                  width: 200,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
             const SizedBox(height: 80),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Giriş Yap Butonu
                 SizedBox(
                   width: 150,
                   height: 55,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFA8C8AE),
+                      foregroundColor: Colors.black,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -36,19 +47,22 @@ class KarsilamaEkrani extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      "Giriş Yap",
-                      style: TextStyle(fontSize: 24, color: Colors.black),
+                      'Giris Yap',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
-
-                // Kaydol Butonu
                 SizedBox(
                   width: 150,
                   height: 55,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.black,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -60,8 +74,11 @@ class KarsilamaEkrani extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      "Kaydol",
-                      style: TextStyle(fontSize: 24, color: Colors.black),
+                      'Kayit Ol',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),

@@ -4,7 +4,10 @@ class ApiSabitler {
   // ─────────────────────────────────────────────
   // BASE URL
   // ─────────────────────────────────────────────
-  static const String baseUrl = 'https://api.vesta.com/v1';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://127.0.0.1:8081/api',
+  );
 
   // ─────────────────────────────────────────────
   // AUTH
@@ -84,8 +87,7 @@ class ApiSabitler {
   static String talepEt(String ilanId) => '$baseUrl/ilanlar/$ilanId/talep';
 
   /// Talebi iptal et: DELETE /ilanlar/{ilanId}/talep
-  static String talepIptal(String ilanId) =>
-      '$baseUrl/ilanlar/$ilanId/talep';
+  static String talepIptal(String ilanId) => '$baseUrl/ilanlar/$ilanId/talep';
 
   // ─────────────────────────────────────────────
   // MESAJLAR
@@ -128,9 +130,10 @@ class ApiSabitler {
   // ─────────────────────────────────────────────
   // SAYFALAMA
   // ─────────────────────────────────────────────
-  static const int sayfaBasiIlan = 10;    // liste ekranında bir sayfada kaç ilan
-  static const int maksimumFoto = 5;      // ilan başına max fotoğraf (sayfa 20)
-  static const int maksHakkindaKarakter = 150; // profil hakkında alanı (sayfa profil)
+  static const int sayfaBasiIlan = 10; // liste ekranında bir sayfada kaç ilan
+  static const int maksimumFoto = 5; // ilan başına max fotoğraf (sayfa 20)
+  static const int maksHakkindaKarakter =
+      150; // profil hakkında alanı (sayfa profil)
 
   // ─────────────────────────────────────────────
   // LOCAL STORAGE ANAHTARLARI

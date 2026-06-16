@@ -1,58 +1,67 @@
 import 'package:flutter/material.dart';
-import 'bagislananlar_ekrani.dart';
-import 'ihtiyaclar_ekrani.dart';
-import 'kategori_detay_ekrani.dart';
-import 'filtre_ekrani.dart';
 
-class AnaSayfaEkrani extends StatelessWidget {
+import '../../models/app_listing.dart';
+import '../../services/ilan_service.dart';
+import '../../utils/listing_taxonomy.dart';
+import '../../widgets/listing_card.dart';
+import '../ilan/ilan_detay_ekrani.dart';
+import 'filtre_ekrani.dart';
+import 'kategori_detay_ekrani.dart';
+
+class AnaSayfaEkrani extends StatefulWidget {
   const AnaSayfaEkrani({super.key});
+
+  @override
+  State<AnaSayfaEkrani> createState() => _AnaSayfaEkraniState();
+}
+
+class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
+  final _service = const IlanService();
+  final _searchController = TextEditingController();
+  late Future<List<AppListing>> _future = _service.getListings();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8F9FA),
       body: Column(
         children: [
-          // 1. ÜST KISIM (Nane Yeşili Arka Plan ve Navigasyon Butonları)
           Container(
             color: const Color(0xFFB2D3C2),
-            padding: const EdgeInsets.only(
-              top: 60,
-              left: 16,
-              right: 16,
-              bottom: 20,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 56, 16, 18),
             child: Column(
               children: [
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Row(
-                          children: [
-                            // BAĞIŞLANANLAR BUTONU (Etkileşimli Beyaz Buton)
-                            _anaMenuButonu(
-                              context,
-                              "Bağışlananlar",
-                              const BagislananlarEkrani(),
-                            ),
-                            // İHTİYAÇLAR BUTONU (Etkileşimli Beyaz Buton)
-                            _anaMenuButonu(
-                              context,
-                              "İhtiyaçlar",
-                              const IhtiyaclarEkrani(),
-                            ),
-                          ],
+                      child: TextField(
+                        controller: _searchController,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) => _reload(),
+                        decoration: InputDecoration(
+                          hintText: 'Urun, kategori veya konum ara',
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: () {
+                    const SizedBox(width: 10),
+                    IconButton.filled(
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                      ),
+                      onPressed: () {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
@@ -60,172 +69,101 @@ class AnaSayfaEkrani extends StatelessWidget {
                           builder: (context) => const FiltreEkrani(),
                         );
                       },
-                      child: Icon(
+                      icon: const Icon(
                         Icons.filter_alt_outlined,
                         color: Colors.black87,
-                        size: 28,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 15),
-                // Arama Çubuğu
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "İhtiyacın olan eşyayı ara...",
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  ),
-                ),
               ],
             ),
           ),
-
-          // 2. ALT KISIM (Kaydırılabilir İçerik)
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            child: RefreshIndicator(
+              onRefresh: () async => _reload(),
+              child: ListView(
+                padding: const EdgeInsets.all(16),
                 children: [
                   const Text(
-                    "Kategoriler",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'Kategoriler',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
-
-                  // 6 AKILLI KATEGORİ KUTUSU
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 3,
-                    childAspectRatio: 2.2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
+                  _categoryGrid(),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _kategoriKutusu(
-                        context,
-                        "Kadın\nGiyim",
-                        "Kadın Giyim",
-                        Icons.checkroom,
-                        Colors.blue.shade50,
-                        const Color(0xFFAFD6C4),
-                        const Color(0xFFDFF0E6),
+                      const Text(
+                        'Guncel Ilanlar',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                      _kategoriKutusu(
-                        context,
-                        "Erkek\nGiyim",
-                        "Erkek Giyim",
-                        Icons.accessibility_new,
-                        Colors.blue.shade50,
-                        const Color(0xFFAFD6C4),
-                        const Color(0xFFDFF0E6),
-                      ),
-                      _kategoriKutusu(
-                        context,
-                        "Çocuk &\nBebek",
-                        "Çocuk & Bebek",
-                        Icons.child_care,
-                        Colors.blue.shade50,
-                        const Color(0xFFF4D8CD),
-                        const Color(0xFFF9E8E1),
-                      ),
-                      _kategoriKutusu(
-                        context,
-                        "Elektronik",
-                        "Elektronik",
-                        Icons.tv,
-                        Colors.blue.shade50,
-                        const Color(0xFFD1C4E9),
-                        const Color(0xFFEDE7F6),
-                      ),
-                      _kategoriKutusu(
-                        context,
-                        "Ev &\nYaşam",
-                        "Ev & Yaşam",
-                        Icons.home_outlined,
-                        Colors.blue.shade50,
-                        const Color(0xFFC8E6C9),
-                        const Color(0xFFE8F5E9),
-                      ),
-                      _kategoriKutusu(
-                        context,
-                        "Kırtasiye &\nDiğer",
-                        "Kırtasiye & Diğer",
-                        Icons.edit,
-                        Colors.blue.shade50,
-                        const Color(0xFFB3E5FC),
-                        const Color(0xFFE1F5FE),
+                      TextButton.icon(
+                        onPressed: _reload,
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: const Text('Yenile'),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 25),
-
-                  const Text(
-                    "Öne Çıkan İlanlar",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
                   const SizedBox(height: 12),
-
-                  // ÖNE ÇIKAN İLANLAR - RESİMLER "ilanlar" KLASÖRÜNDEN GELİYOR
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.70,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15,
-                    children: [
-                      // YENİ: Kışlık Mont'a tıklanınca İlan Detay Ekranına gidecek
-                      _ilanKarti(
-                        "Kışlık Mont",
-                        "İstanbul, Beyoğlu . 2 km",
-                        "Ahmet Y.",
-                        "Bağış",
-                        "Talep et",
-                        const Color(0xFFA5D6A7),
-                        "assets/images/ilanlar/mont2.png",
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/ilan_detay',
-                          ); // Sihirli dokunuş!
+                  FutureBuilder<List<AppListing>>(
+                    future: _future,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 80),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return _StateMessage(
+                          icon: Icons.wifi_off_outlined,
+                          title: 'Ilanlar yuklenemedi',
+                          message:
+                              'Sunucuya ulasilamadi. Lutfen tekrar deneyin.',
+                          onRetry: _reload,
+                        );
+                      }
+                      final listings = snapshot.data ?? const [];
+                      if (listings.isEmpty) {
+                        return _StateMessage(
+                          icon: Icons.inventory_2_outlined,
+                          title: 'Henuz ilan yok',
+                          message: 'Ilk ilani olusturarak baslayabilirsin.',
+                          onRetry: _reload,
+                        );
+                      }
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: listings.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.70,
+                              mainAxisSpacing: 14,
+                              crossAxisSpacing: 14,
+                            ),
+                        itemBuilder: (context, index) {
+                          final listing = listings[index];
+                          return ListingCard(
+                            listing: listing,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    IlanDetayEkrani(listingId: listing.id),
+                              ),
+                            ),
+                            onFavoriteTap: () => _toggleFavorite(listing),
+                          );
                         },
-                      ),
-                      _ilanKarti(
-                        "Bebek Beşiği",
-                        "İstanbul, Beyoğlu . 2 km",
-                        "Zeynep A.",
-                        "Bağış",
-                        "Talep et",
-                        const Color(0xFFA5D6A7),
-                        "assets/images/ilanlar/besik.png",
-                      ),
-                      _ilanKarti(
-                        "Atkı",
-                        "İstanbul, Kadıköy . 5 km",
-                        "Merve K.",
-                        "İhtiyaç",
-                        "Yardım et",
-                        Colors.red.shade300,
-                        "assets/images/ilanlar/atki.png",
-                      ),
-                      _ilanKarti(
-                        "Çalışma Masası",
-                        "İstanbul, Beyoğlu . 2 km",
-                        "Mehmet T.",
-                        "İhtiyaç",
-                        "Yardım et",
-                        Colors.red.shade300,
-                        "assets/images/ilanlar/masa2.png",
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -236,212 +174,108 @@ class AnaSayfaEkrani extends StatelessWidget {
     );
   }
 
-  // Üst menü butonları için yardımcı fonksiyon
-  Widget _anaMenuButonu(BuildContext context, String baslik, Widget sayfa) {
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(30),
-          splashColor: const Color(0xFF1B4D3E).withOpacity(0.4),
+  Widget _categoryGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: ListingTaxonomy.categories.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2.8,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+      ),
+      itemBuilder: (context, index) {
+        final category = ListingTaxonomy.categories[index];
+        return InkWell(
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => sayfa),
+            MaterialPageRoute(
+              builder: (_) => KategoriDetayEkrani(
+                baslik: category.name,
+                ikon: Icons.category_outlined,
+                anaRenk: const Color(0xFFAFD6C4),
+                sekmeRenk: const Color(0xFFE8F5EE),
+              ),
+            ),
           ),
+          borderRadius: BorderRadius.circular(10),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
             alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
             child: Text(
-              baslik,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Kategori kutuları için yardımcı fonksiyon
-  Widget _kategoriKutusu(
-    BuildContext context,
-    String ekrandakiAd,
-    String gercekAd,
-    IconData ikon,
-    Color kutuRenk,
-    Color sayfaRenk,
-    Color sekmeRenk,
-  ) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => KategoriDetayEkrani(
-            baslik: gercekAd,
-            ikon: ikon,
-            anaRenk: sayfaRenk,
-            sekmeRenk: sekmeRenk,
-          ),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: kutuRenk,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(ikon, size: 20),
-            const SizedBox(width: 4),
-            Text(
-              ekrandakiAd,
-              style: const TextStyle(fontSize: 11),
+              category.name,
               textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  // İlan kartları için yardımcı fonksiyon (YENİ: onTap eklendi)
-  Widget _ilanKarti(
-    String baslik,
-    String konum,
-    String kisi,
-    String tip,
-    String butonYazisi,
-    Color butonRengi,
-    String resimYolu, {
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap, // Eğer tıklanma özelliği verildiyse çalıştırır
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: Image.asset(
-                      resimYolu,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          width: double.infinity,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: butonRengi,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        tip,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Icon(Icons.favorite_border, size: 20),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    baslik,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        size: 12,
-                        color: Colors.black54,
-                      ),
-                      Expanded(
-                        child: Text(
-                          konum,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black54,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 26,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: butonRengi,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        butonYazisi,
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+  void _reload() {
+    setState(() {
+      _future = _service.getListings(query: _searchController.text.trim());
+    });
+  }
+
+  Future<void> _toggleFavorite(AppListing listing) async {
+    try {
+      if (listing.favorite) {
+        await _service.removeFavorite(listing.id);
+      } else {
+        await _service.addFavorite(listing.id);
+      }
+      _reload();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Favori islemi tamamlanamadi.')),
+      );
+    }
+  }
+}
+
+class _StateMessage extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final VoidCallback onRetry;
+
+  const _StateMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 54),
+      child: Column(
+        children: [
+          Icon(icon, size: 42, color: Colors.grey),
+          const SizedBox(height: 12),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 4),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.black54),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Tekrar dene'),
+          ),
+        ],
       ),
     );
   }

@@ -1,58 +1,52 @@
 import 'package:flutter/material.dart';
 
-// 1. Yeni oluşturduğumuz ana sayfa tasarımını içeri alıyoruz
 import 'ana_sayfa/ana_sayfa_ekrani.dart';
-
-// 2. Diğer ekranların importları (Bunların klasör yapına göre doğruluğundan emin ol)
 import 'favoriler/favoriler_ekrani.dart';
-import 'sepet/sepetim_ekrani.dart';
-import 'mesajlar/mesajlar_ekrani.dart';
 import 'ilan/ilan_olustur_ekrani.dart';
+import 'mesajlar/mesajlar_ekrani.dart';
 import 'profil/profil_ekrani.dart';
+import 'sepet/sepetim_ekrani.dart';
 
 class AnaSayfaYonetici extends StatefulWidget {
-  const AnaSayfaYonetici({super.key});
+  final int initialIndex;
+
+  const AnaSayfaYonetici({super.key, this.initialIndex = 0});
 
   @override
   State<AnaSayfaYonetici> createState() => _AnaSayfaYoneticiState();
 }
 
 class _AnaSayfaYoneticiState extends State<AnaSayfaYonetici> {
-  // Uygulama ilk açıldığında hangi sayfanın (indeksin) seçili geleceğini belirler
-  int _seciliSayfa = 0;
+  late int _seciliSayfa;
 
-  // Alt menüdeki butonlara tıklandığında hangi widget'ın açılacağını tutan liste
-  final List<Widget> _sayfalar = [
-    const AnaSayfaEkrani(), // 0. İndeks: Senin en son attığın o şık tasarım
-    const MesajlarEkrani(), // 1. İndeks
-    const IlanOlusturEkrani(), // 2. İndeks
-    const FavorilerEkrani(), // 3. İndeks
-    const SepetimEkrani(), // 4. İndeks
-    const ProfilEkrani(), // 5. İndeks
+  late final List<Widget> _sayfalar = [
+    const AnaSayfaEkrani(),
+    const MesajlarEkrani(altMenuGoster: false),
+    const IlanOlusturEkrani(altMenuGoster: false),
+    const FavorilerEkrani(altMenuGoster: false),
+    const SepetimEkrani(altMenuGoster: false),
+    const ProfilEkrani(),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Kullanıcı ana menüdeyken geri tuşuna basarsa giriş ekranına geri dönmesin,
-        // uygulamayı arka plana atsın veya tamamen kapatsın.
-        return true;
-      },
-      child: Scaffold(
-        // Seçili olan sayfayı listeden çekip ekrana basar
-        body: _sayfalar[_seciliSayfa],
+  void initState() {
+    super.initState();
+    _seciliSayfa = widget.initialIndex.clamp(0, _sayfalar.length - 1);
+  }
 
-        // Alt Navigasyon Çubuğu
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
+        body: IndexedStack(index: _seciliSayfa, children: _sayfalar),
         bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType
-              .fixed, // 4'ten fazla item olduğu için bu şart
-          backgroundColor: const Color(0xFFB2D3C2), // Tasarımdaki mint yeşili
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFFB2D3C2),
           currentIndex: _seciliSayfa,
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.black54,
           onTap: (index) {
-            // Butona tıklandığında ekrana o sayfayı getirir
             setState(() {
               _seciliSayfa = index;
             });

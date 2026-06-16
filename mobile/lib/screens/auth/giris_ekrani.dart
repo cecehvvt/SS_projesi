@@ -46,7 +46,6 @@ class _GirisEkraniState extends State<GirisEkrani> {
             ),
             const SizedBox(height: 40),
 
-            // E-posta / Telefon
             _buildInputField(
               controller: emailController,
               hint: "E-posta veya Telefon",
@@ -54,16 +53,12 @@ class _GirisEkraniState extends State<GirisEkrani> {
             ),
             const SizedBox(height: 14),
 
-            // Şifre
             _buildPasswordField(),
             const SizedBox(height: 6),
-
-            // Şifremi Unuttum
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  // Bizim yeni yarattığımız sayfaya gidiyor!
                   Navigator.pushNamed(context, "/sifremi_unuttum");
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.black54),
@@ -74,7 +69,6 @@ class _GirisEkraniState extends State<GirisEkrani> {
               ),
             ),
 
-            // Giriş Yap Butonu
             SizedBox(
               width: double.infinity,
               height: 54,
@@ -106,7 +100,6 @@ class _GirisEkraniState extends State<GirisEkrani> {
             ),
             const SizedBox(height: 16),
 
-            // Hesabın yok mu?
             Center(
               child: TextButton(
                 onPressed: () {

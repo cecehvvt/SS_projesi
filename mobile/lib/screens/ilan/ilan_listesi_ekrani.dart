@@ -6,15 +6,13 @@ class IlanListesiEkrani extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Açık gri arka plan
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFA5D6C1), // Tasarımdaki üst yeşil bar rengi
+        backgroundColor: const Color(0xFFA5D6C1),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-            // Geri dönme işlemi
-          },
+          onPressed: () {},
         ),
         title: const Text(
           'Bağışlananlar',
@@ -26,7 +24,6 @@ class IlanListesiEkrani extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Arama ve Filtre Çubuğu
             Row(
               children: [
                 Expanded(
@@ -41,7 +38,11 @@ class IlanListesiEkrani extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: 'Ara (ürün, başlık, kategori, konum)',
                         hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
-                        prefixIcon: Icon(Icons.search, color: Colors.grey, size: 20),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 10),
                       ),
@@ -59,16 +60,23 @@ class IlanListesiEkrani extends StatelessWidget {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.filter_alt_outlined, color: Colors.green, size: 20),
+                      Icon(
+                        Icons.filter_alt_outlined,
+                        color: Colors.green,
+                        size: 20,
+                      ),
                       SizedBox(width: 4),
-                      Text('Filtrele', style: TextStyle(color: Colors.green, fontSize: 12)),
+                      Text(
+                        'Filtrele',
+                        style: TextStyle(color: Colors.green, fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // "Tümü" ve "Bağışladıklarım" Sekmeleri (Temsili)
             Container(
               height: 40,
@@ -81,11 +89,17 @@ class IlanListesiEkrani extends StatelessWidget {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4EAE2), // Seçili sekme rengi
+                        color: const Color(0xFFD4EAE2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Center(
-                        child: Text('Tümü', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        child: Text(
+                          'Tümü',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -94,9 +108,16 @@ class IlanListesiEkrani extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.favorite_border, size: 16, color: Colors.grey),
+                          Icon(
+                            Icons.favorite_border,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
                           SizedBox(width: 4),
-                          Text('Bağışladıklarım', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                          Text(
+                            'Bağışladıklarım',
+                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
                         ],
                       ),
                     ),
@@ -113,7 +134,8 @@ class IlanListesiEkrani extends StatelessWidget {
                   _buildIlanKarti(
                     kategori: 'Bebek & Çocuk',
                     baslik: 'Bebek Arabası',
-                    aciklama: 'Az kullanılmış, temizdir. İhtiyacı olan bir aileye vermek istiyorum.',
+                    aciklama:
+                        'Az kullanılmış, temizdir. İhtiyacı olan bir aileye vermek istiyorum.',
                     kullanici: 'Zeynep Ş.',
                     konum: 'Üsküdar, İstanbul',
                     zaman: '5 saat önce',
@@ -122,7 +144,8 @@ class IlanListesiEkrani extends StatelessWidget {
                   _buildIlanKarti(
                     kategori: 'Ev & Yaşam',
                     baslik: 'Çalışma Masası',
-                    aciklama: 'Temiz ve sağlamdır. İhtiyaç sahibi birine vermek istiyorum.',
+                    aciklama:
+                        'Temiz ve sağlamdır. İhtiyaç sahibi birine vermek istiyorum.',
                     kullanici: 'Ali B.',
                     konum: 'Beyoğlu, İstanbul',
                     zaman: '4 saat önce',
@@ -152,7 +175,7 @@ class IlanListesiEkrani extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -172,7 +195,6 @@ class IlanListesiEkrani extends StatelessWidget {
             child: const Icon(Icons.image, color: Colors.grey),
           ),
           const SizedBox(width: 12),
-          // Sağ taraf içerik alanı
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,42 +203,74 @@ class IlanListesiEkrani extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4EAE2), // Kategori arka plan rengi
+                        color: const Color(0xFFD4EAE2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         kategori,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal,
+                        ),
                       ),
                     ),
-                    const Icon(Icons.favorite_border, color: Colors.black54, size: 20),
+                    const Icon(
+                      Icons.favorite_border,
+                      color: Colors.black54,
+                      size: 20,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(baslik, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  baslik,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(
-                  aciklama, 
+                  aciklama,
                   style: const TextStyle(fontSize: 11, color: Colors.black87),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                // Kullanıcı, Konum ve Zaman bilgileri
                 Row(
                   children: [
                     const Icon(Icons.person, size: 12, color: Colors.black54),
                     const SizedBox(width: 4),
-                    Text(kullanici, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text(
+                      kullanici,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, size: 12, color: Colors.black54),
+                    const Icon(
+                      Icons.location_on,
+                      size: 12,
+                      color: Colors.black54,
+                    ),
                     const SizedBox(width: 4),
-                    Text(konum, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                    Text(
+                      konum,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.black54,
+                      ),
+                    ),
                   ],
                 ),
                 Row(
@@ -224,28 +278,41 @@ class IlanListesiEkrani extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.access_time, size: 12, color: Colors.black54),
+                        const Icon(
+                          Icons.access_time,
+                          size: 12,
+                          color: Colors.black54,
+                        ),
                         const SizedBox(width: 4),
-                        Text(zaman, style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                        Text(
+                          zaman,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.black54,
+                          ),
+                        ),
                       ],
                     ),
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B824B), // Koyu yeşil buton
+                        backgroundColor: const Color(0xFF3B824B),
                         minimumSize: const Size(60, 24),
                         padding: EdgeInsets.zero,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)
-                        )
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const Text('Talep Et', style: TextStyle(fontSize: 10, color: Colors.white)),
+                      child: const Text(
+                        'Talep Et',
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

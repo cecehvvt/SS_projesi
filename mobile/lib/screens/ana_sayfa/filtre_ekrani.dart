@@ -5,6 +5,7 @@ enum FiltreTuru { ihtiyac, bagis }
 class FiltreEkrani extends StatefulWidget {
   final FiltreTuru tur;
 
+  const FiltreEkrani({super.key, this.tur = FiltreTuru.bagis});
   const FiltreEkrani.ihtiyac({super.key}) : tur = FiltreTuru.ihtiyac;
   const FiltreEkrani.bagis({super.key}) : tur = FiltreTuru.bagis;
 

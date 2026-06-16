@@ -35,7 +35,11 @@ class VestaIlanKarti extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Padding(
@@ -43,7 +47,6 @@ class VestaIlanKarti extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // RESİM VE MESAFE ETİKETİ
             Stack(
               children: [
                 ClipRRect(
@@ -54,30 +57,50 @@ class VestaIlanKarti extends StatelessWidget {
                     height: 140,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      width: 110, height: 140, color: Colors.grey.shade200, child: const Icon(Icons.image_not_supported),
+                      width: 110,
+                      height: 140,
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.image_not_supported),
                     ),
                   ),
                 ),
                 if (mesafe.isNotEmpty)
                   Positioned(
-                    bottom: 8, left: 8,
+                    bottom: 8,
+                    left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                      decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       child: Row(
                         children: [
-                          const Icon(Icons.location_on, color: Colors.white, size: 12),
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 12,
+                          ),
                           const SizedBox(width: 2),
-                          Text(mesafe, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          Text(
+                            mesafe,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
             const SizedBox(width: 12),
-            
-            // DETAYLAR VE BUTON BÖLÜMÜ
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,38 +109,96 @@ class VestaIlanKarti extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFFDFF0E6), borderRadius: BorderRadius.circular(6)),
-                        child: Text(kategori, style: TextStyle(color: Colors.green.shade700, fontSize: 11, fontWeight: FontWeight.w600)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDFF0E6),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          kategori,
+                          style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                       if (isAcil)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.red.shade400, borderRadius: BorderRadius.circular(4)),
-                          child: const Text("ACİL", style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade400,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            "ACİL",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         )
                       else
-                        const Icon(Icons.favorite_border, size: 20, color: Colors.black87),
+                        const Icon(
+                          Icons.favorite_border,
+                          size: 20,
+                          color: Colors.black87,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(baslik, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  Text(
+                    baslik,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(detay, style: const TextStyle(fontSize: 12, color: Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(
+                    detay,
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.person, size: 14, color: Colors.black54),
                       const SizedBox(width: 4),
-                      Text(kisi, style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500)),
+                      Text(
+                        kisi,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: Colors.black54),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 14,
+                        color: Colors.black54,
+                      ),
                       const SizedBox(width: 4),
-                      Text(konum, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text(
+                        konum,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black54,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -126,9 +207,19 @@ class VestaIlanKarti extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.access_time, size: 14, color: Colors.black54),
+                          const Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: Colors.black54,
+                          ),
                           const SizedBox(width: 4),
-                          Text(sure, style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                          Text(
+                            sure,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.black54,
+                            ),
+                          ),
                         ],
                       ),
                       ElevatedButton(
@@ -137,16 +228,25 @@ class VestaIlanKarti extends StatelessWidget {
                           minimumSize: const Size(70, 28),
                           backgroundColor: butonRengi,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           elevation: 0,
                         ),
-                        child: Text(butonYazisi, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                      )
+                        child: Text(
+                          butonYazisi,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
