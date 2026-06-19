@@ -35,6 +35,23 @@ mvnw.cmd spring-boot:run
 3. Proje ayarlari - Servis hesabi - yeni anahtar olustur - application.properties dosyasina yapistir
 4. flutterfire configure komutunu calistir
 
+## Veritabani (Supabase Postgres)
+
+Backend artik verileri bellek yerine **Supabase Postgres** uzerinde tutar (JDBC).
+Tablolar uygulama ilk acilista `backend/src/main/resources/schema.sql` ile otomatik olusur.
+
+1. Supabase panel -> Project Settings -> Database -> veritabani sifrenizi alin.
+2. Backend'i calistirmadan once ortam degiskenlerini ayarlayin:
+
+```powershell
+$env:SUPABASE_DB_PASSWORD = "DB_SIFRENIZ"
+.\mvnw.cmd spring-boot:run
+```
+
+Baglanti adresi/kullanicisi varsayilan olarak Supabase Connection Pooler'a (IPv4,
+`ap-southeast-1`) ayarlidir; sadece sifreyi vermeniz yeterlidir. Alternatif baglanti
+secenekleri icin `backend/.env.example` dosyasina bakin.
+
 ## Azure Deploy
 GitHub repository ayarlarinda su secretlari ekleyin:
 - AZURE_APP_NAME - Azure App Service adiniz

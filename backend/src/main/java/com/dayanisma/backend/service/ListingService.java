@@ -1,7 +1,7 @@
 package com.dayanisma.backend.service;
 
 import com.dayanisma.backend.model.Listing;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,9 +12,9 @@ import java.util.NoSuchElementException;
 
 @Service
 public class ListingService {
-    private final InMemoryStore store;
+    private final DataStore store;
 
-    public ListingService(InMemoryStore store) {
+    public ListingService(DataStore store) {
         this.store = store;
     }
 

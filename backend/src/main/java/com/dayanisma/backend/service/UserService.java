@@ -2,7 +2,7 @@ package com.dayanisma.backend.service;
 
 import com.dayanisma.backend.model.PrivacySettings;
 import com.dayanisma.backend.model.UserProfile;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -11,9 +11,9 @@ import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
-    private final InMemoryStore store;
+    private final DataStore store;
 
-    public UserService(InMemoryStore store) {
+    public UserService(DataStore store) {
         this.store = store;
     }
 

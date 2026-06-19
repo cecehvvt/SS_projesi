@@ -3,7 +3,7 @@ package com.dayanisma.backend.service;
 import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.observer.FavoriteEvent;
 import com.dayanisma.backend.observer.FavoriteEventPublisher;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,13 +13,13 @@ import java.util.Map;
 
 @Service
 public class FavoriteService {
-    private final InMemoryStore store;
+    private final DataStore store;
     private final ListingService listingService;
     private final NotificationService notificationService;
     private final FavoriteEventPublisher publisher;
 
     public FavoriteService(
-            InMemoryStore store,
+            DataStore store,
             ListingService listingService,
             NotificationService notificationService,
             FavoriteEventPublisher publisher

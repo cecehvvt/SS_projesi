@@ -3,7 +3,7 @@ package com.dayanisma.backend.service;
 import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.model.Message;
 import com.dayanisma.backend.model.UserProfile;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,9 +15,9 @@ import java.util.Objects;
 
 @Service
 public class MessageService {
-    private final InMemoryStore store;
+    private final DataStore store;
 
-    public MessageService(InMemoryStore store) {
+    public MessageService(DataStore store) {
         this.store = store;
     }
 

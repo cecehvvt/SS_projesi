@@ -5,20 +5,20 @@ import com.dayanisma.backend.model.SupportRequest;
 import com.dayanisma.backend.service.FavoriteService;
 import com.dayanisma.backend.service.ListingService;
 import com.dayanisma.backend.service.SupportService;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
 public class VestaFacade {
-    private final InMemoryStore store;
+    private final DataStore store;
     private final ListingService listingService;
     private final FavoriteService favoriteService;
     private final SupportService supportService;
 
     public VestaFacade(
-            InMemoryStore store,
+            DataStore store,
             ListingService listingService,
             FavoriteService favoriteService,
             SupportService supportService

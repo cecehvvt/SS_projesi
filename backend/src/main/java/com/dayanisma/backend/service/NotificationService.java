@@ -3,7 +3,7 @@ package com.dayanisma.backend.service;
 import com.dayanisma.backend.model.Notification;
 import com.dayanisma.backend.observer.FavoriteEvent;
 import com.dayanisma.backend.observer.FavoriteObserver;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,9 +12,9 @@ import java.util.Set;
 
 @Service
 public class NotificationService implements FavoriteObserver {
-    private final InMemoryStore store;
+    private final DataStore store;
 
-    public NotificationService(InMemoryStore store) {
+    public NotificationService(DataStore store) {
         this.store = store;
     }
 

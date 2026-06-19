@@ -1,7 +1,7 @@
 package com.dayanisma.backend.service;
 
 import com.dayanisma.backend.model.SupportRequest;
-import com.dayanisma.backend.store.InMemoryStore;
+import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -10,9 +10,9 @@ import java.util.Map;
 
 @Service
 public class SupportService {
-    private final InMemoryStore store;
+    private final DataStore store;
 
-    public SupportService(InMemoryStore store) {
+    public SupportService(DataStore store) {
         this.store = store;
     }
 
