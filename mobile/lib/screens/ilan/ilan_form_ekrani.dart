@@ -407,7 +407,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
       final listing = AppListing(
         id: '',
         ownerId: 'user-1',
-        ownerName: 'Ayse D.',
+        ownerName: 'Vesta Kullanici',
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         listingType: _listingType,

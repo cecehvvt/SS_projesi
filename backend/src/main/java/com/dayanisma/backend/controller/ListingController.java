@@ -73,17 +73,27 @@ public class ListingController {
     }
 
     @PostMapping("/{id}/talep")
-    public ApiResponse<Listing> requestListing(@PathVariable String id) {
+    public ApiResponse<Map<String, Object>> requestListing(@PathVariable String id) {
         return ApiResponse.ok("Talep alindi", facade.requestListing(id));
     }
 
     @DeleteMapping("/{id}/talep")
-    public ApiResponse<Void> cancelRequest(@PathVariable String id) {
-        return ApiResponse.ok("Talep iptal edildi", null);
+    public ApiResponse<Map<String, Object>> cancelRequest(@PathVariable String id) {
+        return ApiResponse.ok("Talep iptal edildi", facade.cancelListingRequest(id));
     }
 
     @PostMapping("/{id}/fotograflar")
     public ApiResponse<Map<String, Object>> uploadPhoto(@PathVariable String id, @RequestBody(required = false) Map<String, Object> request) {
-        return ApiResponse.ok("Fotograf yukleme placeholder", Map.of("ilanId", id));
+        return ApiResponse.ok("Fotograf eklendi", listingService.addPhoto(id, request == null ? Map.of() : request));
+    }
+
+    @GetMapping("/{id}/fotograflar")
+    public ApiResponse<List<Map<String, Object>>> photos(@PathVariable String id) {
+        return ApiResponse.ok("Fotograflar listelendi", listingService.photos(id));
+    }
+
+    @DeleteMapping("/{id}/fotograflar/{photoId}")
+    public ApiResponse<Map<String, Object>> deletePhoto(@PathVariable String id, @PathVariable String photoId) {
+        return ApiResponse.ok("Fotograf silindi", listingService.deletePhoto(id, photoId));
     }
 }

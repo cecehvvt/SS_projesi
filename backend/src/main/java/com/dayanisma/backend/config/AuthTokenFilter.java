@@ -1,0 +1,48 @@
+package com.dayanisma.backend.config;
+
+import com.dayanisma.backend.service.AuthService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
+
+@Component
+public class AuthTokenFilter extends OncePerRequestFilter {
+    private final AuthService authService;
+
+    public AuthTokenFilter(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        String token = bearerToken(request);
+        if (token != null) {
+            authService.userIdForAccessToken(token).ifPresent(userId -> {
+                var authentication = new UsernamePasswordAuthenticationToken(userId, null, List.of());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            });
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private String bearerToken(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return null;
+        }
+        String token = authorization.substring("Bearer ".length()).trim();
+        return token.isBlank() ? null : token;
+    }
+}

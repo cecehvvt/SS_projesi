@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'listing_taxonomy.dart';
+
 class KategoriModel {
   final String ad;
   final IconData ikon;
   final Color anaRenk;
   final Color sekmeRenk;
 
-  KategoriModel({
+  const KategoriModel({
     required this.ad,
     required this.ikon,
     required this.anaRenk,
@@ -14,12 +16,59 @@ class KategoriModel {
   });
 }
 
-// Uygulamanın her yerinden erişebileceğin kategori listesi
-List<KategoriModel> vestaKategorileri = [
-  KategoriModel(ad: "Kadın Giyim", ikon: Icons.checkroom, anaRenk: const Color(0xFFAFD6C4), sekmeRenk: const Color(0xFFDFF0E6)),
-  KategoriModel(ad: "Erkek Giyim", ikon: Icons.accessibility_new, anaRenk: const Color(0xFFAFD6C4), sekmeRenk: const Color(0xFFDFF0E6)),
-  KategoriModel(ad: "Çocuk & Bebek", ikon: Icons.child_care, anaRenk: const Color(0xFFF4D8CD), sekmeRenk: const Color(0xFFF9E8E1)),
-  KategoriModel(ad: "Elektronik", ikon: Icons.tv, anaRenk: const Color(0xFFD1C4E9), sekmeRenk: const Color(0xFFEDE7F6)),
-  KategoriModel(ad: "Ev & Yaşam", ikon: Icons.home_outlined, anaRenk: const Color(0xFFC8E6C9), sekmeRenk: const Color(0xFFE8F5E9)),
-  KategoriModel(ad: "Kırtasiye & Diğer", ikon: Icons.edit, anaRenk: const Color(0xFFB3E5FC), sekmeRenk: const Color(0xFFE1F5FE)),
-];
+// Backward-compatible view of the canonical ListingTaxonomy category list.
+final List<KategoriModel> vestaKategorileri = ListingTaxonomy.categories
+    .map(
+      (category) => KategoriModel(
+        ad: category.name,
+        ikon: _iconFor(category.name),
+        anaRenk: _mainColorFor(category.name),
+        sekmeRenk: _tabColorFor(category.name),
+      ),
+    )
+    .toList(growable: false);
+
+IconData _iconFor(String category) {
+  switch (category) {
+    case 'Kadin':
+      return Icons.checkroom;
+    case 'Erkek':
+      return Icons.man;
+    case 'Cocuk & Bebek':
+      return Icons.child_care;
+    case 'Elektronik':
+      return Icons.devices;
+    case 'Ev & Yasam':
+      return Icons.home_outlined;
+    case 'Kitap & Kirtasiye':
+      return Icons.menu_book;
+    default:
+      return Icons.category_outlined;
+  }
+}
+
+Color _mainColorFor(String category) {
+  switch (category) {
+    case 'Cocuk & Bebek':
+      return const Color(0xFFF4D8CD);
+    case 'Elektronik':
+      return const Color(0xFFD1C4E9);
+    case 'Kitap & Kirtasiye':
+      return const Color(0xFFB3E5FC);
+    default:
+      return const Color(0xFFAFD6C4);
+  }
+}
+
+Color _tabColorFor(String category) {
+  switch (category) {
+    case 'Cocuk & Bebek':
+      return const Color(0xFFF9E8E1);
+    case 'Elektronik':
+      return const Color(0xFFEDE7F6);
+    case 'Kitap & Kirtasiye':
+      return const Color(0xFFE1F5FE);
+    default:
+      return const Color(0xFFDFF0E6);
+  }
+}

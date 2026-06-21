@@ -2,6 +2,8 @@ package com.dayanisma.backend.model;
 
 import java.time.Instant;
 
+import java.util.Objects;
+
 public record Message(
         String id,
         String gondericId,
@@ -17,6 +19,6 @@ public record Message(
     }
 
     public String otherParticipant(String currentUserId) {
-        return gondericId.equals(currentUserId) ? aliciId : gondericId;
+        return Objects.equals(gondericId, currentUserId) ? aliciId : gondericId;
     }
 }

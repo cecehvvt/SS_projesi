@@ -86,6 +86,9 @@ class ApiSabitler {
   /// POST /ilanlar/{ilanId}/talep
   static String talepEt(String ilanId) => '$baseUrl/ilanlar/$ilanId/talep';
 
+  /// Kullanıcının aktif talepleri: GET /taleplerim
+  static const String taleplerim = '$baseUrl/taleplerim';
+
   /// Talebi iptal et: DELETE /ilanlar/{ilanId}/talep
   static String talepIptal(String ilanId) => '$baseUrl/ilanlar/$ilanId/talep';
 

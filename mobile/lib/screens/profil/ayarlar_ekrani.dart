@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../../models/kullanici_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/kullanici_service.dart';
 import '../../widgets/alt_menu.dart';
+import 'profil_duzenle_ekrani.dart';
 import 'sikayet_destek_ekrani.dart';
 
 class AyarlarEkrani extends StatefulWidget {
@@ -10,11 +15,21 @@ class AyarlarEkrani extends StatefulWidget {
 }
 
 class _AyarlarEkraniState extends State<AyarlarEkrani> {
-  bool profilGorumumu = true;
-  bool mesajAlma = true;
-  bool konumGosterimi = false;
+  final _service = const KullaniciService();
+  late Future<KullaniciModel> _future = _service.me();
   bool karanlikMod = false;
   bool bildirimler = true;
+
+  void _reload() {
+    setState(() {
+      _future = _service.me();
+    });
+  }
+
+  Future<void> _updatePrivacy(KullaniciModel user, GizlilikAyarlari privacy) async {
+    await _service.updatePrivacy(privacy);
+    _reload();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +39,7 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -37,243 +48,259 @@ class _AyarlarEkraniState extends State<AyarlarEkrani> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.shade200),
-                ),
-                child: const Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, color: Colors.green),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ayşe Demir',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            'Hesabını yönetin ve tercihlerinizi düzenleyin.',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
+      body: FutureBuilder<KullaniciModel>(
+        future: _future,
+        builder: (context, snapshot) {
+          final user = snapshot.data;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _AccountHeader(user: user),
+                const SizedBox(height: 24),
+                _sectionTitle(Icons.person_outline, 'Hesap Ayarlari'),
+                _menuItem(
+                  'Profilimi Duzenle',
+                  onTap: () async {
+                    final changed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilDuzenleEkrani(),
                       ),
-                    ),
-                    Icon(Icons.verified_user, color: Colors.green),
-                  ],
+                    );
+                    if (changed == true) _reload();
+                  },
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              _buildBolumBasligi(Icons.person_outline, 'Hesap Ayarları'),
-              _buildMenuElemani(context, 'Profilimi Düzenle'),
-              _buildMenuElemani(context, 'Şifre Değiştir'),
-              _buildMenuElemani(context, 'Telefon Numaram'),
-              _buildMenuElemani(context, 'E-posta Adresim'),
-              const Divider(height: 32),
-
-              _buildBolumBasligi(Icons.lock_outline, 'Gizlilik Ayarları'),
-              _buildSwitchElemani(
-                'Profil başkalarının görmesine izin ver',
-                profilGorumumu,
-                (val) => setState(() => profilGorumumu = val),
-              ),
-              _buildSwitchElemani(
-                'Mesaj almayı etkinleştir',
-                mesajAlma,
-                (val) => setState(() => mesajAlma = val),
-              ),
-              _buildSwitchElemani(
-                'Konumu ilanlarda göster',
-                konumGosterimi,
-                (val) => setState(() => konumGosterimi = val),
-              ),
-              const Divider(height: 32),
-
-              _buildBolumBasligi(
-                Icons.headset_mic_outlined,
-                'Şikayet ve Destek',
-              ),
-              _buildMenuElemani(context, 'Kullanıcıyı Şikayet Et'),
-
-              _buildMenuElemani(
-                context,
-                'Yardım & Destek',
-                onTap: () {
-                  Navigator.push(
+                _menuItem('Telefon Numaram', value: user?.telefonNumarasi),
+                _menuItem('E-posta Adresim', value: user?.eposta),
+                const Divider(height: 32),
+                _sectionTitle(Icons.lock_outline, 'Gizlilik Ayarlari'),
+                _privacySwitch(
+                  'Profil baskalarina gorunsun',
+                  user?.gizlilikAyarlari.profilBaskalarinaGorunsun ?? true,
+                  user,
+                  (current, value) => current.copyWith(
+                    profilBaskalarinaGorunsun: value,
+                  ),
+                ),
+                _privacySwitch(
+                  'Mesaj almayi etkinlestir',
+                  user?.gizlilikAyarlari.mesajAlabilir ?? true,
+                  user,
+                  (current, value) => current.copyWith(mesajAlabilir: value),
+                ),
+                _privacySwitch(
+                  'Konumu ilanlarda goster',
+                  user?.gizlilikAyarlari.konumuIlanlardaGoster ?? false,
+                  user,
+                  (current, value) => current.copyWith(
+                    konumuIlanlardaGoster: value,
+                  ),
+                ),
+                const Divider(height: 32),
+                _sectionTitle(Icons.headset_mic_outlined, 'Sikayet ve Destek'),
+                _menuItem(
+                  'Yardim & Destek',
+                  onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SikayetDestekEkrani(),
                     ),
-                  );
-                },
-              ),
-
-              _buildMenuElemani(context, 'Kullanım Koşulları'),
-              const Divider(height: 32),
-
-              _buildBolumBasligi(
-                Icons.settings_outlined,
-                'Uygulama Tercihleri',
-              ),
-              _buildSwitchElemani(
-                'Karanlık Mod',
-                karanlikMod,
-                (val) => setState(() => karanlikMod = val),
-              ),
-              _buildSwitchElemani(
-                'Bildirimler',
-                bildirimler,
-                (val) => setState(() => bildirimler = val),
-              ),
-              _buildMenuElemani(
-                context,
-                'Dil Seçimi',
-                sagTarafYazisi: 'Türkçe',
-              ),
-
-              const SizedBox(height: 32),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade50,
-                    foregroundColor: Colors.red,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.red.shade100),
-                    ),
-                  ),
-                  icon: const Icon(Icons.power_settings_new),
-                  label: const Text(
-                    'Çıkış Yap',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
+                const Divider(height: 32),
+                _sectionTitle(Icons.settings_outlined, 'Uygulama Tercihleri'),
+                _localSwitch(
+                  'Karanlik Mod',
+                  karanlikMod,
+                  (value) => setState(() => karanlikMod = value),
+                ),
+                _localSwitch(
+                  'Bildirimler',
+                  bildirimler,
+                  (value) => setState(() => bildirimler = value),
+                ),
+                _menuItem('Dil Secimi', value: 'Turkce'),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      await const AuthService().logout();
+                      if (!context.mounted) return;
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/login',
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade50,
+                      foregroundColor: Colors.red,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.red.shade100),
+                      ),
+                    ),
+                    icon: const Icon(Icons.power_settings_new),
+                    label: const Text(
+                      'Cikis Yap',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       bottomNavigationBar: const VestaAltMenu(),
     );
   }
 
-  Widget _buildBolumBasligi(IconData ikon, String baslik) {
+  Widget _privacySwitch(
+    String title,
+    bool value,
+    KullaniciModel? user,
+    GizlilikAyarlari Function(GizlilikAyarlari current, bool value) next,
+  ) {
+    return _localSwitch(
+      title,
+      value,
+      user == null
+          ? null
+          : (newValue) => _updatePrivacy(
+                user,
+                next(user.gizlilikAyarlari, newValue),
+              ),
+    );
+  }
+
+  Widget _localSwitch(String title, bool value, ValueChanged<bool>? onChanged) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       child: Row(
         children: [
-          Icon(ikon, size: 20, color: Colors.black87),
-          const SizedBox(width: 8),
-          Text(
-            baslik,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Colors.black87,
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: Colors.white,
+            activeTrackColor: Colors.green,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuElemani(
-    BuildContext context,
-    String baslik, {
-    String? sagTarafYazisi,
-    VoidCallback? onTap,
-  }) {
+  Widget _menuItem(String title, {String? value, VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              baslik,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            Row(
-              children: [
-                if (sagTarafYazisi != null) ...[
-                  Text(
-                    sagTarafYazisi,
-                    style: const TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: Colors.grey,
+            if (value != null && value.isNotEmpty)
+              Flexible(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
-              ],
-            ),
+              ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSwitchElemani(
-    String baslik,
-    bool acikMi,
-    Function(bool) onChanged,
-  ) {
+  Widget _sectionTitle(IconData icon, String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Icon(icon, size: 20, color: Colors.black87),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountHeader extends StatelessWidget {
+  final KullaniciModel? user;
+
+  const _AccountHeader({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final name = user?.tamAd.trim().isNotEmpty == true
+        ? user!.tamAd
+        : 'Kullanici';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.shade200),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            backgroundImage: user?.profilFotoUrl?.isNotEmpty == true
+                ? NetworkImage(user!.profilFotoUrl!)
+                : null,
+            child: user?.profilFotoUrl?.isNotEmpty == true
+                ? null
+                : const Icon(Icons.person, color: Colors.green),
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              baslik,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  user?.kullaniciAdi?.isNotEmpty == true
+                      ? user!.kullaniciAdi!
+                      : 'Hesabini ve tercihlerini duzenle.',
+                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                ),
+              ],
             ),
           ),
-          Switch(
-            value: acikMi,
-            onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: Colors.green,
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey.shade300,
-          ),
+          const Icon(Icons.verified_user, color: Colors.green),
         ],
       ),
     );

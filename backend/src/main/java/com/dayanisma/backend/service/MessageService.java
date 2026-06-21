@@ -4,6 +4,7 @@ import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.model.Message;
 import com.dayanisma.backend.model.UserProfile;
 import com.dayanisma.backend.store.DataStore;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -41,8 +42,8 @@ public class MessageService {
         String currentUserId = store.currentUserId();
         return store.allMessagesOrdered().stream()
                 .filter(message ->
-                        message.gondericId().equals(currentUserId) && message.aliciId().equals(otherUserId)
-                                || message.gondericId().equals(otherUserId) && message.aliciId().equals(currentUserId)
+                        Objects.equals(message.gondericId(), currentUserId) && Objects.equals(message.aliciId(), otherUserId)
+                                || Objects.equals(message.gondericId(), otherUserId) && Objects.equals(message.aliciId(), currentUserId)
                 )
                 .filter(message -> listingId == null || listingId.isBlank() || Objects.equals(message.ilanId(), listingId))
                 .toList();
@@ -51,20 +52,28 @@ public class MessageService {
     public Message send(Map<String, Object> request) {
         String receiverId = text(request, "aliciId", "");
         String content = text(request, "icerik", "").trim();
+        String currentUserId = store.currentUserId();
         if (receiverId.isBlank()) {
             throw new IllegalArgumentException("Mesaj gonderilecek kullanici secilmedi.");
         }
-        if (receiverId.equals(store.currentUserId())) {
+        if (receiverId.equals(currentUserId)) {
             throw new IllegalArgumentException("Kendi ilaniniza mesaj gonderemezsiniz.");
+        }
+        if (store.users().get(receiverId) == null) {
+            throw new IllegalArgumentException("Mesaj gonderilecek kullanici bulunamadi.");
+        }
+        String listingId = text(request, "ilanId", null);
+        if (listingId != null && !listingId.isBlank() && store.listings().get(listingId) == null) {
+            throw new IllegalArgumentException("Mesaj gonderilecek ilan bulunamadi.");
         }
         if (content.isBlank()) {
             throw new IllegalArgumentException("Mesaj bos olamaz.");
         }
         Message message = new Message(
                 store.newId(),
-                text(request, "gondericId", store.currentUserId()),
+                currentUserId,
                 receiverId,
-                text(request, "ilanId", null),
+                listingId,
                 content,
                 Instant.now(),
                 "gonderildi",
@@ -78,6 +87,9 @@ public class MessageService {
         Message current = store.messages().get(id);
         if (current == null) {
             throw new NoSuchElementException("Mesaj bulunamadi: " + id);
+        }
+        if (!Objects.equals(current.aliciId(), store.currentUserId())) {
+            throw new AccessDeniedException("Bu mesaji okundu isaretleme yetkiniz yok.");
         }
         Message updated = current.markRead();
         store.messages().put(id, updated);
@@ -97,6 +109,6 @@ public class MessageService {
         String otherId = message.otherParticipant(currentUserId);
         UserProfile otherUser = store.users().get(otherId);
         Listing listing = message.ilanId() == null ? null : store.listings().get(message.ilanId());
-        return store.chatSummary(message, otherUser, listing);
+        return store.chatSummary(message, otherUser, listing, currentUserId);
     }
 }

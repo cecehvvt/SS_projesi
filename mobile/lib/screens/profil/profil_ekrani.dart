@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../models/app_listing.dart';
+import '../../models/kullanici_model.dart';
+import '../../services/auth_service.dart';
 import '../../services/ilan_service.dart';
+import '../../services/kullanici_service.dart';
 import '../../utils/listing_taxonomy.dart';
 import '../../widgets/listing_image.dart';
 import '../ilan/ilan_detay_ekrani.dart';
@@ -15,17 +18,24 @@ class ProfilEkrani extends StatefulWidget {
 }
 
 class _ProfilEkraniState extends State<ProfilEkrani> {
-  final _service = const IlanService();
-  late Future<List<AppListing>> _future = _loadMine();
+  final _ilanService = const IlanService();
+  final _kullaniciService = const KullaniciService();
+  late Future<_ProfileData> _future = _loadProfile();
 
-  Future<List<AppListing>> _loadMine() async {
-    final listings = await _service.getListings();
-    return listings.where((listing) => listing.ownerId == 'user-1').toList();
+  Future<_ProfileData> _loadProfile() async {
+    final results = await Future.wait([
+      _kullaniciService.me(),
+      _ilanService.getMine(),
+    ]);
+    return _ProfileData(
+      user: results[0] as KullaniciModel,
+      listings: results[1] as List<AppListing>,
+    );
   }
 
   void _reload() {
     setState(() {
-      _future = _loadMine();
+      _future = _loadProfile();
     });
   }
 
@@ -46,26 +56,32 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
           IconButton(
             tooltip: 'Profili duzenle',
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProfilDuzenleEkrani(),
-              ),
-            ),
+            onPressed: () async {
+              final changed = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilDuzenleEkrani(),
+                ),
+              );
+              if (changed == true) _reload();
+            },
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => _reload(),
-        child: FutureBuilder<List<AppListing>>(
+        child: FutureBuilder<_ProfileData>(
           future: _future,
           builder: (context, snapshot) {
-            final listings = snapshot.data ?? const <AppListing>[];
+            final user = snapshot.data?.user;
+            final listings = snapshot.data?.listings ?? const <AppListing>[];
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
-                const _ProfileHeader(),
+                _ProfileHeader(user: user, onChanged: _reload),
+                const SizedBox(height: 12),
+                _ProfileInfo(user: user),
                 const SizedBox(height: 20),
                 _Stats(listings: listings),
                 const SizedBox(height: 24),
@@ -111,6 +127,15 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
                 _ProfileMenu(
                   onMessagesTap: () =>
                       Navigator.pushNamed(context, '/mesajlar'),
+                  onLogoutTap: () async {
+                    await const AuthService().logout();
+                    if (!context.mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
+                  },
                 ),
               ],
             );
@@ -121,11 +146,97 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader();
+class _ProfileInfo extends StatelessWidget {
+  final KullaniciModel? user;
+
+  const _ProfileInfo({required this.user});
 
   @override
   Widget build(BuildContext context) {
+    final about = user?.hakkinda?.trim();
+    final username = user?.kullaniciAdi?.trim();
+    final phone = user?.telefonNumarasi?.trim();
+    final email = user?.eposta?.trim();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Profil Bilgileri',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            about == null || about.isEmpty
+                ? 'Hakkinda bilgisi eklenmedi.'
+                : about,
+            style: const TextStyle(color: Colors.black87, height: 1.35),
+          ),
+          const SizedBox(height: 12),
+          if (username != null && username.isNotEmpty)
+            _InfoLine(icon: Icons.alternate_email, text: username),
+          if (phone != null && phone.isNotEmpty)
+            _InfoLine(icon: Icons.phone_outlined, text: phone),
+          if (email != null && email.isNotEmpty)
+            _InfoLine(icon: Icons.mail_outline, text: email),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoLine extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _InfoLine({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.black54),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(text, style: const TextStyle(color: Colors.black87)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileData {
+  final KullaniciModel user;
+  final List<AppListing> listings;
+
+  const _ProfileData({required this.user, required this.listings});
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final KullaniciModel? user;
+  final VoidCallback onChanged;
+
+  const _ProfileHeader({required this.user, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final displayName = user == null || user!.tamAd.trim().isEmpty
+        ? 'Vesta Kullanici'
+        : user!.tamAd;
+    final location = user?.konum?.isNotEmpty == true
+        ? user!.konum!
+        : user?.adres.isNotEmpty == true
+        ? user!.adres
+        : 'Konum eklenmedi';
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -135,39 +246,48 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 32,
-            backgroundColor: Color(0xFFE8F5EE),
-            child: Icon(
-              Icons.person_outline,
-              size: 36,
-              color: Color(0xFF2E7D32),
-            ),
+            backgroundColor: const Color(0xFFE8F5EE),
+            backgroundImage:
+                user?.profilFotoUrl?.isNotEmpty == true
+                    ? NetworkImage(user!.profilFotoUrl!)
+                    : null,
+            child: user?.profilFotoUrl?.isNotEmpty == true
+                ? null
+                : const Icon(
+                    Icons.person_outline,
+                    size: 36,
+                    color: Color(0xFF2E7D32),
+                  ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ayse Demir',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                  displayName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'Uskudar, Istanbul',
-                  style: TextStyle(color: Colors.black54),
-                ),
+                const SizedBox(height: 4),
+                Text(location, style: const TextStyle(color: Colors.black54)),
               ],
             ),
           ),
           TextButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProfilDuzenleEkrani(),
-              ),
-            ),
+            onPressed: () async {
+              final changed = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilDuzenleEkrani(),
+                ),
+              );
+              if (changed == true) onChanged();
+            },
             icon: const Icon(Icons.edit_outlined, size: 18),
             label: const Text('Duzenle'),
           ),
@@ -337,8 +457,12 @@ class _StateCard extends StatelessWidget {
 
 class _ProfileMenu extends StatelessWidget {
   final VoidCallback onMessagesTap;
+  final VoidCallback onLogoutTap;
 
-  const _ProfileMenu({required this.onMessagesTap});
+  const _ProfileMenu({
+    required this.onMessagesTap,
+    required this.onLogoutTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -361,6 +485,18 @@ class _ProfileMenu extends StatelessWidget {
             leading: Icon(Icons.help_outline),
             title: Text('Yardim & Destek'),
             trailing: Icon(Icons.chevron_right),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              'Cikis Yap',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            onTap: onLogoutTap,
           ),
         ],
       ),

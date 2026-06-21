@@ -9,7 +9,6 @@ import 'screens/auth/kayit_ekrani.dart';
 import 'screens/auth/sifremi_unuttum_ekrani.dart';
 import 'screens/ilan/ilan_listesi_ekrani.dart';
 import 'screens/ilan/ilan_detay_ekrani.dart';
-import 'screens/ilan/ihtiyac_detay_ekrani.dart';
 import 'screens/ilan/bagis_ilani_olustur_ekrani.dart';
 import 'screens/ilan/ihtiyac_ilani_olustur_ekrani.dart';
 import 'screens/ilan/takas_ilan_ekrani.dart';
@@ -46,7 +45,7 @@ class VestaApp extends StatelessWidget {
         '/sifremi_unuttum': (context) => const SifremiUnuttumEkrani(),
         '/ilan_listesi': (context) => const IlanListesiEkrani(),
         '/ilan_detay': (context) => const IlanDetayEkrani(),
-        '/ihtiyac_detay': (context) => const IhtiyacDetayEkrani(),
+        '/ihtiyac_detay': (context) => const IlanDetayEkrani(),
         '/ilan_olustur': (context) => const AnaSayfaYonetici(initialIndex: 2),
         '/bagis_ilani_olustur': (context) => const BagisIlaniOlusturEkrani(),
         '/ihtiyac_ilani_olustur': (context) =>

@@ -7,10 +7,15 @@ import com.dayanisma.backend.model.PrivacySettings;
 import com.dayanisma.backend.model.SupportRequest;
 import com.dayanisma.backend.model.UserProfile;
 import jakarta.annotation.PostConstruct;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.sql.Array;
 import java.sql.PreparedStatement;
@@ -25,6 +30,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -69,14 +75,37 @@ public class DataStore {
                         "hakkinda, konum, telefon_numarasi, eposta, profil_foto_url, gizlilik_profil_gorunur, " +
                         "gizlilik_mesaj_alabilir, gizlilik_konum_goster, kayit_tarihi, aktif) " +
                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (id) DO NOTHING",
-                CURRENT_USER_ID, "Ayse", "Demir", "11111111111", "Uskudar, Istanbul",
+                CURRENT_USER_ID, "Ayse", "Demir", null, "Uskudar, Istanbul",
                 "ayse@example.com", "@aysedemir34", "Paylasmayi seven Vesta kullanicisi.",
                 "Uskudar, Istanbul", "+90 555 000 0001", "ayse@example.com", null,
                 true, true, false, ts(Instant.now().minus(30, ChronoUnit.DAYS)), true);
     }
 
     public String currentUserId() {
-        return CURRENT_USER_ID;
+        String userId = currentUserIdOrNull();
+        if (userId != null) {
+            return userId;
+        }
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            return CURRENT_USER_ID;
+        }
+        throw new AccessDeniedException("Oturum gerekli.");
+    }
+
+    public String currentUserIdOrNull() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof String userId
+                && !"anonymousUser".equals(userId)) {
+            return userId;
+        }
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+            Object userId = attributes.getRequest().getAttribute("AUTHENTICATED_USER_ID");
+            if (userId instanceof String value && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return null;
     }
 
     public String newId() {
@@ -123,17 +152,17 @@ public class DataStore {
 
     public List<Notification> allNotificationsFor(String userId) {
         return notifications.values().stream()
-                .filter(notification -> notification.userId().equals(userId))
+                .filter(notification -> Objects.equals(notification.userId(), userId))
                 .sorted((left, right) -> right.olusturmaZamani().compareTo(left.olusturmaZamani()))
                 .toList();
     }
 
-    public Map<String, Object> chatSummary(Message message, UserProfile otherUser, Listing listing) {
+    public Map<String, Object> chatSummary(Message message, UserProfile otherUser, Listing listing, String currentUserId) {
         Map<String, Object> summary = new LinkedHashMap<>();
-        String otherUserId = otherUser == null ? message.otherParticipant(CURRENT_USER_ID) : otherUser.id();
+        String otherUserId = otherUser == null ? message.otherParticipant(currentUserId) : otherUser.id();
         String otherUserName = otherUser == null
                 ? (listing == null ? "Vesta kullanicisi" : listing.ownerName())
-                : otherUser.ad() + " " + otherUser.soyad().charAt(0) + ".";
+                : userDisplayName(otherUser);
         summary.put("karsiKullaniciId", otherUserId);
         summary.put("karsiKullaniciAd", otherUserName);
         summary.put("karsiKullaniciAvatarUrl", otherUser == null ? null : otherUser.profilFotoUrl());
@@ -143,14 +172,15 @@ public class DataStore {
         summary.put("ilanFotoUrl", listing == null || listing.imageUrls().isEmpty() ? null : listing.imageUrls().get(0));
         summary.put("sonMesajIcerik", message.icerik());
         summary.put("sonMesajZamani", message.gonderimZamani());
-        summary.put("okunmamisSayi", message.aliciId().equals(CURRENT_USER_ID) && !"okundu".equals(message.durum()) ? 1 : 0);
+        summary.put("okunmamisSayi", Objects.equals(message.aliciId(), currentUserId) && !"okundu".equals(message.durum()) ? 1 : 0);
         return summary;
     }
 
     public List<Map<String, Object>> favoriteRowsForCurrentUser() {
+        String currentUserId = currentUserId();
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : favoriteUserIdsByListingId.entrySet()) {
-            if (entry.getValue().contains(CURRENT_USER_ID)) {
+            if (entry.getValue().contains(currentUserId)) {
                 Listing listing = listings.get(entry.getKey());
                 if (listing != null) {
                     rows.add(Map.of("ilan", listing.withFavorite(true), "favoriTakipciSayisi", entry.getValue().size()));
@@ -168,7 +198,7 @@ public class DataStore {
             rs.getString("id"),
             rs.getString("ad"),
             rs.getString("soyad"),
-            rs.getString("tc_kimlik_no"),
+            null,
             rs.getString("adres"),
             rs.getString("eposta_veya_telefon"),
             rs.getString("kullanici_adi"),
@@ -351,5 +381,12 @@ public class DataStore {
             return Arrays.asList(strings);
         }
         return List.of();
+    }
+
+    private static String userDisplayName(UserProfile user) {
+        String firstName = user.ad() == null ? "" : user.ad().trim();
+        String lastInitial = user.soyad() == null || user.soyad().isBlank() ? "" : user.soyad().trim().charAt(0) + ".";
+        String displayName = (firstName + " " + lastInitial).trim();
+        return displayName.isBlank() ? "Vesta kullanicisi" : displayName;
     }
 }

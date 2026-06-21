@@ -1,6 +1,7 @@
 package com.dayanisma.backend.service;
 
 import com.dayanisma.backend.model.PrivacySettings;
+import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.model.UserProfile;
 import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class UserService {
                 current.id(),
                 text(request, "ad", current.ad()),
                 text(request, "soyad", current.soyad()),
-                text(request, "tcKimlikNo", current.tcKimlikNo()),
+                null,
                 text(request, "adres", current.adres()),
                 text(request, "epostaVeyaTelefon", current.epostaVeyaTelefon()),
                 text(request, "kullaniciAdi", current.kullaniciAdi()),
@@ -49,6 +50,7 @@ public class UserService {
                 current.aktif()
         );
         store.users().put(updated.id(), updated);
+        syncListingOwnerNames(updated);
         return updated;
     }
 
@@ -82,19 +84,21 @@ public class UserService {
 
     public UserProfile register(Map<String, Object> request) {
         String id = store.newId();
+        String email = text(request, "email", text(request, "eposta", null));
+        String emailOrPhone = text(request, "epostaVeyaTelefon", email == null ? "" : email);
         UserProfile user = new UserProfile(
                 id,
                 text(request, "ad", "Yeni"),
                 text(request, "soyad", "Kullanici"),
-                text(request, "tcKimlikNo", ""),
+                null,
                 text(request, "adres", ""),
-                text(request, "epostaVeyaTelefon", text(request, "email", "")),
-                null,
-                null,
-                null,
-                null,
-                text(request, "email", null),
-                null,
+                emailOrPhone,
+                text(request, "kullaniciAdi", null),
+                text(request, "hakkinda", null),
+                text(request, "konum", text(request, "adres", null)),
+                text(request, "telefonNumarasi", emailOrPhone.contains("@") ? null : emailOrPhone),
+                email,
+                text(request, "profilFotoUrl", null),
                 PrivacySettings.defaults(),
                 Instant.now(),
                 true
@@ -111,5 +115,43 @@ public class UserService {
     private boolean bool(Map<String, Object> request, String key, boolean fallback) {
         Object value = request.get(key);
         return value instanceof Boolean bool ? bool : fallback;
+    }
+
+    private void syncListingOwnerNames(UserProfile user) {
+        String displayName = displayName(user.ad(), user.soyad());
+        store.listings().values().stream()
+                .filter(listing -> user.id().equals(listing.ownerId()))
+                .forEach(listing -> store.listings().put(listing.id(), withOwnerName(listing, displayName)));
+    }
+
+    private Listing withOwnerName(Listing listing, String ownerName) {
+        return new Listing(
+                listing.id(),
+                listing.ownerId(),
+                ownerName,
+                listing.title(),
+                listing.description(),
+                listing.listingType(),
+                listing.category(),
+                listing.subCategory(),
+                listing.city(),
+                listing.district(),
+                listing.condition(),
+                listing.deliveryMethod(),
+                listing.contactPreference(),
+                listing.desiredSwapItem(),
+                listing.imageUrls(),
+                listing.status(),
+                listing.createdAt(),
+                listing.updatedAt(),
+                listing.urgent(),
+                listing.favorite()
+        );
+    }
+
+    private String displayName(String firstName, String lastName) {
+        String value = ((firstName == null ? "" : firstName.trim()) + " " +
+                (lastName == null ? "" : lastName.trim())).trim();
+        return value.isBlank() ? "Vesta kullanicisi" : value;
     }
 }

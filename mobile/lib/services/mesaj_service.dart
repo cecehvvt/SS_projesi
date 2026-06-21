@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../constants/api_sabitler.dart';
 import '../models/mesaj_model.dart';
+import 'api_client.dart';
 
 class MesajServiceException implements Exception {
   final String message;
@@ -18,7 +19,10 @@ class MesajService {
   const MesajService();
 
   Future<List<SohbetOzeti>> getSohbetler() async {
-    final response = await http.get(Uri.parse(ApiSabitler.sohbetler));
+    final response = await http.get(
+      Uri.parse(ApiSabitler.sohbetler),
+      headers: ApiClient.headers(),
+    );
     final body = _decode(response);
     final rows = body['data'] as List<dynamic>? ?? const [];
     return rows
@@ -33,7 +37,7 @@ class MesajService {
     final uri = Uri.parse(
       ApiSabitler.sohbetMesajlari(karsiKullaniciId),
     ).replace(queryParameters: ilanId == null ? null : {'ilanId': ilanId});
-    final response = await http.get(uri);
+    final response = await http.get(uri, headers: ApiClient.headers());
     final body = _decode(response);
     final rows = body['data'] as List<dynamic>? ?? const [];
     return rows
@@ -48,9 +52,7 @@ class MesajService {
   }) async {
     final response = await http.post(
       Uri.parse(ApiSabitler.mesajGonder),
-      headers: const {
-        ApiSabitler.headerContentType: ApiSabitler.headerContentTypeJson,
-      },
+      headers: ApiClient.headers(json: true),
       body: jsonEncode({
         'aliciId': aliciId,
         'ilanId': ilanId,
@@ -62,14 +64,13 @@ class MesajService {
   }
 
   Map<String, dynamic> _decode(http.Response response) {
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    if (response.statusCode < 200 ||
-        response.statusCode >= 300 ||
-        body['success'] == false) {
+    try {
+      final data = ApiClient.decode(response, 'Mesaj islemi tamamlanamadi.');
+      return {'data': data};
+    } on ApiClientException catch (exception) {
       throw MesajServiceException(
-        body['message']?.toString() ?? 'Mesaj islemi tamamlanamadi.',
+        exception.message,
       );
     }
-    return body;
   }
 }

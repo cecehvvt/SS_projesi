@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class FavoriteService {
@@ -37,6 +38,9 @@ public class FavoriteService {
     public Listing add(String listingId) {
         Listing listing = listingService.get(listingId);
         String currentUserId = store.currentUserId();
+        if (Objects.equals(listing.ownerId(), currentUserId)) {
+            throw new IllegalArgumentException("Kendi ilaninizi favorilere ekleyemezsiniz.");
+        }
         store.favoriteUserIdsByListingId()
                 .computeIfAbsent(listingId, ignored -> new LinkedHashSet<>())
                 .add(currentUserId);

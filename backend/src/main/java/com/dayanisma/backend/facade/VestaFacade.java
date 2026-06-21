@@ -3,6 +3,7 @@ package com.dayanisma.backend.facade;
 import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.model.SupportRequest;
 import com.dayanisma.backend.service.FavoriteService;
+import com.dayanisma.backend.service.ListingRequestService;
 import com.dayanisma.backend.service.ListingService;
 import com.dayanisma.backend.service.SupportService;
 import com.dayanisma.backend.store.DataStore;
@@ -14,17 +15,20 @@ import java.util.Map;
 public class VestaFacade {
     private final DataStore store;
     private final ListingService listingService;
+    private final ListingRequestService listingRequestService;
     private final FavoriteService favoriteService;
     private final SupportService supportService;
 
     public VestaFacade(
             DataStore store,
             ListingService listingService,
+            ListingRequestService listingRequestService,
             FavoriteService favoriteService,
             SupportService supportService
     ) {
         this.store = store;
         this.listingService = listingService;
+        this.listingRequestService = listingRequestService;
         this.favoriteService = favoriteService;
         this.supportService = supportService;
     }
@@ -55,15 +59,20 @@ public class VestaFacade {
         );
     }
 
-    public Listing requestListing(String id) {
+    public Map<String, Object> requestListing(String id) {
         Listing listing = listingService.get(id);
+        Map<String, Object> request = listingRequestService.request(id);
         favoriteService.notifyFollowers(
                 id,
                 store.currentUserId(),
                 "Favori ilanda yeni talep",
                 listing.title() + " icin yeni bir talep olustu."
         );
-        return listing;
+        return request;
+    }
+
+    public Map<String, Object> cancelListingRequest(String id) {
+        return listingRequestService.cancel(id);
     }
 
     public SupportRequest createSupportRequest(Map<String, Object> request) {

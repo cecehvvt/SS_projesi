@@ -99,7 +99,9 @@ class _DetailContent extends StatefulWidget {
 }
 
 class _DetailContentState extends State<_DetailContent> {
+  final _service = const IlanService();
   int _imageIndex = 0;
+  bool _requesting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -245,22 +247,52 @@ class _DetailContentState extends State<_DetailContent> {
                     ],
                   )
                 else
-                  FilledButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SohbetEkrani(
-                          karsiKullaniciId: listing.ownerId,
-                          karsiKullaniciAd: listing.ownerName,
-                          ilanId: listing.id,
-                          ilanBaslik: listing.title,
-                          ilanKonum: listing.location,
-                          ilanFotoUrl: listing.firstImage,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: _requesting
+                              ? null
+                              : () => _requestListing(listing),
+                          icon: _requesting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.shopping_bag_outlined),
+                          label: Text(
+                            _requesting
+                                ? 'Ekleniyor...'
+                                : listing.listingType == 'ihtiyac'
+                                ? 'Yardim Et'
+                                : 'Talep Et',
+                          ),
                         ),
                       ),
-                    ),
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Mesaj Gonder'),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SohbetEkrani(
+                                karsiKullaniciId: listing.ownerId,
+                                karsiKullaniciAd: listing.ownerName,
+                                ilanId: listing.id,
+                                ilanBaslik: listing.title,
+                                ilanKonum: listing.location,
+                                ilanFotoUrl: listing.firstImage,
+                              ),
+                            ),
+                          ),
+                          icon: const Icon(Icons.chat_bubble_outline),
+                          label: const Text('Mesaj'),
+                        ),
+                      ),
+                    ],
                   ),
                 const SizedBox(height: 20),
               ],
@@ -269,6 +301,29 @@ class _DetailContentState extends State<_DetailContent> {
         ],
       ),
     );
+  }
+
+  Future<void> _requestListing(AppListing listing) async {
+    setState(() => _requesting = true);
+    try {
+      await _service.requestListing(listing.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Talep Sepetim bolumune eklendi.')),
+      );
+    } on IlanServiceException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Talep olusturulamadi.')));
+    } finally {
+      if (mounted) setState(() => _requesting = false);
+    }
   }
 }
 
