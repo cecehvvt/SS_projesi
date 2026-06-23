@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../../models/app_listing.dart';
 import '../../models/mesaj_model.dart';
 import '../../services/ilan_service.dart';
@@ -7,6 +8,7 @@ import '../../services/mesaj_service.dart';
 import '../../widgets/alt_menu.dart';
 import '../../widgets/listing_image.dart';
 import 'sohbet_ekrani.dart';
+import 'notifications_panel.dart';
 
 class MesajlarEkrani extends StatefulWidget {
   final bool altMenuGoster;
@@ -30,79 +32,91 @@ class _MesajlarEkraniState extends State<MesajlarEkrani> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-        title: const Text(
-          'Mesajlar',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Ilandan sohbet baslat',
-            icon: const Icon(Icons.add_comment_outlined),
-            onPressed: _showListingPicker,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Renkler.cream,
+        appBar: AppBar(
+          title: const Text('Mesajlar'),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              tooltip: 'İlandan sohbet başlat',
+              icon: const Icon(Icons.add_comment_outlined),
+              onPressed: _showListingPicker,
+            ),
+          ],
+          bottom: const TabBar(
+            labelColor: Renkler.terracottaDark,
+            unselectedLabelColor: Renkler.inkSoft,
+            indicatorColor: Renkler.terracotta,
+            indicatorWeight: 3,
+            tabs: [
+              Tab(text: 'Mesajlar'),
+              Tab(text: 'Bildirimler'),
+            ],
           ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async => _reload(),
-        child: FutureBuilder<List<SohbetOzeti>>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return _StateMessage(
-                icon: Icons.error_outline,
-                title: 'Sohbetler yuklenemedi',
-                message: 'Lutfen biraz sonra tekrar dene.',
-                actionLabel: 'Tekrar dene',
-                onAction: _reload,
-              );
-            }
-            final sohbetler = snapshot.data ?? const [];
-            if (sohbetler.isEmpty) {
-              return _StateMessage(
-                icon: Icons.chat_bubble_outline,
-                title: 'Henuz sohbet yok',
-                message:
-                    'Mesaj atmak istedigin ilani secerek yeni bir sohbet baslatabilirsin.',
-                actionLabel: 'Ilan sec',
-                onAction: _showListingPicker,
-              );
-            }
-            return ListView.separated(
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: sohbetler.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final sohbet = sohbetler[index];
-                return _ConversationTile(
-                  sohbet: sohbet,
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SohbetEkrani.fromSummary(sohbet),
-                      ),
-                    );
-                    if (mounted) _reload();
-                  },
-                );
-              },
-            );
-          },
         ),
+        body: TabBarView(
+          children: [
+            RefreshIndicator(
+              onRefresh: () async => _reload(),
+              child: FutureBuilder<List<SohbetOzeti>>(
+                future: _future,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return _StateMessage(
+                      icon: Icons.error_outline,
+                      title: 'Sohbetler yüklenemedi',
+                      message: 'Lütfen biraz sonra tekrar dene.',
+                      actionLabel: 'Tekrar dene',
+                      onAction: _reload,
+                    );
+                  }
+                  final sohbetler = snapshot.data ?? const [];
+                  if (sohbetler.isEmpty) {
+                    return _StateMessage(
+                      icon: Icons.chat_bubble_outline,
+                      title: 'Henüz sohbet yok',
+                      message:
+                          'Mesaj atmak istediğin ilanı seçerek yeni bir sohbet başlatabilirsin.',
+                      actionLabel: 'İlan seç',
+                      onAction: _showListingPicker,
+                    );
+                  }
+                  return ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: sohbetler.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final sohbet = sohbetler[index];
+                      return _ConversationTile(
+                        sohbet: sohbet,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SohbetEkrani.fromSummary(sohbet),
+                            ),
+                          );
+                          if (mounted) _reload();
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const NotificationsPanel(),
+          ],
+        ),
+        bottomNavigationBar: widget.altMenuGoster
+            ? const VestaAltMenu(seciliIndex: 1)
+            : null,
       ),
-      bottomNavigationBar: widget.altMenuGoster
-          ? const VestaAltMenu(seciliIndex: 1)
-          : null,
     );
   }
 
@@ -124,7 +138,7 @@ class _MesajlarEkraniState extends State<MesajlarEkrani> {
             if (snapshot.hasError) {
               return const _PickerMessage(
                 icon: Icons.error_outline,
-                text: 'Ilanlar yuklenemedi.',
+                text: 'İlanlar yüklenemedi.',
               );
             }
             final listings = (snapshot.data ?? const [])
@@ -133,7 +147,7 @@ class _MesajlarEkraniState extends State<MesajlarEkrani> {
             if (listings.isEmpty) {
               return const _PickerMessage(
                 icon: Icons.inventory_2_outlined,
-                text: 'Mesaj atabilecegin aktif ilan yok.',
+                text: 'Mesaj atabileceğin aktif ilan yok.',
               );
             }
             return SafeArea(
@@ -210,13 +224,13 @@ class _ConversationTile extends StatelessWidget {
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       leading: CircleAvatar(
-        backgroundColor: const Color(0xFFE8F5EE),
+        backgroundColor: Renkler.oliveLight,
         child: Text(
           sohbet.karsiKullaniciAd.isEmpty
               ? 'V'
               : sohbet.karsiKullaniciAd.substring(0, 1).toUpperCase(),
           style: const TextStyle(
-            color: Color(0xFF2E7D32),
+            color: Renkler.paper,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -233,7 +247,7 @@ class _ConversationTile extends StatelessWidget {
           ),
           Text(
             sohbet.formatliZaman,
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            style: const TextStyle(fontSize: 12, color: Renkler.inkSoft),
           ),
         ],
       ),
@@ -246,7 +260,7 @@ class _ConversationTile extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: sohbet.okunmamisVar ? Colors.black87 : Colors.black54,
+              color: sohbet.okunmamisVar ? Renkler.ink : Renkler.inkSoft,
               fontWeight: sohbet.okunmamisVar
                   ? FontWeight.w700
                   : FontWeight.normal,
@@ -258,7 +272,7 @@ class _ConversationTile extends StatelessWidget {
               sohbet.ilanBaslik!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF2E7D32)),
+              style: const TextStyle(fontSize: 12, color: Renkler.olive),
             ),
           ],
         ],

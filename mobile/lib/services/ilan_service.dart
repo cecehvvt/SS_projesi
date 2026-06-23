@@ -21,12 +21,16 @@ class IlanService {
   Future<List<AppListing>> getListings({
     String? listingType,
     String? category,
+    String? condition,
+    bool? urgent,
     String? query,
   }) async {
     final uri = Uri.parse(ApiSabitler.ilanlar).replace(
       queryParameters: {
         if (listingType != null && listingType.isNotEmpty) 'tur': listingType,
         if (category != null && category.isNotEmpty) 'kategori': category,
+        if (condition != null && condition.isNotEmpty) 'durum': condition,
+        if (urgent != null) 'acil': urgent.toString(),
         if (query != null && query.isNotEmpty) 'q': query,
       },
     );
@@ -130,18 +134,16 @@ class IlanService {
       rethrow;
     } catch (_) {
       throw const IlanServiceException(
-        'Sunucuya ulasilamadi. Lutfen uygulamayi yeniden deneyin.',
+        'Sunucuya ulaşılamadı. Lütfen uygulamayı yeniden deneyin.',
       );
     }
   }
 
   dynamic _decode(http.Response response) {
     try {
-      return ApiClient.decode(response, 'Islem tamamlanamadi.');
+      return ApiClient.decode(response, 'İşlem tamamlanamadı.');
     } on ApiClientException catch (exception) {
-      throw IlanServiceException(
-        exception.message,
-      );
+      throw IlanServiceException(exception.message);
     }
   }
 }

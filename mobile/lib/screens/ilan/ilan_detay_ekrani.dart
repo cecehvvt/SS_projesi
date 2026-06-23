@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../models/app_listing.dart';
 import '../../services/ilan_service.dart';
+import '../../services/api_client.dart';
+import '../../services/notification_service.dart';
 import '../../utils/listing_taxonomy.dart';
 import '../../widgets/listing_image.dart';
 import '../mesajlar/sohbet_ekrani.dart';
@@ -26,7 +28,7 @@ class _IlanDetayEkraniState extends State<IlanDetayEkrani> {
     if (_future == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Goruntulenecek ilan secilmedi.')),
+        body: const Center(child: Text('Görüntülenecek ilan seçilmedi.')),
       );
     }
     return FutureBuilder<AppListing>(
@@ -40,7 +42,7 @@ class _IlanDetayEkraniState extends State<IlanDetayEkrani> {
         if (snapshot.hasError || !snapshot.hasData) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Ilan detayi yuklenemedi.')),
+            body: const Center(child: Text('İlan detayı yüklenemedi.')),
           );
         }
         return _DetailContent(
@@ -55,8 +57,8 @@ class _IlanDetayEkraniState extends State<IlanDetayEkrani> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ilani sil'),
-        content: const Text('Bu ilani silmek istediginize emin misiniz?'),
+        title: const Text('İlanı sil'),
+        content: const Text('Bu ilanı silmek istediğinize emin misiniz?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -75,13 +77,13 @@ class _IlanDetayEkraniState extends State<IlanDetayEkrani> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Ilan silindi.')));
+      ).showSnackBar(const SnackBar(content: Text('İlan silindi.')));
       Navigator.pop(context);
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ilan silinemedi. Lutfen tekrar deneyin.'),
+          content: Text('İlan silinemedi. Lütfen tekrar deneyin.'),
         ),
       );
     }
@@ -100,17 +102,19 @@ class _DetailContent extends StatefulWidget {
 
 class _DetailContentState extends State<_DetailContent> {
   final _service = const IlanService();
+  final _notificationService = const NotificationService();
   int _imageIndex = 0;
   bool _requesting = false;
+  bool _swapping = false;
 
   @override
   Widget build(BuildContext context) {
     final listing = widget.listing;
-    final isOwner = listing.ownerId == 'user-1';
+    final isOwner = listing.ownerId == ApiClient.kullaniciId;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Ilan Detayi'),
+        title: const Text('İlan Detayı'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -169,7 +173,13 @@ class _DetailContentState extends State<_DetailContent> {
                   runSpacing: 8,
                   children: [
                     _Chip(text: ListingTaxonomy.typeLabel(listing.listingType)),
-                    _Chip(text: '${listing.category} / ${listing.subCategory}'),
+                    _Chip(
+                      text:
+                          '${ListingTaxonomy.categoryLabel(listing.category)} / '
+                          '${ListingTaxonomy.optionLabel(listing.subCategory)}',
+                    ),
+                    if (listing.listingType == 'ihtiyac' && listing.urgent)
+                      const _Chip(text: 'Acil'),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -196,21 +206,18 @@ class _DetailContentState extends State<_DetailContent> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                _InfoRow(label: 'Urun durumu', value: listing.condition),
                 _InfoRow(
-                  label: 'Teslim yontemi',
+                  label: 'Ürün durumu',
+                  value: ListingTaxonomy.conditionLabel(listing.condition),
+                ),
+                _InfoRow(
+                  label: 'Teslim yöntemi',
                   value: listing.deliveryMethod,
                 ),
-                _InfoRow(label: 'Iletisim', value: listing.contactPreference),
-                if (listing.listingType == 'takas' &&
-                    listing.desiredSwapItem != null)
-                  _InfoRow(
-                    label: 'Istenen takas urunu',
-                    value: listing.desiredSwapItem!,
-                  ),
+                _InfoRow(label: 'İletişim', value: listing.contactPreference),
                 const SizedBox(height: 18),
                 const Text(
-                  'Aciklama',
+                  'Açıklama',
                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
@@ -227,13 +234,13 @@ class _DetailContentState extends State<_DetailContent> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
-                                  'Duzenleme ekrani sonraki adimda baglanacak.',
+                                  'Düzenleme ekranı sonraki adımda bağlanacak.',
                                 ),
                               ),
                             );
                           },
                           icon: const Icon(Icons.edit_outlined),
-                          label: const Text('Duzenle'),
+                          label: const Text('Düzenle'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -267,9 +274,27 @@ class _DetailContentState extends State<_DetailContent> {
                             _requesting
                                 ? 'Ekleniyor...'
                                 : listing.listingType == 'ihtiyac'
-                                ? 'Yardim Et'
+                                ? 'Yardım Et'
                                 : 'Talep Et',
                           ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _swapping
+                              ? null
+                              : () => _requestSwap(listing),
+                          icon: _swapping
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.swap_horiz),
+                          label: const Text('Takas'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -309,7 +334,7 @@ class _DetailContentState extends State<_DetailContent> {
       await _service.requestListing(listing.id);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Talep Sepetim bolumune eklendi.')),
+        const SnackBar(content: Text('Talep Sepetim bölümüne eklendi.')),
       );
     } on IlanServiceException catch (error) {
       if (!mounted) return;
@@ -320,9 +345,27 @@ class _DetailContentState extends State<_DetailContent> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Talep olusturulamadi.')));
+      ).showSnackBar(const SnackBar(content: Text('Talep oluşturulamadı.')));
     } finally {
       if (mounted) setState(() => _requesting = false);
+    }
+  }
+
+  Future<void> _requestSwap(AppListing listing) async {
+    setState(() => _swapping = true);
+    try {
+      await _notificationService.createSwap(listing.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Takas isteği ilan sahibine gönderildi.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.toString())));
+    } finally {
+      if (mounted) setState(() => _swapping = false);
     }
   }
 }
@@ -401,7 +444,7 @@ class _OwnerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Iletisim uygulama ici mesajlasma ile yurutulur.',
+                  'İletişim uygulama içi mesajlaşma ile yürütülür.',
                   style: TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ],

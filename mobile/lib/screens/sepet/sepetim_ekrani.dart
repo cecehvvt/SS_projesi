@@ -57,8 +57,8 @@ class _SepetimEkraniState extends State<SepetimEkrani> {
             if (snapshot.hasError) {
               return _StateMessage(
                 icon: Icons.error_outline,
-                title: 'Talepler yuklenemedi',
-                message: 'Sunucuya ulasilamadi. Lutfen tekrar deneyin.',
+                title: 'Talepler yüklenemedi',
+                message: 'Sunucuya ulaşılamadı. Lütfen tekrar deneyin.',
                 actionLabel: 'Tekrar dene',
                 onAction: _reload,
               );
@@ -69,8 +69,8 @@ class _SepetimEkraniState extends State<SepetimEkrani> {
                 icon: Icons.shopping_bag_outlined,
                 title: 'Sepetin bos',
                 message:
-                    'Talep ettigin veya yardim etmek istedigin ilanlar burada gorunecek.',
-                actionLabel: 'Ilanlara bak',
+                    'Talep ettiğin veya yardım etmek istediğin ilanlar burada görünecek.',
+                actionLabel: 'İlanlara bak',
                 onAction: () => Navigator.pushNamed(context, '/ana_sayfa'),
               );
             }
@@ -176,7 +176,7 @@ class _RequestTile extends StatelessWidget {
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: onCancel,
-                        child: const Text('Iptal et'),
+                        child: const Text('İptal et'),
                       ),
                     ],
                   ),

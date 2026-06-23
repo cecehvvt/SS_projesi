@@ -63,8 +63,8 @@ class _KategoriDetayEkraniState extends State<KategoriDetayEkrani> {
             if (snapshot.hasError) {
               return _StateMessage(
                 icon: Icons.error_outline,
-                title: 'Ilanlar yuklenemedi',
-                message: 'Lutfen tekrar dene.',
+                title: 'İlanlar yüklenemedi',
+                message: 'Lütfen tekrar dene.',
                 onRetry: _reload,
               );
             }
@@ -73,7 +73,7 @@ class _KategoriDetayEkraniState extends State<KategoriDetayEkrani> {
               return _StateMessage(
                 icon: widget.ikon,
                 title: 'Bu kategoride ilan yok',
-                message: 'Yeni ilanlar eklendiginde burada gorunecek.',
+                message: 'Yeni ilanlar eklendiğinde burada görünecek.',
                 onRetry: _reload,
               );
             }

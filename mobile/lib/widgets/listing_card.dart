@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../constants/renkler.dart';
 import '../models/app_listing.dart';
 import '../utils/listing_taxonomy.dart';
 import 'listing_image.dart';
@@ -20,16 +22,16 @@ class ListingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          color: Renkler.paper,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Renkler.line),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
+              color: Renkler.ink.withValues(alpha: 0.05),
+              blurRadius: 14,
               offset: const Offset(0, 4),
             ),
           ],
@@ -44,27 +46,32 @@ class ListingCard extends StatelessWidget {
                     child: ListingImage(
                       source: listing.firstImage,
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
+                        top: Radius.circular(18),
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: _Tag(
-                      text: ListingTaxonomy.typeLabel(listing.listingType),
-                    ),
-                  ),
+                  Positioned(top: 8, left: 8, child: _Tag(listing: listing)),
                   Positioned(
                     top: 4,
                     right: 4,
-                    child: IconButton(
-                      onPressed: onFavoriteTap,
-                      icon: Icon(
-                        listing.favorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: listing.favorite ? Colors.red : Colors.black87,
+                    child: Material(
+                      color: Renkler.paper.withValues(alpha: 0.94),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        onTap: onFavoriteTap,
+                        customBorder: const CircleBorder(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            listing.favorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 19,
+                            color: listing.favorite
+                                ? Renkler.terracotta
+                                : Renkler.ink,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -72,25 +79,31 @@ class ListingCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(12, 11, 12, 13),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     listing.title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
+                    style: GoogleFonts.fraunces(
+                      color: Renkler.ink,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      height: 1.12,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${listing.category} / ${listing.subCategory}',
+                    '${ListingTaxonomy.categoryLabel(listing.category)} / '
+                    '${ListingTaxonomy.optionLabel(listing.subCategory)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 11),
+                    style: const TextStyle(
+                      color: Renkler.inkSoft,
+                      fontSize: 10,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Row(
@@ -98,16 +111,16 @@ class ListingCard extends StatelessWidget {
                       const Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: Colors.black54,
+                        color: Renkler.inkSoft,
                       ),
                       const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          listing.location,
+                          ListingTaxonomy.locationLabel(listing.location),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.black54,
+                            color: Renkler.inkSoft,
                             fontSize: 11,
                           ),
                         ),
@@ -125,24 +138,32 @@ class ListingCard extends StatelessWidget {
 }
 
 class _Tag extends StatelessWidget {
-  final String text;
+  final AppListing listing;
 
-  const _Tag({required this.text});
+  const _Tag({required this.listing});
 
   @override
   Widget build(BuildContext context) {
+    final isDonation = listing.listingType == 'bagis';
+    final background = isDonation ? Renkler.olive : Renkler.terracotta;
+    final text = switch (listing.listingType) {
+      'bagis' => 'BAĞIŞ',
+      'takas' => 'TAKAS',
+      _ => 'İHTİYAÇ',
+    };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F5EE),
-        borderRadius: BorderRadius.circular(8),
+        color: background,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
         style: const TextStyle(
-          color: Color(0xFF2E7D32),
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
+          color: Renkler.paper,
+          fontSize: 9,
+          letterSpacing: 0.8,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );

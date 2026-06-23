@@ -47,13 +47,20 @@ class KullaniciService {
     return KullaniciModel.fromJson(data as Map<String, dynamic>);
   }
 
+  Future<void> deleteAccount() async {
+    final response = await http.delete(
+      Uri.parse(ApiSabitler.hesapSil),
+      headers: ApiClient.headers(),
+    );
+    _decode(response);
+    ApiClient.clearSession();
+  }
+
   dynamic _decode(http.Response response) {
     try {
-      return ApiClient.decode(response, 'Kullanici bilgisi alinamadi.');
+      return ApiClient.decode(response, 'Kullanıcı bilgisi alınamadı.');
     } on ApiClientException catch (exception) {
-      throw KullaniciServiceException(
-        exception.message,
-      );
+      throw KullaniciServiceException(exception.message);
     }
   }
 }

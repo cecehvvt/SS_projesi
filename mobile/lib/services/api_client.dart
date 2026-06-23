@@ -13,7 +13,8 @@ class ApiClient {
 
   static Map<String, String> headers({bool json = false}) {
     return {
-      if (json) ApiSabitler.headerContentType: ApiSabitler.headerContentTypeJson,
+      if (json)
+        ApiSabitler.headerContentType: ApiSabitler.headerContentTypeJson,
       if (accessToken != null && accessToken!.isNotEmpty)
         ApiSabitler.headerAuthorization: 'Bearer $accessToken',
     };

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../../models/mesaj_model.dart';
 import '../../services/mesaj_service.dart';
 import '../../widgets/listing_image.dart';
@@ -17,7 +18,7 @@ class SohbetEkrani extends StatefulWidget {
   const SohbetEkrani({
     super.key,
     this.karsiKullaniciId = '',
-    this.karsiKullaniciAd = 'Vesta kullanicisi',
+    this.karsiKullaniciAd = 'Vesta kullanıcısı',
     this.ilanId,
     this.ilanBaslik,
     this.ilanKonum,
@@ -73,17 +74,14 @@ class _SohbetEkraniState extends State<SohbetEkrani> {
   Widget build(BuildContext context) {
     final canChat = widget.karsiKullaniciId.isNotEmpty;
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8F8),
+      backgroundColor: Renkler.cream,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
         title: Row(
           children: [
             const CircleAvatar(
               radius: 18,
-              backgroundColor: Color(0xFFE8F5EE),
-              child: Icon(Icons.person_outline, color: Color(0xFF2E7D32)),
+              backgroundColor: Renkler.oliveLight,
+              child: Icon(Icons.person_outline, color: Renkler.paper),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -100,8 +98,8 @@ class _SohbetEkraniState extends State<SohbetEkrani> {
                     ),
                   ),
                   const Text(
-                    'Guvenli sohbet',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF2E7D32)),
+                    'Güvenli sohbet',
+                    style: TextStyle(fontSize: 11, color: Renkler.olive),
                   ),
                 ],
               ),
@@ -141,7 +139,7 @@ class _SohbetEkraniState extends State<SohbetEkrani> {
               Text(
                 _error!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.black54),
+                style: const TextStyle(color: Renkler.inkSoft),
               ),
               const SizedBox(height: 16),
               FilledButton(
@@ -158,9 +156,9 @@ class _SohbetEkraniState extends State<SohbetEkrani> {
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
-            'Bu ilan icin henuz mesaj yok. Ilk mesaji yazabilirsin.',
+            'Bu ilan için henüz mesaj yok. İlk mesajı yazabilirsin.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black54),
+            style: TextStyle(color: Renkler.inkSoft),
           ),
         ),
       );
@@ -206,7 +204,7 @@ class _SohbetEkraniState extends State<SohbetEkrani> {
       if (!mounted || silent) return;
       setState(() {
         _loading = false;
-        _error = 'Mesajlar yuklenemedi. Lutfen tekrar dene.';
+        _error = 'Mesajlar yüklenemedi. Lütfen tekrar dene.';
       });
     }
   }
@@ -256,10 +254,12 @@ class _ListingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+        color: Renkler.paper,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Renkler.line),
       ),
       child: Row(
         children: [
@@ -278,7 +278,7 @@ class _ListingHeader extends StatelessWidget {
                   widget.ilanBaslik ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                  style: Renkler.baslik(size: 16),
                 ),
                 if (widget.ilanKonum != null) ...[
                   const SizedBox(height: 3),
@@ -286,7 +286,10 @@ class _ListingHeader extends StatelessWidget {
                     widget.ilanKonum!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Renkler.inkSoft,
+                    ),
                   ),
                 ],
               ],
@@ -313,9 +316,9 @@ class _Composer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade300)),
+      decoration: const BoxDecoration(
+        color: Renkler.paper,
+        border: Border(top: BorderSide(color: Renkler.line)),
       ),
       child: SafeArea(
         child: Row(
@@ -328,15 +331,15 @@ class _Composer extends StatelessWidget {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => onSend(),
                 decoration: InputDecoration(
-                  hintText: 'Mesajini yaz...',
+                  hintText: 'Mesajını yaz...',
                   filled: true,
-                  fillColor: const Color(0xFFF1F3F3),
+                  fillColor: Renkler.cream,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -375,36 +378,43 @@ class _MessageBubble extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: mine ? const Color(0xFFDDF2E7) : Colors.white,
+          color: mine ? Renkler.terracotta : Renkler.paper,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
             bottomLeft: Radius.circular(mine ? 16 : 4),
             bottomRight: Radius.circular(mine ? 4 : 16),
           ),
-          border: mine ? null : Border.all(color: Colors.grey.shade200),
+          border: mine ? null : Border.all(color: Renkler.line),
         ),
         child: Column(
           crossAxisAlignment: mine
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
           children: [
-            Text(message.icerik, style: const TextStyle(height: 1.35)),
+            Text(
+              message.icerik,
+              style: TextStyle(
+                height: 1.35,
+                color: mine ? Renkler.paper : Renkler.ink,
+              ),
+            ),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   message.saatFormati,
-                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: mine
+                        ? Renkler.paper.withValues(alpha: 0.8)
+                        : Renkler.inkSoft,
+                  ),
                 ),
                 if (mine) ...[
                   const SizedBox(width: 4),
-                  const Icon(
-                    Icons.done_all,
-                    size: 15,
-                    color: Color(0xFF2E7D32),
-                  ),
+                  const Icon(Icons.done_all, size: 15, color: Renkler.paper),
                 ],
               ],
             ),
@@ -424,9 +434,9 @@ class _NoChatSelected extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(24),
         child: Text(
-          'Sohbet baslatmak icin Mesajlar ekranindan bir ilan sec.',
+          'Sohbet başlatmak için Mesajlar ekranından bir ilan seç.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.black54),
+          style: TextStyle(color: Renkler.inkSoft),
         ),
       ),
     );

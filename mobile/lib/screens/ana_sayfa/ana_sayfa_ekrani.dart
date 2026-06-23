@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../../models/app_listing.dart';
 import '../../services/ilan_service.dart';
 import '../../utils/listing_taxonomy.dart';
@@ -18,7 +19,9 @@ class AnaSayfaEkrani extends StatefulWidget {
 class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
   final _service = const IlanService();
   final _searchController = TextEditingController();
-  late Future<List<AppListing>> _future = _service.getListings();
+  String _selectedType = 'bagis';
+  ListingFilters _filters = const ListingFilters();
+  late Future<List<AppListing>> _future = _loadListings();
 
   @override
   void dispose() {
@@ -29,14 +32,20 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Renkler.cream,
       body: Column(
         children: [
           Container(
-            color: const Color(0xFFB2D3C2),
-            padding: const EdgeInsets.fromLTRB(16, 56, 16, 18),
+            decoration: const BoxDecoration(
+              color: Renkler.cream,
+              border: Border(bottom: BorderSide(color: Renkler.line)),
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 48, 16, 18),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('Vesta', style: Renkler.baslik(size: 30)),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
@@ -45,13 +54,13 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
                         textInputAction: TextInputAction.search,
                         onSubmitted: (_) => _reload(),
                         decoration: InputDecoration(
-                          hintText: 'Urun, kategori veya konum ara',
+                          hintText: 'Ürün, kategori veya konum ara',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Renkler.paper,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: Renkler.line),
                           ),
                         ),
                       ),
@@ -59,22 +68,76 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
                     const SizedBox(width: 10),
                     IconButton.filled(
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: Renkler.terracotta,
+                        foregroundColor: Renkler.paper,
                       ),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => const FiltreEkrani(),
-                        );
+                      onPressed: () async {
+                        final filters =
+                            await showModalBottomSheet<ListingFilters>(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => FiltreEkrani(
+                                tur: _selectedType == 'ihtiyac'
+                                    ? FiltreTuru.ihtiyac
+                                    : FiltreTuru.bagis,
+                                initialFilters: _filters,
+                              ),
+                            );
+                        if (filters == null || !mounted) return;
+                        setState(() {
+                          _filters = filters;
+                          _future = _loadListings();
+                        });
                       },
-                      icon: const Icon(
-                        Icons.filter_alt_outlined,
-                        color: Colors.black87,
+                      icon: Icon(
+                        _filters.active
+                            ? Icons.filter_alt
+                            : Icons.filter_alt_outlined,
+                        color: Renkler.paper,
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 14),
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(
+                      value: 'bagis',
+                      icon: Icon(Icons.card_giftcard),
+                      label: Text('Bağışlananlar'),
+                    ),
+                    ButtonSegment(
+                      value: 'ihtiyac',
+                      icon: Icon(Icons.volunteer_activism_outlined),
+                      label: Text('İhtiyaçlar'),
+                    ),
+                  ],
+                  selected: {_selectedType},
+                  onSelectionChanged: (value) {
+                    setState(() {
+                      _selectedType = value.first;
+                      _filters = const ListingFilters();
+                      _future = _loadListings();
+                    });
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? Renkler.terracotta
+                          : Renkler.paper,
+                    ),
+                    foregroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? Renkler.paper
+                          : Renkler.ink,
+                    ),
+                    iconColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? Renkler.paper
+                          : Renkler.olive,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -85,22 +148,18 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  const Text(
-                    'Kategoriler',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                  ),
+                  Text('Kategoriler', style: Renkler.baslik(size: 21)),
                   const SizedBox(height: 12),
                   _categoryGrid(),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Guncel Ilanlar',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      Text(
+                        _selectedType == 'bagis'
+                            ? 'Bağışlanan Ürünler'
+                            : 'İhtiyaç İlanları',
+                        style: Renkler.baslik(size: 21),
                       ),
                       TextButton.icon(
                         onPressed: _reload,
@@ -122,9 +181,9 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
                       if (snapshot.hasError) {
                         return _StateMessage(
                           icon: Icons.wifi_off_outlined,
-                          title: 'Ilanlar yuklenemedi',
+                          title: 'İlanlar yüklenemedi',
                           message:
-                              'Sunucuya ulasilamadi. Lutfen tekrar deneyin.',
+                              'Sunucuya ulaşılamadı. Lütfen tekrar deneyin.',
                           onRetry: _reload,
                         );
                       }
@@ -132,8 +191,8 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
                       if (listings.isEmpty) {
                         return _StateMessage(
                           icon: Icons.inventory_2_outlined,
-                          title: 'Henuz ilan yok',
-                          message: 'Ilk ilani olusturarak baslayabilirsin.',
+                          title: 'Henüz ilan yok',
+                          message: 'İlk ilanı oluşturarak başlayabilirsin.',
                           onRetry: _reload,
                         );
                       }
@@ -192,25 +251,29 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
             context,
             MaterialPageRoute(
               builder: (_) => KategoriDetayEkrani(
-                baslik: category.name,
+                baslik: ListingTaxonomy.categoryLabel(category.name),
                 ikon: Icons.category_outlined,
-                anaRenk: const Color(0xFFAFD6C4),
-                sekmeRenk: const Color(0xFFE8F5EE),
+                anaRenk: Renkler.oliveLight,
+                sekmeRenk: Renkler.cream,
               ),
             ),
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200),
+              color: Renkler.paper,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Renkler.line),
             ),
             child: Text(
-              category.name,
+              ListingTaxonomy.categoryLabel(category.name),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+              style: const TextStyle(
+                color: Renkler.ink,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
             ),
           ),
         );
@@ -220,9 +283,17 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
 
   void _reload() {
     setState(() {
-      _future = _service.getListings(query: _searchController.text.trim());
+      _future = _loadListings();
     });
   }
+
+  Future<List<AppListing>> _loadListings() => _service.getListings(
+    listingType: _selectedType,
+    category: _filters.category,
+    condition: _filters.condition,
+    urgent: _selectedType == 'ihtiyac' ? _filters.urgent : null,
+    query: _searchController.text.trim(),
+  );
 
   Future<void> _toggleFavorite(AppListing listing) async {
     try {
@@ -235,7 +306,7 @@ class _AnaSayfaEkraniState extends State<AnaSayfaEkrani> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Favori islemi tamamlanamadi.')),
+        const SnackBar(content: Text('Favori işlemi tamamlanamadı.')),
       );
     }
   }
@@ -260,14 +331,15 @@ class _StateMessage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 54),
       child: Column(
         children: [
-          Icon(icon, size: 42, color: Colors.grey),
+          const SizedBox(height: 4),
+          Icon(icon, size: 42, color: Renkler.oliveLight),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(title, style: Renkler.baslik(size: 19)),
           const SizedBox(height: 4),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.black54),
+            style: const TextStyle(color: Renkler.inkSoft),
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(

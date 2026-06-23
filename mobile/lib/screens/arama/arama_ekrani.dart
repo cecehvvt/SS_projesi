@@ -59,7 +59,7 @@ class _AramaEkraniState extends State<AramaEkrani> {
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _reload(),
               decoration: InputDecoration(
-                hintText: 'Ilan ara',
+                hintText: 'İlan ara',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   onPressed: _reload,
@@ -81,12 +81,12 @@ class _AramaEkraniState extends State<AramaEkrani> {
                 ButtonSegment(
                   value: IlanTuru.bagis,
                   icon: Icon(Icons.card_giftcard),
-                  label: Text('Bagis'),
+                  label: Text('Bağış'),
                 ),
                 ButtonSegment(
                   value: IlanTuru.ihtiyac,
                   icon: Icon(Icons.volunteer_activism_outlined),
-                  label: Text('Ihtiyac'),
+                  label: Text('İhtiyaç'),
                 ),
               ],
               selected: {_selectedType},
@@ -110,8 +110,8 @@ class _AramaEkraniState extends State<AramaEkrani> {
                   if (snapshot.hasError) {
                     return _StateMessage(
                       icon: Icons.error_outline,
-                      title: 'Arama yapilamadi',
-                      message: 'Lutfen tekrar dene.',
+                      title: 'Arama yapılamadı',
+                      message: 'Lütfen tekrar dene.',
                       onRetry: _reload,
                     );
                   }
@@ -119,8 +119,8 @@ class _AramaEkraniState extends State<AramaEkrani> {
                   if (listings.isEmpty) {
                     return _StateMessage(
                       icon: Icons.search_off,
-                      title: 'Sonuc bulunamadi',
-                      message: 'Bu arama icin henuz ilan yok.',
+                      title: 'Sonuç bulunamadı',
+                      message: 'Bu arama için henüz ilan yok.',
                       onRetry: _reload,
                     );
                   }

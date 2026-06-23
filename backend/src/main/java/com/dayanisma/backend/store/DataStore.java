@@ -6,7 +6,6 @@ import com.dayanisma.backend.model.Notification;
 import com.dayanisma.backend.model.PrivacySettings;
 import com.dayanisma.backend.model.SupportRequest;
 import com.dayanisma.backend.model.UserProfile;
-import jakarta.annotation.PostConstruct;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +23,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -37,11 +35,9 @@ import java.util.UUID;
 /**
  * Tum uygulama verisini Supabase Postgres uzerinde tutan veri katmani.
  *
- * <p>Onceki bellek-ici (RAM) surumun ({@code InMemoryStore}) genel API'si korunmustur:
- * {@code users()}, {@code listings()}, {@code favoriteUserIdsByListingId()} gibi metotlar
- * hala {@code Map} dondurur, ancak bu Map'ler {@link JdbcEntityMap}/{@link JdbcFavoriteMap}
- * araciligiyla dogrudan veritabanina okur/yazar. Boylece servis katmaninda hicbir degisiklik
- * gerekmeden veriler kalici hale gelir.</p>
+ * <p>{@code users()}, {@code listings()} ve {@code favoriteUserIdsByListingId()}
+ * metotları Map arayüzü sunar; bu Map'ler {@link JdbcEntityMap} ve
+ * {@link JdbcFavoriteMap} üzerinden doğrudan veritabanına okur/yazar.</p>
  */
 @Component
 @DependsOnDatabaseInitialization
@@ -65,20 +61,6 @@ public class DataStore {
         this.notifications = new JdbcEntityMap<>(jdbc, "notifications", NOTIFICATION_MAPPER, Notification::id, this::upsertNotification);
         this.supportRequests = new JdbcEntityMap<>(jdbc, "support_requests", SUPPORT_MAPPER, SupportRequest::id, this::upsertSupportRequest);
         this.favoriteUserIdsByListingId = new JdbcFavoriteMap(jdbc);
-    }
-
-    @PostConstruct
-    void seed() {
-        // Varsayilan kullaniciyi yalnizca yoksa ekle (mevcut verileri ezme).
-        jdbc.update(
-                "INSERT INTO users (id, ad, soyad, tc_kimlik_no, adres, eposta_veya_telefon, kullanici_adi, " +
-                        "hakkinda, konum, telefon_numarasi, eposta, profil_foto_url, gizlilik_profil_gorunur, " +
-                        "gizlilik_mesaj_alabilir, gizlilik_konum_goster, kayit_tarihi, aktif) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (id) DO NOTHING",
-                CURRENT_USER_ID, "Ayse", "Demir", null, "Uskudar, Istanbul",
-                "ayse@example.com", "@aysedemir34", "Paylasmayi seven Vesta kullanicisi.",
-                "Uskudar, Istanbul", "+90 555 000 0001", "ayse@example.com", null,
-                true, true, false, ts(Instant.now().minus(30, ChronoUnit.DAYS)), true);
     }
 
     public String currentUserId() {

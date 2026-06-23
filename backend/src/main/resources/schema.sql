@@ -238,6 +238,20 @@ CREATE INDEX IF NOT EXISTS idx_favorites_user      ON favorites (user_id);
 CREATE INDEX IF NOT EXISTS idx_listing_requests_user ON listing_requests (requester_id);
 CREATE INDEX IF NOT EXISTS idx_listing_requests_listing ON listing_requests (listing_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_listing_requests_listing_requester ON listing_requests (listing_id, requester_id);
+
+CREATE TABLE IF NOT EXISTS swap_requests (
+    id           TEXT PRIMARY KEY,
+    listing_id   TEXT        NOT NULL,
+    requester_id TEXT        NOT NULL,
+    owner_id     TEXT        NOT NULL,
+    status       TEXT        NOT NULL DEFAULT 'pending',
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (listing_id, requester_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_swap_requests_owner ON swap_requests (owner_id, status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_swap_requests_requester ON swap_requests (requester_id, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages (gonderic_id, alici_id, ilan_id, gonderim_zamani);
 CREATE INDEX IF NOT EXISTS idx_users_eposta_veya_telefon ON users (lower(eposta_veya_telefon));
 CREATE INDEX IF NOT EXISTS idx_users_eposta ON users (lower(eposta));

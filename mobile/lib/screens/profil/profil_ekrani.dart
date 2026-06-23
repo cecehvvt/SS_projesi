@@ -6,9 +6,11 @@ import '../../services/auth_service.dart';
 import '../../services/ilan_service.dart';
 import '../../services/kullanici_service.dart';
 import '../../utils/listing_taxonomy.dart';
+import '../../utils/profile_image.dart';
 import '../../widgets/listing_image.dart';
 import '../ilan/ilan_detay_ekrani.dart';
 import 'profil_duzenle_ekrani.dart';
+import 'sikayet_destek_ekrani.dart';
 
 class ProfilEkrani extends StatefulWidget {
   const ProfilEkrani({super.key});
@@ -52,21 +54,6 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Profili duzenle',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () async {
-              final changed = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilDuzenleEkrani(),
-                ),
-              );
-              if (changed == true) _reload();
-            },
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => _reload(),
@@ -86,7 +73,7 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
                 _Stats(listings: listings),
                 const SizedBox(height: 24),
                 const Text(
-                  'Ilanlarim',
+                  'İlanlarım',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 12),
@@ -98,15 +85,15 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
                 else if (snapshot.hasError)
                   _StateCard(
                     icon: Icons.error_outline,
-                    text: 'Ilanlarin yuklenemedi.',
+                    text: 'İlanların yüklenemedi.',
                     actionLabel: 'Tekrar dene',
                     onAction: _reload,
                   )
                 else if (listings.isEmpty)
                   _StateCard(
                     icon: Icons.inventory_2_outlined,
-                    text: 'Henuz olusturdugun ilan yok.',
-                    actionLabel: 'Ilan olustur',
+                    text: 'Henüz oluşturduğun ilan yok.',
+                    actionLabel: 'İlan oluştur',
                     onAction: () =>
                         Navigator.pushNamed(context, '/ilan_olustur'),
                   )
@@ -127,6 +114,12 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
                 _ProfileMenu(
                   onMessagesTap: () =>
                       Navigator.pushNamed(context, '/mesajlar'),
+                  onHelpTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SikayetDestekEkrani(),
+                    ),
+                  ),
                   onLogoutTap: () async {
                     await const AuthService().logout();
                     if (!context.mounted) return;
@@ -136,6 +129,7 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
                       (route) => false,
                     );
                   },
+                  onDeleteAccountTap: _deleteAccount,
                 ),
               ],
             );
@@ -143,6 +137,42 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
         ),
       ),
     );
+  }
+
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Hesabı sil'),
+        content: const Text(
+          'Hesabın ve oluşturduğun tüm ilanlar kalıcı olarak silinecek. '
+          'Bu işlem geri alınamaz.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Vazgeç'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Hesabı kalıcı olarak sil'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await _kullaniciService.deleteAccount();
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    } on KullaniciServiceException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 }
 
@@ -174,7 +204,7 @@ class _ProfileInfo extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             about == null || about.isEmpty
-                ? 'Hakkinda bilgisi eklenmedi.'
+                ? 'Hakkında bilgisi eklenmedi.'
                 : about,
             style: const TextStyle(color: Colors.black87, height: 1.35),
           ),
@@ -230,7 +260,7 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayName = user == null || user!.tamAd.trim().isEmpty
-        ? 'Vesta Kullanici'
+        ? 'Vesta Kullanıcısı'
         : user!.tamAd;
     final location = user?.konum?.isNotEmpty == true
         ? user!.konum!
@@ -249,10 +279,9 @@ class _ProfileHeader extends StatelessWidget {
           CircleAvatar(
             radius: 32,
             backgroundColor: const Color(0xFFE8F5EE),
-            backgroundImage:
-                user?.profilFotoUrl?.isNotEmpty == true
-                    ? NetworkImage(user!.profilFotoUrl!)
-                    : null,
+            backgroundImage: user?.profilFotoUrl?.isNotEmpty == true
+                ? profileImageProvider(user!.profilFotoUrl!)
+                : null,
             child: user?.profilFotoUrl?.isNotEmpty == true
                 ? null
                 : const Icon(
@@ -289,7 +318,7 @@ class _ProfileHeader extends StatelessWidget {
               if (changed == true) onChanged();
             },
             icon: const Icon(Icons.edit_outlined, size: 18),
-            label: const Text('Duzenle'),
+            label: const Text('Düzenle'),
           ),
         ],
       ),
@@ -310,14 +339,11 @@ class _Stats extends StatelessWidget {
     final ihtiyac = listings
         .where((listing) => listing.listingType == 'ihtiyac')
         .length;
-    final takas = listings
-        .where((listing) => listing.listingType == 'takas')
-        .length;
     return Row(
       children: [
         Expanded(
           child: _StatTile(
-            label: 'Bagis',
+            label: 'Bağış',
             count: bagis,
             icon: Icons.card_giftcard,
           ),
@@ -325,17 +351,9 @@ class _Stats extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatTile(
-            label: 'Ihtiyac',
+            label: 'İhtiyaç',
             count: ihtiyac,
             icon: Icons.volunteer_activism_outlined,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _StatTile(
-            label: 'Takas',
-            count: takas,
-            icon: Icons.swap_horiz,
           ),
         ),
       ],
@@ -412,7 +430,8 @@ class _MiniListingCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         subtitle: Text(
-          '${ListingTaxonomy.typeLabel(listing.listingType)} - ${listing.category}',
+          '${ListingTaxonomy.typeLabel(listing.listingType)} - '
+          '${ListingTaxonomy.categoryLabel(listing.category)}',
         ),
         trailing: const Icon(Icons.chevron_right),
       ),
@@ -457,11 +476,15 @@ class _StateCard extends StatelessWidget {
 
 class _ProfileMenu extends StatelessWidget {
   final VoidCallback onMessagesTap;
+  final VoidCallback onHelpTap;
   final VoidCallback onLogoutTap;
+  final VoidCallback onDeleteAccountTap;
 
   const _ProfileMenu({
     required this.onMessagesTap,
+    required this.onHelpTap,
     required this.onLogoutTap,
+    required this.onDeleteAccountTap,
   });
 
   @override
@@ -481,20 +504,30 @@ class _ProfileMenu extends StatelessWidget {
             onTap: onMessagesTap,
           ),
           const Divider(height: 1),
-          const ListTile(
-            leading: Icon(Icons.help_outline),
-            title: Text('Yardim & Destek'),
-            trailing: Icon(Icons.chevron_right),
+          ListTile(
+            leading: const Icon(
+              Icons.delete_forever_outlined,
+              color: Colors.red,
+            ),
+            title: const Text(
+              'Hesabı Sil',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
+            ),
+            onTap: onDeleteAccountTap,
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Yardım & Destek'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: onHelpTap,
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text(
-              'Cikis Yap',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.w700,
-              ),
+              'Çıkış Yap',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
             ),
             onTap: onLogoutTap,
           ),

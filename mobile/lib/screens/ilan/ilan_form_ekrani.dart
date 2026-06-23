@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../constants/renkler.dart';
 import '../../models/app_listing.dart';
 import '../../services/ilan_service.dart';
 import '../../utils/listing_taxonomy.dart';
@@ -21,7 +22,6 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _desiredSwapController = TextEditingController();
   final _service = const IlanService();
   final _picker = ImagePicker();
 
@@ -31,7 +31,8 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
   String _city = ListingTaxonomy.cities.first;
   String _district =
       ListingTaxonomy.districtsByCity[ListingTaxonomy.cities.first]!.first;
-  String _condition = ListingTaxonomy.conditions.first;
+  String? _condition;
+  bool? _urgent;
   String _deliveryMethod = ListingTaxonomy.deliveryMethods.first;
   String _contactPreference = ListingTaxonomy.contactPreferences.first;
   final List<String> _imageDataUris = [];
@@ -42,19 +43,15 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _desiredSwapController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Renkler.cream,
       appBar: AppBar(
-        title: Text('${ListingTaxonomy.typeLabel(_listingType)} Olustur'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
+        title: Text('${ListingTaxonomy.typeLabel(_listingType)} Oluştur'),
       ),
       body: Form(
         key: _formKey,
@@ -62,12 +59,19 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
           padding: const EdgeInsets.all(16),
           children: [
             _section(
-              title: 'Ilan tipi',
+              title: 'İlan tipi',
               child: SegmentedButton<String>(
                 segments: const [
-                  ButtonSegment(value: 'bagis', label: Text('Bagis')),
-                  ButtonSegment(value: 'ihtiyac', label: Text('Ihtiyac')),
-                  ButtonSegment(value: 'takas', label: Text('Takas')),
+                  ButtonSegment(
+                    value: 'bagis',
+                    icon: Icon(Icons.card_giftcard_outlined),
+                    label: Text('Bağışlıyorum'),
+                  ),
+                  ButtonSegment(
+                    value: 'ihtiyac',
+                    icon: Icon(Icons.volunteer_activism_outlined),
+                    label: Text('İhtiyacım Var'),
+                  ),
                 ],
                 selected: {_listingType},
                 onSelectionChanged: (value) =>
@@ -75,8 +79,8 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
               ),
             ),
             _section(
-              title: 'Fotograflar',
-              subtitle: 'En az 1, en fazla 5 fotograf ekleyin.',
+              title: 'Fotoğraflar',
+              subtitle: 'En az 1, en fazla 5 fotoğraf ekleyin.',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -103,9 +107,9 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                   TextFormField(
                     controller: _titleController,
                     maxLength: 60,
-                    decoration: const InputDecoration(labelText: 'Baslik *'),
+                    decoration: const InputDecoration(labelText: 'Başlık *'),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Baslik bos birakilamaz.'
+                        ? 'Başlık boş bırakılamaz.'
                         : null,
                   ),
                   const SizedBox(height: 12),
@@ -113,9 +117,9 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                     controller: _descriptionController,
                     maxLines: 5,
                     maxLength: 500,
-                    decoration: const InputDecoration(labelText: 'Aciklama *'),
+                    decoration: const InputDecoration(labelText: 'Açıklama *'),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Aciklama bos birakilamaz.'
+                        ? 'Açıklama boş bırakılamaz.'
                         : null,
                   ),
                 ],
@@ -132,7 +136,9 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                         .map(
                           (item) => DropdownMenuItem(
                             value: item.name,
-                            child: Text(item.name),
+                            child: Text(
+                              ListingTaxonomy.categoryLabel(item.name),
+                            ),
                           ),
                         )
                         .toList(),
@@ -145,7 +151,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                       });
                     },
                     validator: (value) =>
-                        value == null ? 'Kategori secin.' : null,
+                        value == null ? 'Kategori seçin.' : null,
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
@@ -155,13 +161,15 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                     ),
                     items: _subCategoriesFor(_category)
                         .map(
-                          (item) =>
-                              DropdownMenuItem(value: item, child: Text(item)),
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(ListingTaxonomy.optionLabel(item)),
+                          ),
                         )
                         .toList(),
                     onChanged: (value) => setState(() => _subCategory = value),
                     validator: (value) =>
-                        value == null ? 'Alt kategori secin.' : null,
+                        value == null ? 'Alt kategori seçin.' : null,
                   ),
                 ],
               ),
@@ -172,11 +180,13 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                 children: [
                   DropdownButtonFormField<String>(
                     initialValue: _city,
-                    decoration: const InputDecoration(labelText: 'Sehir *'),
+                    decoration: const InputDecoration(labelText: 'Şehir *'),
                     items: ListingTaxonomy.cities
                         .map(
-                          (item) =>
-                              DropdownMenuItem(value: item, child: Text(item)),
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(ListingTaxonomy.optionLabel(item)),
+                          ),
                         )
                         .toList(),
                     onChanged: (value) {
@@ -193,14 +203,14 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _district,
-                    decoration: const InputDecoration(labelText: 'Ilce *'),
+                    decoration: const InputDecoration(labelText: 'İlçe *'),
                     items:
                         (ListingTaxonomy.districtsByCity[_city] ??
                                 const ['Merkez'])
                             .map(
                               (item) => DropdownMenuItem(
                                 value: item,
-                                child: Text(item),
+                                child: Text(ListingTaxonomy.optionLabel(item)),
                               ),
                             )
                             .toList(),
@@ -211,27 +221,67 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                   DropdownButtonFormField<String>(
                     initialValue: _condition,
                     decoration: const InputDecoration(
-                      labelText: 'Urun durumu *',
+                      labelText: 'Ürün durumu *',
                     ),
                     items: ListingTaxonomy.conditions
                         .map(
-                          (item) =>
-                              DropdownMenuItem(value: item, child: Text(item)),
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(ListingTaxonomy.conditionLabel(item)),
+                          ),
                         )
                         .toList(),
-                    onChanged: (value) =>
-                        setState(() => _condition = value ?? _condition),
+                    onChanged: (value) => setState(() => _condition = value),
+                    validator: (value) =>
+                        value == null ? 'Ürün durumunu seçin.' : null,
                   ),
+                  if (_listingType == 'ihtiyac') ...[
+                    const SizedBox(height: 12),
+                    SegmentedButton<bool>(
+                      segments: const [
+                        ButtonSegment(
+                          value: true,
+                          icon: Icon(Icons.priority_high),
+                          label: Text('Acil'),
+                        ),
+                        ButtonSegment(
+                          value: false,
+                          icon: Icon(Icons.schedule),
+                          label: Text('Normal'),
+                        ),
+                      ],
+                      selected: _urgent == null ? const {} : {_urgent!},
+                      emptySelectionAllowed: true,
+                      onSelectionChanged: (selection) => setState(
+                        () => _urgent = selection.isEmpty
+                            ? null
+                            : selection.first,
+                      ),
+                    ),
+                    if (_urgent == null)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Aciliyet durumunu seçin.',
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _deliveryMethod,
                     decoration: const InputDecoration(
-                      labelText: 'Teslim yontemi *',
+                      labelText: 'Teslim yöntemi *',
                     ),
                     items: ListingTaxonomy.deliveryMethods
                         .map(
-                          (item) =>
-                              DropdownMenuItem(value: item, child: Text(item)),
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(ListingTaxonomy.optionLabel(item)),
+                          ),
                         )
                         .toList(),
                     onChanged: (value) => setState(
@@ -242,12 +292,14 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                   DropdownButtonFormField<String>(
                     initialValue: _contactPreference,
                     decoration: const InputDecoration(
-                      labelText: 'Iletisim tercihi *',
+                      labelText: 'İletişim tercihi *',
                     ),
                     items: ListingTaxonomy.contactPreferences
                         .map(
-                          (item) =>
-                              DropdownMenuItem(value: item, child: Text(item)),
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(ListingTaxonomy.optionLabel(item)),
+                          ),
                         )
                         .toList(),
                     onChanged: (value) => setState(
@@ -257,22 +309,6 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                 ],
               ),
             ),
-            if (_listingType == 'takas')
-              _section(
-                title: 'Takas bilgisi',
-                child: TextFormField(
-                  controller: _desiredSwapController,
-                  decoration: const InputDecoration(
-                    labelText: 'Takas edilmek istenen urun *',
-                  ),
-                  validator: (value) {
-                    if (_listingType != 'takas') return null;
-                    return value == null || value.trim().isEmpty
-                        ? 'Takas icin istenen urunu yazin.'
-                        : null;
-                  },
-                ),
-              ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: _saving ? null : _save,
@@ -283,7 +319,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.check_circle_outline),
-              label: Text(_saving ? 'Kaydediliyor...' : 'Ilani Kaydet'),
+              label: Text(_saving ? 'Yayınlanıyor...' : 'İlanı Yayınla'),
             ),
             const SizedBox(height: 24),
           ],
@@ -301,22 +337,27 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        color: Renkler.paper,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Renkler.line),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+            style: const TextStyle(
+              color: Renkler.terracottaDark,
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              letterSpacing: 1.2,
+            ),
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(color: Colors.black54, fontSize: 12),
+              style: const TextStyle(color: Renkler.inkSoft, fontSize: 12),
             ),
           ],
           const SizedBox(height: 12),
@@ -333,7 +374,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
           source: source,
           width: 76,
           height: 76,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         Positioned(
           top: -8,
@@ -351,18 +392,21 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
     return PopupMenuButton<ImageSource>(
       onSelected: _pickImage,
       itemBuilder: (context) => const [
-        PopupMenuItem(value: ImageSource.gallery, child: Text('Galeriden sec')),
+        PopupMenuItem(value: ImageSource.gallery, child: Text('Galeriden seç')),
         PopupMenuItem(value: ImageSource.camera, child: Text('Kamera')),
       ],
       child: Container(
         width: 76,
         height: 76,
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F5EE),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF4CAF7D)),
+          color: Renkler.cream,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Renkler.terracotta, width: 1.5),
         ),
-        child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF2E7D32)),
+        child: const Icon(
+          Icons.add_a_photo_outlined,
+          color: Renkler.terracottaDark,
+        ),
       ),
     );
   }
@@ -384,7 +428,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Fotograf secilemedi. Lutfen tekrar deneyin.'),
+          content: Text('Fotoğraf seçilemedi. Lütfen tekrar deneyin.'),
         ),
       );
     } finally {
@@ -395,11 +439,17 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
   Future<void> _save() async {
     if (_imageDataUris.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lutfen en az bir fotograf ekleyin.')),
+        const SnackBar(content: Text('Lütfen en az bir fotoğraf ekleyin.')),
       );
       return;
     }
     if (!_formKey.currentState!.validate()) return;
+    if (_listingType == 'ihtiyac' && _urgent == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Aciliyet durumunu seçin.')));
+      return;
+    }
 
     setState(() => _saving = true);
     try {
@@ -407,7 +457,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
       final listing = AppListing(
         id: '',
         ownerId: 'user-1',
-        ownerName: 'Vesta Kullanici',
+        ownerName: 'Vesta Kullanıcısı',
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         listingType: _listingType,
@@ -415,21 +465,20 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
         subCategory: _subCategory!,
         city: _city,
         district: _district,
-        condition: _condition,
+        condition: _condition!,
         deliveryMethod: _deliveryMethod,
         contactPreference: _contactPreference,
-        desiredSwapItem: _listingType == 'takas'
-            ? _desiredSwapController.text.trim()
-            : null,
+        desiredSwapItem: null,
         imageUrls: List<String>.from(_imageDataUris),
         status: 'active',
         createdAt: now,
         updatedAt: now,
+        urgent: _listingType == 'ihtiyac' ? _urgent! : false,
       );
       await _service.createListing(listing);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ilan basariyla olusturuldu.')),
+        const SnackBar(content: Text('İlan başarıyla oluşturuldu.')),
       );
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -445,7 +494,7 @@ class _IlanFormEkraniState extends State<IlanFormEkrani> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ilan kaydedilemedi. Lutfen tekrar deneyin.'),
+          content: Text('İlan kaydedilemedi. Lütfen tekrar deneyin.'),
         ),
       );
     } finally {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants/renkler.dart';
 import 'ana_sayfa/ana_sayfa_ekrani.dart';
 import 'favoriler/favoriler_ekrani.dart';
 import 'ilan/ilan_olustur_ekrani.dart';
@@ -42,10 +43,10 @@ class _AnaSayfaYoneticiState extends State<AnaSayfaYonetici> {
         body: IndexedStack(index: _seciliSayfa, children: _sayfalar),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color(0xFFB2D3C2),
+          backgroundColor: Renkler.paper,
           currentIndex: _seciliSayfa,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.black54,
+          selectedItemColor: Renkler.terracottaDark,
+          unselectedItemColor: Renkler.inkSoft,
           onTap: (index) {
             setState(() {
               _seciliSayfa = index;
@@ -61,7 +62,7 @@ class _AnaSayfaYoneticiState extends State<AnaSayfaYonetici> {
               label: 'Mesajlar',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline),
+              icon: Icon(Icons.add_circle, color: Renkler.terracotta, size: 30),
               label: 'İlan Oluştur',
             ),
             BottomNavigationBarItem(

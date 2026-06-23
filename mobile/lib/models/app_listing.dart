@@ -17,6 +17,7 @@ class AppListing {
   final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool urgent;
   final bool favorite;
 
   const AppListing({
@@ -38,6 +39,7 @@ class AppListing {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.urgent = false,
     this.favorite = false,
   });
 
@@ -61,6 +63,7 @@ class AppListing {
     'desiredSwapItem': desiredSwapItem,
     'imageUrls': imageUrls,
     'status': status,
+    'urgent': urgent,
   };
 
   factory AppListing.fromJson(Map<String, dynamic> json) {
@@ -68,7 +71,7 @@ class AppListing {
       id: json['id']?.toString() ?? '',
       ownerId: (json['ownerId'] ?? json['ilanSahibiId'] ?? '').toString(),
       ownerName:
-          (json['ownerName'] ?? json['ilanSahibiAdSoyad'] ?? 'Vesta Kullanici')
+          (json['ownerName'] ?? json['ilanSahibiAdSoyad'] ?? 'Vesta Kullanıcı')
               .toString(),
       title: (json['title'] ?? json['baslik'] ?? '').toString(),
       description: (json['description'] ?? json['aciklama'] ?? '').toString(),
@@ -81,7 +84,7 @@ class AppListing {
       district:
           (json['district'] ?? _districtFromLocation(json['konum']) ?? 'Merkez')
               .toString(),
-      condition: (json['condition'] ?? json['urunDurumu'] ?? 'Iyi').toString(),
+      condition: (json['condition'] ?? json['urunDurumu'] ?? 'İyi').toString(),
       deliveryMethod: (json['deliveryMethod'] ?? 'Elden teslim').toString(),
       contactPreference: (json['contactPreference'] ?? 'Uygulama ici mesaj')
           .toString(),
@@ -94,6 +97,7 @@ class AppListing {
               .toString(),
       createdAt: _date(json['createdAt'] ?? json['olusturmaTarihi']),
       updatedAt: _date(json['updatedAt'] ?? json['olusturmaTarihi']),
+      urgent: json['urgent'] as bool? ?? json['acilMi'] as bool? ?? false,
       favorite:
           json['favorite'] as bool? ?? json['favorilendi'] as bool? ?? false,
     );

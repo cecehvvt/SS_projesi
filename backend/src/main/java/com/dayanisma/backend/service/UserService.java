@@ -5,6 +5,8 @@ import com.dayanisma.backend.model.Listing;
 import com.dayanisma.backend.model.UserProfile;
 import com.dayanisma.backend.store.DataStore;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Map;
@@ -13,9 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class UserService {
     private final DataStore store;
+    private final JdbcTemplate jdbc;
 
-    public UserService(DataStore store) {
+    public UserService(DataStore store, JdbcTemplate jdbc) {
         this.store = store;
+        this.jdbc = jdbc;
     }
 
     public UserProfile me() {
@@ -80,6 +84,24 @@ public class UserService {
         );
         store.users().put(updated.id(), updated);
         return updated;
+    }
+
+    @Transactional
+    public Map<String, Integer> deleteMe() {
+        String userId = store.currentUserId();
+
+        jdbc.update(
+                "DELETE FROM swap_requests " +
+                        "WHERE owner_id=? OR requester_id=? " +
+                        "OR listing_id IN (SELECT id FROM listings WHERE owner_id=?)",
+                userId, userId, userId
+        );
+        int deletedListings = jdbc.update("DELETE FROM listings WHERE owner_id=?", userId);
+        int deletedUsers = jdbc.update("DELETE FROM users WHERE id=?", userId);
+        if (deletedUsers != 1) {
+            throw new NoSuchElementException("Kullanıcı bulunamadı: " + userId);
+        }
+        return Map.of("silinenIlanSayisi", deletedListings);
     }
 
     public UserProfile register(Map<String, Object> request) {

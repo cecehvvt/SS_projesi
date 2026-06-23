@@ -4,6 +4,7 @@ import com.dayanisma.backend.dto.ApiResponse;
 import com.dayanisma.backend.model.UserProfile;
 import com.dayanisma.backend.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,6 +26,11 @@ public class UserController {
     @GetMapping("/me")
     public ApiResponse<UserProfile> me() {
         return ApiResponse.ok("Kullanici bilgisi", userService.me());
+    }
+
+    @DeleteMapping("/me")
+    public ApiResponse<Map<String, Integer>> deleteMe() {
+        return ApiResponse.ok("Hesap ve kullanıcıya ait ilanlar silindi", userService.deleteMe());
     }
 
     @PutMapping("/me")

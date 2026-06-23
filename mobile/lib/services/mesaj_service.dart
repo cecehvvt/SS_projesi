@@ -65,12 +65,10 @@ class MesajService {
 
   Map<String, dynamic> _decode(http.Response response) {
     try {
-      final data = ApiClient.decode(response, 'Mesaj islemi tamamlanamadi.');
+      final data = ApiClient.decode(response, 'Mesaj işlemi tamamlanamadı.');
       return {'data': data};
     } on ApiClientException catch (exception) {
-      throw MesajServiceException(
-        exception.message,
-      );
+      throw MesajServiceException(exception.message);
     }
   }
 }

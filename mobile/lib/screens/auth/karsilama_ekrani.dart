@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import 'giris_ekrani.dart';
 import 'kayit_ekrani.dart';
 
@@ -9,7 +10,7 @@ class KarsilamaEkrani extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F5F5),
+      backgroundColor: Renkler.authBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -47,7 +48,7 @@ class KarsilamaEkrani extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      'Giris Yap',
+                      'Giriş Yap',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -74,7 +75,7 @@ class KarsilamaEkrani extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      'Kayit Ol',
+                      'Kayıt Ol',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,

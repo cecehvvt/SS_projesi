@@ -17,6 +17,70 @@ class ListingTaxonomy {
     'Onarim gerekebilir',
   ];
 
+  static String conditionLabel(String condition) {
+    switch (condition) {
+      case 'Yeni / Acilmamis':
+        return 'Yeni / Kullanılmamış';
+      case 'Az kullanilmis':
+        return 'Az kullanılmış';
+      case 'Iyi':
+        return 'İyi';
+      case 'Onarim gerekebilir':
+        return 'Onarım gerekebilir';
+      default:
+        return condition;
+    }
+  }
+
+  static String categoryLabel(String category) {
+    switch (category) {
+      case 'Kadin':
+        return 'Kadın';
+      case 'Cocuk & Bebek':
+        return 'Çocuk & Bebek';
+      case 'Ev & Yasam':
+        return 'Ev & Yaşam';
+      case 'Kitap & Kirtasiye':
+        return 'Kitap & Kırtasiye';
+      case 'Diger':
+        return 'Diğer';
+      default:
+        return category;
+    }
+  }
+
+  static String optionLabel(String value) {
+    const labels = {
+      'Ayakkabi': 'Ayakkabı',
+      'Kucuk Ev Elektronigi': 'Küçük Ev Elektroniği',
+      'Ev Esyalari': 'Ev Eşyaları',
+      'Mutfak Gerecleri': 'Mutfak Gereçleri',
+      'Kirtasiye': 'Kırtasiye',
+      'Uygulama ici mesaj': 'Uygulama içi mesaj',
+      'Telefonu sonra paylas': 'Telefonu sonra paylaş',
+      'Istanbul': 'İstanbul',
+      'Izmir': 'İzmir',
+      'Diger': 'Diğer',
+      'Uskudar': 'Üsküdar',
+      'Kadikoy': 'Kadıköy',
+      'Beyoglu': 'Beyoğlu',
+      'Besiktas': 'Beşiktaş',
+      'Cankaya': 'Çankaya',
+      'Kecioren': 'Keçiören',
+      'Karsiyaka': 'Karşıyaka',
+      'Nilufer': 'Nilüfer',
+      'Yildirim': 'Yıldırım',
+    };
+    return labels[value] ?? value;
+  }
+
+  static String locationLabel(String location) {
+    return location
+        .split(RegExp(r'\s*/\s*|\s*,\s*'))
+        .map(optionLabel)
+        .join(' / ');
+  }
+
   static const deliveryMethods = ['Elden teslim', 'Kargo', 'Fark etmez'];
 
   static const contactPreferences = [
@@ -55,11 +119,11 @@ class ListingTaxonomy {
   static String typeLabel(String type) {
     switch (type) {
       case 'bagis':
-        return 'Bagis Ilani';
+        return 'Bağış İlanı';
       case 'ihtiyac':
-        return 'Ihtiyac Ilani';
+        return 'İhtiyaç İlanı';
       case 'takas':
-        return 'Takas Ilani';
+        return 'Takas İlanı';
       default:
         return type;
     }

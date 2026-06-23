@@ -24,6 +24,7 @@ class ApiSabitler {
   // ─────────────────────────────────────────────
   static const String kullaniciBilgi = '$baseUrl/users/me';
   static const String kullaniciBilgiGuncelle = '$baseUrl/users/me';
+  static const String hesapSil = '$baseUrl/users/me';
   static const String profilFotoyukle = '$baseUrl/users/me/avatar';
   static const String gizlilikGuncelle = '$baseUrl/users/me/privacy';
 
@@ -116,6 +117,14 @@ class ApiSabitler {
 
   /// Şehir/ilçe arama (konum seçimi): GET /konum/ara?q=Üsküdar
   static const String konumAra = '$baseUrl/konum/ara';
+
+  // BILDIRIMLER / TAKAS
+  static const String bildirimler = '$baseUrl/bildirimler';
+  static const String gelenTakasIstekleri = '$baseUrl/takas-istekleri/gelen';
+  static String takasIstegiOlustur(String ilanId) =>
+      '$baseUrl/takas-istekleri/ilan/$ilanId';
+  static String takasIstegiYanitla(String istekId) =>
+      '$baseUrl/takas-istekleri/$istekId';
 
   // ─────────────────────────────────────────────
   // HTTP HEADER ANAHTARLARI

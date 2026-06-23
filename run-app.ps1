@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$FlutterRunArguments = @($args)
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $mobileDir = Join-Path $root "mobile"
@@ -9,6 +10,25 @@ $backendUrl = "http://127.0.0.1:8081"
 
 if (-not (Test-Path $flutter)) {
     $flutter = "flutter"
+}
+
+function Clear-StaleFlutterRun {
+    $staleProcesses = Get-Process dart, dartvm -ErrorAction SilentlyContinue
+    if ($staleProcesses) {
+        Write-Host "Önceki Flutter oturumu kapatılıyor..."
+        $staleProcesses | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Milliseconds 500
+    }
+
+    $flutterAssets = Join-Path $mobileDir "build\flutter_assets"
+    if (Test-Path -LiteralPath $flutterAssets) {
+        Remove-Item -LiteralPath $flutterAssets -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    $flutterBuildCache = Join-Path $mobileDir ".dart_tool\flutter_build"
+    if (Test-Path -LiteralPath $flutterBuildCache) {
+        Remove-Item -LiteralPath $flutterBuildCache -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 function Stop-Port8081 {
@@ -40,25 +60,16 @@ function Wait-HttpReady {
     return $false
 }
 
-function Get-LocalIp {
-    $ip = Get-NetIPAddress -AddressFamily IPv4 |
-        Where-Object {
-            $_.IPAddress -notlike "127.*" -and
-            $_.IPAddress -notlike "169.254.*" -and
-            $_.PrefixOrigin -ne "WellKnown"
-        } |
-        Select-Object -First 1 -ExpandProperty IPAddress
-
-    if (-not $ip) {
-        return "127.0.0.1"
+function Test-BackendReady {
+    try {
+        $response = Invoke-WebRequest -UseBasicParsing -Uri $backendUrl -TimeoutSec 2
+        return $response.StatusCode -ge 200 -and $response.StatusCode -lt 500
+    } catch {
+        return $false
     }
-
-    return $ip
 }
 
 function Start-Backend {
-    Stop-Port8081
-
     $out = Join-Path $backendDir "backend.out.log"
     $err = Join-Path $backendDir "backend.err.log"
     $mvnw = Join-Path $backendDir "mvnw.cmd"
@@ -67,6 +78,25 @@ function Start-Backend {
     if (-not (Test-Path $mvnw)) {
         throw "Backend Maven dosyasi bulunamadi: $mvnw"
     }
+
+    $envFile = Join-Path $backendDir ".env"
+    if (-not (Test-Path $envFile)) {
+        throw "Supabase ayari eksik. backend\.env.example dosyasini backend\.env olarak kopyalayip SUPABASE_DB_PASSWORD degerini girin."
+    }
+
+    $passwordLine = Get-Content -LiteralPath $envFile |
+        Where-Object { $_ -match '^\s*SUPABASE_DB_PASSWORD\s*=\s*(.+)\s*$' } |
+        Select-Object -First 1
+    if (-not $passwordLine -or $passwordLine -match 'your_supabase_database_password') {
+        throw "backend\.env icindeki SUPABASE_DB_PASSWORD gercek Supabase veritabani sifresi olmali."
+    }
+
+    if (Test-BackendReady) {
+        Write-Host "Backend zaten hazir: $backendUrl"
+        return
+    }
+
+    Stop-Port8081
 
     Write-Host "Backend arka planda baslatiliyor..."
     Start-Process `
@@ -88,51 +118,51 @@ function Start-Backend {
     Write-Host "Backend hazir: $backendUrl"
 }
 
-function Stop-GradleDaemons {
-    $gradlew = Join-Path $mobileDir "android\gradlew.bat"
-    if (Test-Path $gradlew) {
-        Push-Location (Join-Path $mobileDir "android")
-        try {
-            & $gradlew --stop | Out-Null
-        } catch {
-            Write-Host "Gradle daemon durdurma atlandi."
-        } finally {
-            Pop-Location
+function Enable-AndroidPortReverse {
+    $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
+    if (-not (Test-Path $adb)) {
+        return
+    }
+
+    $previousErrorAction = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $androidDevices = & $adb devices 2>$null |
+            Where-Object { $_ -match "\sdevice$" }
+        if ($androidDevices) {
+            & $adb reverse tcp:8081 tcp:8081 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Android cihaz icin localhost:8081 yonlendirmesi hazir."
+            }
         }
+    } finally {
+        $ErrorActionPreference = $previousErrorAction
     }
 }
 
-function Clear-ToolLocks {
-    Remove-Item -LiteralPath "C:\flutter_sdk\flutter\bin\cache\lockfile" -Force -ErrorAction SilentlyContinue
-    Get-ChildItem -Path (Join-Path $env:USERPROFILE ".gradle\wrapper\dists") `
-        -Recurse `
-        -Include "*.lck", "*.lock" `
-        -ErrorAction SilentlyContinue |
-        Remove-Item -Force -ErrorAction SilentlyContinue
-}
+$apiBaseUrl = "http://127.0.0.1:8081/api"
 
-$localIp = Get-LocalIp
-$apiBaseUrl = "http://${localIp}:8081/api"
-
+Clear-StaleFlutterRun
 Start-Backend
-
-Write-Host ""
-Write-Host "Flutter cihaz akisi basliyor..."
-Write-Host "Labelscan'deki gibi cihaz secimi Flutter tarafindan yapilacak."
-Write-Host "Mobil API adresi: $apiBaseUrl"
-Write-Host ""
+Enable-AndroidPortReverse
 
 Push-Location $mobileDir
 try {
-    Clear-ToolLocks
-    & $flutter pub get
-    & $flutter config --enable-web
-    Stop-GradleDaemons
-    Write-Host ""
-    Write-Host "Flutter'in gordugu cihazlar:"
-    & $flutter devices
-    Write-Host ""
-    & $flutter run --dart-define=API_BASE_URL=$apiBaseUrl
+    if (-not (Test-Path -LiteralPath (Join-Path $mobileDir ".dart_tool\package_config.json"))) {
+        & $flutter pub get
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+    }
+
+    $hasApiBaseUrl = $FlutterRunArguments |
+        Where-Object { $_ -match '^--dart-define=API_BASE_URL=' }
+    if (-not $hasApiBaseUrl) {
+        $FlutterRunArguments += "--dart-define=API_BASE_URL=$apiBaseUrl"
+    }
+
+    & $flutter run @FlutterRunArguments
+    exit $LASTEXITCODE
 } finally {
     Pop-Location
 }

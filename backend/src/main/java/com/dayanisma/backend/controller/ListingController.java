@@ -32,18 +32,22 @@ public class ListingController {
     public ApiResponse<List<Listing>> list(
             @RequestParam(required = false) String tur,
             @RequestParam(required = false) String kategori,
+            @RequestParam(required = false) String durum,
+            @RequestParam(required = false) Boolean acil,
             @RequestParam(required = false) String q
     ) {
-        return ApiResponse.ok("Ilanlar listelendi", listingService.list(tur, kategori, q));
+        return ApiResponse.ok("Ilanlar listelendi", listingService.list(tur, kategori, durum, acil, q));
     }
 
     @GetMapping("/ara")
     public ApiResponse<List<Listing>> search(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String tur,
-            @RequestParam(required = false) String kategori
+            @RequestParam(required = false) String kategori,
+            @RequestParam(required = false) String durum,
+            @RequestParam(required = false) Boolean acil
     ) {
-        return ApiResponse.ok("Arama tamamlandi", listingService.list(tur, kategori, q));
+        return ApiResponse.ok("Arama tamamlandi", listingService.list(tur, kategori, durum, acil, q));
     }
 
     @GetMapping("/benim")

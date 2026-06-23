@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../../services/auth_service.dart';
 
 class KayitEkrani extends StatefulWidget {
@@ -44,7 +45,7 @@ class _KayitEkraniState extends State<KayitEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Renkler.authBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -65,7 +66,7 @@ class _KayitEkraniState extends State<KayitEkrani> {
               const SizedBox(height: 4),
               const Center(
                 child: Text(
-                  'Kayit Ol',
+                  'Kayıt Ol',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -88,31 +89,28 @@ class _KayitEkraniState extends State<KayitEkrani> {
               ),
               _buildInputField(
                 controller: _kullaniciAdiController,
-                hint: 'Kullanici adi',
+                hint: 'Kullanıcı adı',
               ),
               _buildInputField(
                 controller: _hakkindaController,
                 hint: 'Hakkimda',
                 maxLines: 3,
               ),
-              _buildInputField(
-                controller: _konumController,
-                hint: 'Konum',
-              ),
+              _buildInputField(controller: _konumController, hint: 'Konum'),
               _buildInputField(
                 controller: _telefonController,
-                hint: 'Telefon numarasi',
+                hint: 'Telefon numarası',
                 keyboardType: TextInputType.phone,
               ),
               _buildPasswordField(
                 controller: _sifreController,
-                hint: 'Sifre',
+                hint: 'Şifre',
                 gizli: _sifre1Gizli,
                 onToggle: () => setState(() => _sifre1Gizli = !_sifre1Gizli),
               ),
               _buildPasswordField(
                 controller: _sifreTekrarController,
-                hint: 'Sifre tekrar',
+                hint: 'Şifre tekrar',
                 gizli: _sifre2Gizli,
                 onToggle: () => setState(() => _sifre2Gizli = !_sifre2Gizli),
               ),
@@ -189,7 +187,7 @@ class _KayitEkraniState extends State<KayitEkrani> {
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   style: TextButton.styleFrom(foregroundColor: Colors.black54),
                   child: const Text(
-                    'Zaten hesabin var mi? Giris yap',
+                    'Zaten hesabın var mı? Giriş yap',
                     style: TextStyle(fontSize: 13.5),
                   ),
                 ),
@@ -276,7 +274,7 @@ class _KayitEkraniState extends State<KayitEkrani> {
       return;
     }
     if (_sifreController.text != _sifreTekrarController.text) {
-      _showError('Sifreler eslesmiyor.');
+      _showError('Şifreler eşleşmiyor.');
       return;
     }
     setState(() => _loading = true);
@@ -308,8 +306,8 @@ class _KayitEkraniState extends State<KayitEkrani> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

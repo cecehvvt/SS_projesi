@@ -1,148 +1,184 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Renkler {
   Renkler._();
 
-  // ─────────────────────────────────────────────
-  // PRIMARY — Yeşil (butonlar, kategori badge, Kaydet, Talep Et)
-  // ─────────────────────────────────────────────
-  static const Color primary = Color(0xFF4CAF7D);
-  static const Color primaryKoyu = Color(0xFF388E5E);
-  static const Color primaryAcik = Color(0xFFE8F5EE); // chip arka planı
+  static const Color cream = Color(0xFFFFFBF5);
+  static const Color paper = Color(0xFFFFFFFF);
+  static const Color terracotta = Color(0xFFD96C4A);
+  static const Color terracottaDark = Color(0xFFB6502F);
+  static const Color olive = Color(0xFF5C6B4F);
+  static const Color oliveLight = Color(0xFF7C8A6C);
+  static const Color ink = Color(0xFF2B2622);
+  static const Color inkSoft = Color(0xFF6B635B);
+  static const Color line = Color(0xFFEAE2D6);
+  static const Color authBackground = Color(0xFFF9F3F3);
 
-  // ─────────────────────────────────────────────
-  // SECONDARY — Mor/Lila (İhtiyaç İlanı Oluştur butonu, Kaydet mor)
-  // ─────────────────────────────────────────────
-  static const Color secondary = Color(0xFF7C3AED);
-  static const Color secondaryAcik = Color(0xFFF3EEFF); // ihtiyaç kart bg
+  // Mevcut ekranların kullandığı adlar yeni Vesta paletine bağlanır.
+  static const Color primary = terracotta;
+  static const Color primaryKoyu = terracottaDark;
+  static const Color primaryAcik = Color(0xFFFFEEE8);
+  static const Color secondary = olive;
+  static const Color secondaryAcik = Color(0xFFF0F2ED);
+  static const Color headerTeal = cream;
+  static const Color headerTealKoyu = line;
+  static const Color acilBadge = terracotta;
+  static const Color acilBadgeAcik = Color(0xFFFFEEE8);
+  static const Color arkaplan = cream;
+  static const Color kartArkaplan = paper;
+  static const Color inputArkaplan = paper;
+  static const Color bolucuCizgi = line;
+  static const Color metinKoyu = ink;
+  static const Color metinOrta = inkSoft;
+  static const Color metinAcik = inkSoft;
+  static const Color metinBeyaz = paper;
+  static const Color kalpIkon = inkSoft;
+  static const Color kalpIkonDolu = terracotta;
+  static const Color uzaklikBadge = ink;
+  static const Color navBarArkaplan = paper;
+  static const Color navBarAktif = terracottaDark;
+  static const Color navBarPasif = inkSoft;
+  static const Color navBarEkleButon = terracotta;
+  static const Color toggleAktif = terracotta;
+  static const Color togglePasif = line;
 
-  // ─────────────────────────────────────────────
-  // HEADER TEAL — Bağışlananlar / İhtiyaçlar başlık arka planı
-  // ─────────────────────────────────────────────
-  static const Color headerTeal = Color(0xFFB2DFDB); // açık teal
-  static const Color headerTealKoyu = Color(0xFF80CBC4);
-
-  // ─────────────────────────────────────────────
-  // ACİL BADGE — Kırmızı-turuncu
-  // ─────────────────────────────────────────────
-  static const Color acilBadge = Color(0xFFFF5722);
-  static const Color acilBadgeAcik = Color(0xFFFFF3EE);
-
-  // ─────────────────────────────────────────────
-  // ARKA PLANLAR
-  // ─────────────────────────────────────────────
-  static const Color arkaplan = Color(0xFFF5F5F5); // genel sayfa bg
-  static const Color kartArkaplan = Color(0xFFFFFFFF); // kart bg
-  static const Color inputArkaplan = Color(0xFFF0F0F0); // text field bg
-  static const Color bolucuCizgi = Color(0xFFE0E0E0);
-
-  // ─────────────────────────────────────────────
-  // METİN
-  // ─────────────────────────────────────────────
-  static const Color metinKoyu = Color(0xFF1A1A1A); // başlık, büyük metin
-  static const Color metinOrta = Color(0xFF555555); // normal içerik
-  static const Color metinAcik = Color(0xFF9E9E9E); // placeholder, alt bilgi
-  static const Color metinBeyaz = Color(0xFFFFFFFF);
-
-  // ─────────────────────────────────────────────
-  // İKON / BADGE
-  // ─────────────────────────────────────────────
-  static const Color kalpIkon = Color(0xFF9E9E9E); // favori boş
-  static const Color kalpIkonDolu = Color(0xFFE53935); // favori dolu
-  static const Color uzaklikBadge = Color(0xFF424242); // "6 km" koyu gri
-
-  // ─────────────────────────────────────────────
-  // NAVİGASYON ÇUBUĞU
-  // ─────────────────────────────────────────────
-  static const Color navBarArkaplan = Color(0xFFFFFFFF);
-  static const Color navBarAktif = Color(0xFF4CAF7D);
-  static const Color navBarPasif = Color(0xFF9E9E9E);
-  static const Color navBarEkleButon = Color(0xFF4CAF7D); // orta + butonu
-
-  // ─────────────────────────────────────────────
-  // DURUM / TOGGLE
-  // ─────────────────────────────────────────────
-  static const Color toggleAktif = Color(0xFF4CAF7D);
-  static const Color togglePasif = Color(0xFFBDBDBD);
-
-  // ─────────────────────────────────────────────
-  // KOLAY ERİŞİM — MaterialColor oluşturma
-  // ─────────────────────────────────────────────
-  static MaterialColor get primarySwatch => _buildSwatch(primary);
-
-  static MaterialColor _buildSwatch(Color color) {
-    final hsl = HSLColor.fromColor(color);
-    return MaterialColor(color.toARGB32(), {
-      50: hsl.withLightness((hsl.lightness + 0.4).clamp(0.0, 1.0)).toColor(),
-      100: hsl.withLightness((hsl.lightness + 0.3).clamp(0.0, 1.0)).toColor(),
-      200: hsl.withLightness((hsl.lightness + 0.2).clamp(0.0, 1.0)).toColor(),
-      300: hsl.withLightness((hsl.lightness + 0.1).clamp(0.0, 1.0)).toColor(),
-      400: color,
-      500: color,
-      600: hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor(),
-      700: hsl.withLightness((hsl.lightness - 0.2).clamp(0.0, 1.0)).toColor(),
-      800: hsl.withLightness((hsl.lightness - 0.3).clamp(0.0, 1.0)).toColor(),
-      900: hsl.withLightness((hsl.lightness - 0.4).clamp(0.0, 1.0)).toColor(),
-    });
-  }
-
-  // ─────────────────────────────────────────────
-  // TEMA
-  // ─────────────────────────────────────────────
-  static ThemeData get tema => ThemeData(
-    primarySwatch: primarySwatch,
-    primaryColor: primary,
-    scaffoldBackgroundColor: arkaplan,
-    colorScheme: const ColorScheme.light(
-      primary: primary,
-      secondary: secondary,
-      surface: kartArkaplan,
-      onPrimary: metinBeyaz,
-      onSecondary: metinBeyaz,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: headerTeal,
-      foregroundColor: metinKoyu,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        color: metinKoyu,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primary,
-        foregroundColor: metinBeyaz,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        minimumSize: const Size(double.infinity, 50),
-      ),
-    ),
-    inputDecorationTheme: const InputDecorationTheme(
-      filled: true,
-      fillColor: inputArkaplan,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        borderSide: BorderSide.none,
-      ),
-      hintStyle: TextStyle(color: metinAcik, fontSize: 14),
-    ),
-    cardTheme: const CardThemeData(
-      color: kartArkaplan,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-      ),
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: navBarArkaplan,
-      selectedItemColor: navBarAktif,
-      unselectedItemColor: navBarPasif,
-      type: BottomNavigationBarType.fixed,
-      elevation: 8,
-    ),
+  static TextStyle baslik({
+    double size = 24,
+    FontWeight weight = FontWeight.w600,
+    Color color = ink,
+  }) => GoogleFonts.fraunces(
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+    height: 1.15,
   );
+
+  static ThemeData get tema {
+    final base = ThemeData(useMaterial3: true);
+    final inter = GoogleFonts.interTextTheme(
+      base.textTheme,
+    ).apply(bodyColor: ink, displayColor: ink);
+    return base.copyWith(
+      scaffoldBackgroundColor: cream,
+      colorScheme: const ColorScheme.light(
+        primary: terracotta,
+        onPrimary: paper,
+        secondary: olive,
+        onSecondary: paper,
+        surface: paper,
+        onSurface: ink,
+        outline: line,
+        error: terracottaDark,
+      ),
+      textTheme: inter.copyWith(
+        headlineLarge: GoogleFonts.fraunces(
+          textStyle: inter.headlineLarge,
+          fontWeight: FontWeight.w600,
+        ),
+        headlineMedium: GoogleFonts.fraunces(
+          textStyle: inter.headlineMedium,
+          fontWeight: FontWeight.w600,
+        ),
+        headlineSmall: GoogleFonts.fraunces(
+          textStyle: inter.headlineSmall,
+          fontWeight: FontWeight.w600,
+        ),
+        titleLarge: GoogleFonts.fraunces(
+          textStyle: inter.titleLarge,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: cream,
+        foregroundColor: ink,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: baslik(size: 21),
+      ),
+      cardTheme: const CardThemeData(
+        color: paper,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(18)),
+          side: BorderSide(color: line),
+        ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: paper,
+        labelStyle: TextStyle(color: inkSoft),
+        hintStyle: TextStyle(color: inkSoft, fontSize: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderSide: BorderSide(color: line),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderSide: BorderSide(color: line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderSide: BorderSide(color: terracotta, width: 1.5),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: terracotta,
+          foregroundColor: paper,
+          minimumSize: const Size(0, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: terracotta,
+          foregroundColor: paper,
+          elevation: 0,
+          minimumSize: const Size(0, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: terracottaDark,
+          side: const BorderSide(color: line),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+      chipTheme: base.chipTheme.copyWith(
+        backgroundColor: paper,
+        selectedColor: primaryAcik,
+        side: const BorderSide(color: line),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        labelStyle: const TextStyle(color: ink, fontWeight: FontWeight.w600),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: paper,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(color: line),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: paper,
+        selectedItemColor: terracottaDark,
+        unselectedItemColor: inkSoft,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+      ),
+    );
+  }
 }

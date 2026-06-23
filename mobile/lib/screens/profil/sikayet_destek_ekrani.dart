@@ -1,147 +1,70 @@
 import 'package:flutter/material.dart';
-import '../../constants/renkler.dart';
 
-class SikayetDestekEkrani extends StatefulWidget {
+class SikayetDestekEkrani extends StatelessWidget {
   const SikayetDestekEkrani({super.key});
 
-  @override
-  State<SikayetDestekEkrani> createState() => _SikayetDestekEkraniState();
-}
-
-class _SikayetDestekEkraniState extends State<SikayetDestekEkrani> {
-  String seciliKategori = "Kullanıcı Şikayeti";
-  final TextEditingController konuController = TextEditingController();
-  final TextEditingController aciklamaController = TextEditingController();
+  static const _questions = <(String, String)>[
+    (
+      'Nasıl ilan oluşturabilirim?',
+      'Alt menüdeki İlan Oluştur butonuna dokunun. Bağış veya ihtiyaç türünü seçip fotoğrafları ve ilan bilgilerini doldurarak kaydedin.',
+    ),
+    (
+      'Bir ilana nasıl talep veya takas isteği gönderebilirim?',
+      'İlan detayında Talep Et ya da Takas butonunu kullanın. Takas isteğiniz ilan sahibinin Bildirimler ekranına gider.',
+    ),
+    (
+      'İlan sahibiyle nasıl iletişim kurabilirim?',
+      'İlan detayındaki Mesaj butonuna dokunun. Tüm sohbetlerinize Mesajlar sekmesinden ulaşabilirsiniz.',
+    ),
+    (
+      'Profil fotoğrafımı nasıl değiştirebilirim?',
+      'Profilim ekranında Düzenle butonuna dokunun. Galeriden fotoğraf seçebilir veya kamerayla yeni bir fotoğraf çekebilirsiniz.',
+    ),
+    (
+      'Bağış ve ihtiyaç ilanlarını nasıl ayırabilirim?',
+      'Ana sayfadaki arama alanının altında bulunan Bağışlananlar ve İhtiyaçlar seçeneklerini kullanın.',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Renkler.arkaplan,
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text("Şikayet ve Destek"),
-        backgroundColor: Renkler.headerTeal,
+        title: const Text('Yardım ve Destek'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildSikayetFormu(),
-            const SizedBox(height: 20),
-            _buildDestekKart(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSikayetFormu() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text(
-              "Kullanıcı Şikayet Et",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        children: [
+          const Text(
+            'Sıkça Sorulan Sorular',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Merak ettiğiniz sorunun cevabını görmek için başlığa dokunun.',
+            style: TextStyle(color: Colors.black54),
+          ),
+          const SizedBox(height: 18),
+          ..._questions.map(
+            (item) => Card(
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 10),
+              child: ExpansionTile(
+                leading: const Icon(Icons.help_outline),
+                title: Text(
+                  item.$1,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                children: [Text(item.$2, style: const TextStyle(height: 1.45))],
               ),
             ),
-            const SizedBox(height: 15),
-
-            DropdownButtonFormField<String>(
-              initialValue: seciliKategori,
-              items: [
-                "Kullanıcı Şikayeti",
-                "Ürün Şikayeti",
-                "Teslimat Sorunu"
-              ]
-                  .map((e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  seciliKategori = value!;
-                });
-              },
-            ),
-
-            const SizedBox(height: 12),
-
-            TextField(
-              controller: konuController,
-              decoration: const InputDecoration(
-                hintText: "Şikayet Konusu",
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            TextField(
-              controller: aciklamaController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: "Açıklama yaz...",
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Şikayet başarıyla gönderildi"),
-                    ),
-                  );
-                },
-                child: const Text("Şikayet Gönder"),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDestekKart() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text(
-              "Yardım & Destek",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 15),
-
-            ListTile(
-              leading: const Icon(Icons.call),
-              title: const Text("Canlı Destek"),
-              onTap: () {},
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.email),
-              title: const Text("E-posta Gönder"),
-              onTap: () {},
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.help_outline),
-              title: const Text("SSS"),
-              onTap: () {},
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -45,13 +45,13 @@ class _FavorilerEkraniState extends State<FavorilerEkrani> {
                   Icon(Icons.favorite_border, size: 48, color: Colors.grey),
                   SizedBox(height: 12),
                   Text(
-                    'Henuz favori ilanin yok',
+                    'Henüz favori ilanın yok',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontWeight: FontWeight.w800),
                   ),
                   SizedBox(height: 6),
                   Text(
-                    'Begendigin ilanlari favorilere ekleyerek burada takip edebilirsin.',
+                    'Beğendiğin ilanları favorilere ekleyerek burada takip edebilirsin.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black54),
                   ),

@@ -15,12 +15,9 @@ class AuthService {
     final response = await http.post(
       Uri.parse(ApiSabitler.girisYap),
       headers: ApiClient.headers(json: true),
-      body: jsonEncode({
-        'epostaVeyaTelefon': identifier,
-        'password': password,
-      }),
+      body: jsonEncode({'epostaVeyaTelefon': identifier, 'password': password}),
     );
-    final data = ApiClient.decode(response, 'Giris yapilamadi.');
+    final data = ApiClient.decode(response, 'Giriş yapılamadı.');
     ApiClient.setSession(Map<String, dynamic>.from(data as Map));
   }
 
@@ -50,7 +47,7 @@ class AuthService {
         'telefonNumarasi': telefonNumarasi,
       }),
     );
-    final data = ApiClient.decode(response, 'Kayit tamamlanamadi.');
+    final data = ApiClient.decode(response, 'Kayıt tamamlanamadı.');
     ApiClient.setSession(Map<String, dynamic>.from(data as Map));
   }
 

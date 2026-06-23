@@ -1,109 +1,52 @@
-# Dayanisma App
+# Vesta
 
-Sosyal paylasim ve dayanisma odakli mobil uygulama.
+Vesta; Flutter frontend, Java Spring Boot backend ve Supabase PostgreSQL
+veritabanından oluşur.
 
-## Ekipler
-- **Frontend** -> mobile/ klasoru (Flutter)
-- **Backend** -> backend/ klasoru (Java Spring Boot + Azure App Service + Firebase)
+## İlk Kurulum
 
-## Figma Tasarim
-https://www.figma.com/design/dyvhi5OZ94GmdG3akW64Li/Untitled?node-id=0-1&p=f
+`backend/.env.example` dosyasını `backend/.env` olarak kopyalayın ve
+`SUPABASE_DB_PASSWORD` değerini girin.
 
-## Kurulum
-
-### Flutter (Mobile)
-cd mobile
-flutter pub get
-flutter run
-
-### Backend (Java Spring Boot)
-cd backend
-./mvnw spring-boot:run
-
-Windows icin:
-mvnw.cmd spring-boot:run
-
-### Gereksinimler
-- Java 17+
-- Maven (veya mvnw kullanin)
-- Flutter 3.x+
-- Android Studio (emulator icin)
-
-## Firebase Kurulum
-1. Firebase Console - Yeni proje olustur
-2. Android uygulamasi ekle - google-services.json indir - mobile/android/app/ icine koy
-3. Proje ayarlari - Servis hesabi - yeni anahtar olustur - application.properties dosyasina yapistir
-4. flutterfire configure komutunu calistir
-
-## Veritabani (Supabase Postgres)
-
-Backend artik verileri bellek yerine **Supabase Postgres** uzerinde tutar (JDBC).
-Tablolar uygulama ilk acilista `backend/src/main/resources/schema.sql` ile otomatik olusur.
-
-1. Supabase panel -> Project Settings -> Database -> veritabani sifrenizi alin.
-2. Backend'i calistirmadan once ortam degiskenlerini ayarlayin:
-
-```powershell
-$env:SUPABASE_DB_PASSWORD = "DB_SIFRENIZ"
-.\mvnw.cmd spring-boot:run
-```
-
-Baglanti adresi/kullanicisi varsayilan olarak Supabase Connection Pooler'a (IPv4,
-`ap-southeast-1`) ayarlidir; sadece sifreyi vermeniz yeterlidir. Alternatif baglanti
-secenekleri icin `backend/.env.example` dosyasina bakin.
-
-## Azure Deploy
-GitHub repository ayarlarinda su secretlari ekleyin:
-- AZURE_APP_NAME - Azure App Service adiniz
-- AZURE_PUBLISH_PROFILE - Azure portaldan indirilen publish profile icerigi
-
-## Son committen sonra uygulamayı çalıştırma adımları aşağıdaki gibidir . Bu kılavuzdan yardım alabilirsiniz.
-
-```md
 ## Uygulamayı Çalıştırma
 
-### 1. Gerekli Kurulumlar
-
-Önce Flutter kurulumunun doğru çalıştığını kontrol edin:
+Her zaman önce proje köküne girin:
 
 ```powershell
-flutter doctor
+cd "C:\Users\ecehv\OneDrive\Desktop\SS projesi\dayanisma-app"
 ```
 
-Eksik görünen Android Studio, SDK, Chrome/Edge veya cihaz izinlerini tamamlayın.
-
-Projeyi çalıştırmadan önce `mobile` klasörüne girin:
+Labelscan projesindeki gibi geliştirme terminalini açın:
 
 ```powershell
-cd mobile
-flutter pub get
+.\dev-shell.cmd
 ```
 
-### 2. Telefonda Çalıştırma
-
-Telefonu USB ile bilgisayara bağlayın.
-
-Android telefonda:
-- Geliştirici seçeneklerini açın.
-- USB hata ayıklama modunu etkinleştirin.
-- Telefonda çıkan USB hata ayıklama iznine izin verin.
-
-Bağlı cihazları kontrol edin:
+Yeni açılan terminalde cihazları görün:
 
 ```powershell
 flutter devices
 ```
 
-Cihaz listede görünüyorsa uygulamayı çalıştırın:
+### Chrome
 
 ```powershell
-flutter run
+flutter run -d chrome
 ```
 
-Belirli bir cihaz seçmek için cihaz ID’sini kullanabilirsiniz:
+### Edge
 
 ```powershell
-flutter run -d CIHAZ_ID
+flutter run -d edge
+```
+
+### USB Android Telefon
+
+Telefonu USB ile bağlayın, USB hata ayıklama iznini verin ve:
+
+```powershell
+flutter devices
+flutter run -d TELEFON_CIHAZ_ID
 ```
 
 Örnek:
@@ -112,124 +55,41 @@ flutter run -d CIHAZ_ID
 flutter run -d R58N123ABC
 ```
 
-Backend bilgisayarda çalışıyorsa ve uygulama fiziksel telefonda açılıyorsa, `127.0.0.1` telefonun kendisini işaret eder. Bu yüzden bilgisayarın yerel IP adresiyle çalıştırmak gerekir:
+Backend otomatik başlatılır. Android telefon için `adb reverse` otomatik
+uygulanır. API adresini veya `--dart-define` parametresini elle yazmanız gerekmez.
+
+## Kısa Özet
 
 ```powershell
-flutter run --dart-define=API_BASE_URL=http://BILGISAYAR_IP_ADRESI:8081/api
-```
-
-Örnek:
-
-```powershell
-flutter run --dart-define=API_BASE_URL=http://192.168.1.25:8081/api
-```
-
-Bilgisayar ve telefon aynı Wi-Fi ağına bağlı olmalıdır.
-
-### 3. Android Emulator ile Çalıştırma
-
-Android emulator açıksa:
-
-```powershell
+cd "C:\Users\ecehv\OneDrive\Desktop\SS projesi\dayanisma-app"
+.\dev-shell.cmd
 flutter devices
-flutter run
-```
-
-Emulator içinden bilgisayardaki backend’e bağlanmak için genelde `10.0.2.2` kullanılır:
-
-```powershell
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8081/api
-```
-
-### 4. Chrome veya Edge’de Çalıştırma
-
-Web üzerinde çalıştırmak için cihazları kontrol edin:
-
-```powershell
-flutter devices
-```
-
-Chrome’da çalıştırmak için:
-
-```powershell
-flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
-Edge’de çalıştırmak için:
-
-```powershell
-flutter run -d edge --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
-Belirli bir porttan açmak isterseniz:
-
-```powershell
-flutter run -d chrome --web-port=3000 --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
-### 5. Backend’i Çalıştırma
-
-Backend klasörüne girin:
-
-```powershell
-cd ../backend
-```
-
-Spring Boot backend’i çalıştırın:
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-Backend varsayılan olarak şu adreste çalışır:
-
-```text
-http://127.0.0.1:8081/api
-```
-
-Mobil uygulamayı ayrı bir terminalde `mobile` klasöründen çalıştırın.
-
-### 6. Sık Kullanılan Komutlar
-
-Flutter bağımlılıklarını yüklemek:
-
-```powershell
-flutter pub get
-```
-
-Cihazları listelemek:
-
-```powershell
-flutter devices
-```
-
-Uygulamayı varsayılan cihazda çalıştırmak:
-
-```powershell
-flutter run
-```
-
-Chrome’da çalıştırmak:
-
-```powershell
 flutter run -d chrome
 ```
 
-Edge’de çalıştırmak:
+Telefon için son komut:
 
 ```powershell
-flutter run -d edge
+flutter run -d TELEFON_CIHAZ_ID
 ```
 
-Android APK oluşturmak:
+## APK Kurulumu
 
-```powershell
-flutter build apk --debug --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
-Kod analizi yapmak:
+Telefon ve bilgisayar aynı Wi-Fi ağındaysa proje kökünde:
 
 ```powershell
-dart analyze lib
+.\install-android.ps1
 ```
-```
+
+Bu script APK oluşturur ve bağlı Android telefona yükler.
+
+## Önemli
+
+Normal PowerShell içinde doğrudan `flutter run` çalıştırmayın. Önce
+`.\dev-shell.cmd` komutuyla Vesta terminalini açın. Bu terminal:
+
+- Doğru `mobile` klasörünü açar.
+- Backend'i otomatik başlatır.
+- API adresini otomatik ekler.
+- USB Android bağlantısını otomatik hazırlar.
+- Önceki Flutter çalışmasından kalan kilitli Dart sürecini otomatik temizler.

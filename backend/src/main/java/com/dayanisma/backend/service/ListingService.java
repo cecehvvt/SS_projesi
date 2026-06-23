@@ -27,11 +27,17 @@ public class ListingService {
     }
 
     public List<Listing> list(String tur, String kategori, String q) {
+        return list(tur, kategori, null, null, q);
+    }
+
+    public List<Listing> list(String tur, String kategori, String durum, Boolean acil, String q) {
         String currentUserId = store.currentUserIdOrNull();
         return store.listings().values().stream()
                 .filter(listing -> "active".equals(listing.status()))
                 .filter(listing -> tur == null || tur.isBlank() || equalsIgnoreCase(listing.listingType(), tur))
                 .filter(listing -> kategori == null || kategori.isBlank() || equalsIgnoreCase(listing.category(), kategori))
+                .filter(listing -> durum == null || durum.isBlank() || equalsIgnoreCase(listing.condition(), durum))
+                .filter(listing -> acil == null || listing.urgent() == acil)
                 .filter(listing -> q == null || q.isBlank() || matchesSearch(listing, q))
                 .map(listing -> listing.withFavorite(isFavorite(listing.id(), currentUserId)))
                 .sorted((left, right) -> right.createdAt().compareTo(left.createdAt()))

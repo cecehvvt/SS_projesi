@@ -39,7 +39,7 @@ class SohbetOzeti {
     return SohbetOzeti(
       karsiKullaniciId: json['karsiKullaniciId']?.toString() ?? '',
       karsiKullaniciAd:
-          json['karsiKullaniciAd']?.toString() ?? 'Vesta kullanicisi',
+          json['karsiKullaniciAd']?.toString() ?? 'Vesta kullanıcısı',
       karsiKullaniciAvatarUrl: json['karsiKullaniciAvatarUrl']?.toString(),
       ilanId: json['ilanId']?.toString(),
       ilanBaslik: json['ilanBaslik']?.toString(),

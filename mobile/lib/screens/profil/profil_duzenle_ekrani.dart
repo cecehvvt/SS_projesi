@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../models/kullanici_model.dart';
 import '../../services/kullanici_service.dart';
+import '../../utils/profile_image.dart';
 
 class ProfilDuzenleEkrani extends StatefulWidget {
   const ProfilDuzenleEkrani({super.key});
@@ -20,7 +24,9 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
   final _konumController = TextEditingController();
   final _telefonController = TextEditingController();
   final _epostaController = TextEditingController();
-  final _profilFotoController = TextEditingController();
+  final _picker = ImagePicker();
+  String _profileImage = '';
+  bool _pickingImage = false;
 
   bool profilGorsun = true;
   bool mesajGelsin = true;
@@ -44,7 +50,6 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
     _konumController.dispose();
     _telefonController.dispose();
     _epostaController.dispose();
-    _profilFotoController.dispose();
     super.dispose();
   }
 
@@ -69,7 +74,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
     _konumController.text = user.konum ?? '';
     _telefonController.text = user.telefonNumarasi ?? '';
     _epostaController.text = user.eposta ?? user.epostaVeyaTelefon;
-    _profilFotoController.text = user.profilFotoUrl ?? '';
+    _profileImage = user.profilFotoUrl ?? '';
     profilGorsun = user.gizlilikAyarlari.profilBaskalarinaGorunsun;
     mesajGelsin = user.gizlilikAyarlari.mesajAlabilir;
     konumGoster = user.gizlilikAyarlari.konumuIlanlardaGoster;
@@ -93,7 +98,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
         'konum': _konumController.text.trim(),
         'telefonNumarasi': _telefonController.text.trim(),
         'eposta': _epostaController.text.trim(),
-        'profilFotoUrl': _profilFotoController.text.trim(),
+        'profilFotoUrl': _profileImage,
       });
       await _service.updatePrivacy(
         GizlilikAyarlari(
@@ -123,7 +128,7 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Profili Duzenle',
+          'Profili Düzenle',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -134,13 +139,37 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
                 children: [
-                  _AvatarPreview(url: _profilFotoController.text.trim()),
+                  _AvatarPreview(source: _profileImage),
                   const SizedBox(height: 12),
-                  _buildTextField(
-                    controller: _profilFotoController,
-                    label: 'Profil fotograf URL',
-                    icon: Icons.image_outlined,
+                  PopupMenuButton<ImageSource>(
+                    enabled: !_pickingImage,
+                    onSelected: _pickProfileImage,
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: ImageSource.gallery,
+                        child: Text('Galeriden seç'),
+                      ),
+                      PopupMenuItem(
+                        value: ImageSource.camera,
+                        child: Text('Kamerayla çek'),
+                      ),
+                    ],
+                    child: Chip(
+                      avatar: _pickingImage
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.add_a_photo_outlined, size: 18),
+                      label: Text(
+                        _profileImage.isEmpty
+                            ? 'Profil fotoğrafı ekle'
+                            : 'Profil fotoğrafını değiştir',
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -161,12 +190,12 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
                   ),
                   _buildTextField(
                     controller: _kullaniciAdiController,
-                    label: 'Kullanici adi',
+                    label: 'Kullanıcı adı',
                     icon: Icons.alternate_email,
                   ),
                   _buildTextField(
                     controller: _hakkindaController,
-                    label: 'Hakkimda',
+                    label: 'Hakkımda',
                     maxLines: 4,
                     maxLength: 150,
                   ),
@@ -281,25 +310,47 @@ class _ProfilDuzenleEkraniState extends State<ProfilDuzenleEkrani> {
     );
   }
 
+  Future<void> _pickProfileImage(ImageSource source) async {
+    setState(() => _pickingImage = true);
+    try {
+      final image = await _picker.pickImage(
+        source: source,
+        maxWidth: 720,
+        imageQuality: 75,
+      );
+      if (image == null) return;
+      final bytes = await image.readAsBytes();
+      final mime = image.mimeType ?? 'image/jpeg';
+      if (!mounted) return;
+      setState(
+        () => _profileImage = 'data:$mime;base64,${base64Encode(bytes)}',
+      );
+    } catch (_) {
+      if (mounted) _showError('Fotoğraf seçilemedi. Lütfen tekrar deneyin.');
+    } finally {
+      if (mounted) setState(() => _pickingImage = false);
+    }
+  }
+
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
 class _AvatarPreview extends StatelessWidget {
-  final String url;
+  final String source;
 
-  const _AvatarPreview({required this.url});
+  const _AvatarPreview({required this.source});
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: 45,
       backgroundColor: const Color(0xFFE0E0E0),
-      backgroundImage: url.isEmpty ? null : NetworkImage(url),
-      child: url.isEmpty
+      backgroundImage: profileImageProvider(source),
+      child: source.isEmpty
           ? const Icon(Icons.person_outline, size: 50, color: Colors.black87)
           : null,
     );
@@ -334,19 +385,19 @@ class _PrivacyCard extends StatelessWidget {
       child: Column(
         children: [
           _buildSwitchRow(
-            'Profil baskalarina gorunsun',
+            'Profil başkalarına görünsün',
             Icons.visibility_outlined,
             profilGorsun,
             onProfilChanged,
           ),
           _buildSwitchRow(
-            'Mesaj almayi etkinlestir',
+            'Mesaj almayı etkinleştir',
             Icons.chat_bubble_outline,
             mesajGelsin,
             onMesajChanged,
           ),
           _buildSwitchRow(
-            'Konumu ilanlarda goster',
+            'Konumu ilanlarda göster',
             Icons.location_on_outlined,
             konumGoster,
             onKonumChanged,

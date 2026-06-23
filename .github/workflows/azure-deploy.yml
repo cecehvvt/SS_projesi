@@ -11,20 +11,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          node-version: '18'
+          distribution: temurin
+          java-version: '17'
+          cache: maven
 
-      - name: Install dependencies
+      - name: Build Spring Boot application
         working-directory: backend
-        run: npm install
+        run: ./mvnw -DskipTests package
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: backend
+          package: backend/target/*.jar

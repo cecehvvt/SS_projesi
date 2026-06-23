@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../auth/karsilama_ekrani.dart';
 
 class SplashEkrani extends StatefulWidget {
@@ -11,7 +12,6 @@ class SplashEkrani extends StatefulWidget {
 
 class _SplashEkraniState extends State<SplashEkrani>
     with SingleTickerProviderStateMixin {
-  static const _backgroundColor = Color(0xFFF8F5F5);
   static const _logoWidth = 168.0;
 
   late final AnimationController _controller;
@@ -59,7 +59,7 @@ class _SplashEkraniState extends State<SplashEkrani>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: Renkler.authBackground,
       body: Center(
         child: AnimatedBuilder(
           animation: _controller,

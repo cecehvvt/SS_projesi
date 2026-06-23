@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/renkler.dart';
 import '../../services/auth_service.dart';
 
 class GirisEkrani extends StatefulWidget {
@@ -25,7 +26,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F3F3),
+      backgroundColor: Renkler.authBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -34,7 +35,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Giris Yap',
+          'Giriş Yap',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -51,7 +52,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Bagis yapabilir veya ihtiyaci olan\nkiyafetleri bulabilirsin.',
+              'Bağış yapabilir veya ihtiyacı olan\nkişilere ulaşabilirsin.',
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 40),
@@ -71,7 +72,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
                 },
                 style: TextButton.styleFrom(foregroundColor: Colors.black54),
                 child: const Text(
-                  'Sifremi Unuttum',
+                  'Şifremi Unuttum',
                   style: TextStyle(fontSize: 13),
                 ),
               ),
@@ -96,7 +97,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text(
-                        'Giris yap',
+                        'Giriş yap',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -162,7 +163,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
         obscureText: _sifreGizli,
         style: const TextStyle(fontSize: 15, color: Colors.black87),
         decoration: InputDecoration(
-          hintText: 'Sifre',
+          hintText: 'Şifre',
           hintStyle: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 15),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -188,7 +189,7 @@ class _GirisEkraniState extends State<GirisEkrani> {
     final identifier = emailController.text.trim();
     final password = passwordController.text;
     if (identifier.isEmpty || password.isEmpty) {
-      _showError('E-posta/telefon ve sifre zorunludur.');
+      _showError('E-posta/telefon ve şifre zorunludur.');
       return;
     }
 
@@ -216,8 +217,8 @@ class _GirisEkraniState extends State<GirisEkrani> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

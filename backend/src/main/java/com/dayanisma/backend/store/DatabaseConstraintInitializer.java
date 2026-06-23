@@ -19,7 +19,25 @@ public class DatabaseConstraintInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        ensureListingsOwnerCascade();
         constraints().forEach(this::addIfMissing);
+    }
+
+    private void ensureListingsOwnerCascade() {
+        List<String> definitions = jdbc.queryForList(
+                "SELECT pg_get_constraintdef(c.oid) FROM pg_constraint c " +
+                        "JOIN pg_namespace n ON n.oid = c.connamespace " +
+                        "WHERE c.conname = 'fk_listings_owner' AND n.nspname = current_schema()",
+                String.class
+        );
+        if (definitions.stream().anyMatch(value -> value.contains("ON DELETE CASCADE"))) {
+            return;
+        }
+        jdbc.execute("ALTER TABLE listings DROP CONSTRAINT IF EXISTS fk_listings_owner");
+        jdbc.execute(
+                "ALTER TABLE listings ADD CONSTRAINT fk_listings_owner " +
+                        "FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE NOT VALID"
+        );
     }
 
     private void addIfMissing(ConstraintDefinition constraint) {
@@ -38,11 +56,6 @@ public class DatabaseConstraintInitializer implements ApplicationRunner {
 
     private List<ConstraintDefinition> constraints() {
         return List.of(
-                new ConstraintDefinition(
-                        "fk_listings_owner",
-                        "ALTER TABLE listings ADD CONSTRAINT fk_listings_owner " +
-                                "FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL NOT VALID"
-                ),
                 new ConstraintDefinition(
                         "fk_favorites_listing",
                         "ALTER TABLE favorites ADD CONSTRAINT fk_favorites_listing " +
