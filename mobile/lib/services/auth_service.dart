@@ -18,7 +18,7 @@ class AuthService {
       body: jsonEncode({'epostaVeyaTelefon': identifier, 'password': password}),
     );
     final data = ApiClient.decode(response, 'Giriş yapılamadı.');
-    ApiClient.setSession(Map<String, dynamic>.from(data as Map));
+    await ApiClient.setSession(Map<String, dynamic>.from(data as Map));
   }
 
   Future<void> register({
@@ -48,14 +48,17 @@ class AuthService {
       }),
     );
     final data = ApiClient.decode(response, 'Kayıt tamamlanamadı.');
-    ApiClient.setSession(Map<String, dynamic>.from(data as Map));
+    await ApiClient.setSession(Map<String, dynamic>.from(data as Map));
   }
 
   Future<void> logout() async {
-    await http.post(
-      Uri.parse(ApiSabitler.cikisYap),
-      headers: ApiClient.headers(),
-    );
-    ApiClient.clearSession();
+    try {
+      await http.post(
+        Uri.parse(ApiSabitler.cikisYap),
+        headers: ApiClient.headers(),
+      );
+    } finally {
+      await ApiClient.clearSession();
+    }
   }
 }

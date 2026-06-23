@@ -293,7 +293,11 @@ class _KayitEkraniState extends State<KayitEkrani> {
         telefonNumarasi: _telefonController.text.trim(),
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/ana_sayfa');
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/ana_sayfa',
+        (route) => false,
+      );
     } catch (error) {
       if (mounted) {
         _showError(error.toString());

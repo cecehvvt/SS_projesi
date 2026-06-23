@@ -140,7 +140,60 @@ function Enable-AndroidPortReverse {
     }
 }
 
+function Get-SelectedDeviceId {
+    for ($index = 0; $index -lt $FlutterRunArguments.Count; $index++) {
+        $argument = $FlutterRunArguments[$index]
+        if (($argument -eq "-d" -or $argument -eq "--device-id") -and
+            $index + 1 -lt $FlutterRunArguments.Count) {
+            return $FlutterRunArguments[$index + 1]
+        }
+        if ($argument -match "^--device-id=(.+)$") {
+            return $Matches[1]
+        }
+    }
+    return $null
+}
+
+function Get-AndroidDeviceIds {
+    $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
+    if (-not (Test-Path $adb)) {
+        return @()
+    }
+
+    return @(
+        & $adb devices 2>$null |
+            Where-Object { $_ -match "^(\S+)\s+device$" } |
+            ForEach-Object {
+                if ($_ -match "^(\S+)\s+device$") {
+                    $Matches[1]
+                }
+            }
+    )
+}
+
+function Get-LanIpAddress {
+    $client = [System.Net.Sockets.UdpClient]::new()
+    try {
+        $client.Connect("8.8.8.8", 65530)
+        return ([System.Net.IPEndPoint]$client.Client.LocalEndPoint).Address.ToString()
+    } finally {
+        $client.Dispose()
+    }
+}
+
 $apiBaseUrl = "http://127.0.0.1:8081/api"
+$selectedDeviceId = Get-SelectedDeviceId
+$androidDeviceIds = Get-AndroidDeviceIds
+if ($selectedDeviceId -and $androidDeviceIds -contains $selectedDeviceId) {
+    $lanIp = Get-LanIpAddress
+    if (-not $lanIp) {
+        throw "Android telefon icin bilgisayarin yerel ag adresi bulunamadi."
+    }
+    $apiBaseUrl = "http://${lanIp}:8081/api"
+    Write-Host "Android telefon USB olmadan da calisacak."
+    Write-Host "Telefon API adresi: $apiBaseUrl"
+    Write-Host "Telefon ve bilgisayar ayni Wi-Fi aginda olmali."
+}
 
 Clear-StaleFlutterRun
 Start-Backend

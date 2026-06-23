@@ -53,7 +53,7 @@ class KullaniciService {
       headers: ApiClient.headers(),
     );
     _decode(response);
-    ApiClient.clearSession();
+    await ApiClient.clearSession();
   }
 
   dynamic _decode(http.Response response) {

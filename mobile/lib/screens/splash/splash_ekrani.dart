@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/renkler.dart';
-import '../auth/karsilama_ekrani.dart';
+import '../../services/api_client.dart';
 
 class SplashEkrani extends StatefulWidget {
   const SplashEkrani({super.key});
@@ -41,11 +41,14 @@ class _SplashEkraniState extends State<SplashEkrani>
 
     Future.delayed(const Duration(milliseconds: 250), () async {
       if (!mounted) return;
+      final hasSession = await ApiClient.restoreSession();
+      if (!mounted) return;
       await _controller.forward();
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.pushNamedAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const KarsilamaEkrani()),
+        hasSession ? '/ana_sayfa' : '/welcome',
+        (route) => false,
       );
     });
   }
