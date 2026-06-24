@@ -83,30 +83,7 @@ git --version
 
 ---
 
-## Database Configuration
 
-Copy the example environment file:
-
-```powershell
-Copy-Item "backend\.env.example" "backend\.env"
-```
-
-Open `backend\.env` and configure your database password:
-
-```properties
-SUPABASE_DB_PASSWORD=YOUR_SUPABASE_PASSWORD
-```
-
-Optional connection settings:
-
-```properties
-SUPABASE_DB_URL=jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
-SUPABASE_DB_USER=postgres.rqhylrxkbxmvdromdwlt
-```
-
-> The `.env` file contains sensitive information and should never be committed to GitHub.
-
----
 
 ## Quick Start
 
@@ -149,118 +126,6 @@ flutter run -d edge
 ```
 
 ---
-
-## Run on Android Device
-
-1. Enable Developer Options.
-2. Enable USB Debugging.
-3. Connect the device via USB.
-4. Approve the debugging authorization prompt.
-5. Find the device ID:
-
-```powershell
-flutter devices
-```
-
-Run the application:
-
-```powershell
-flutter run -d DEVICE_ID
-```
-
-Example:
-
-```powershell
-flutter run -d R58N123ABC
-```
-
----
-
-## Build and Install APK
-
-When the phone and computer are connected to the same Wi-Fi network:
-
-```powershell
-.\install-android.ps1
-```
-
-The script will:
-
-- Detect the local IP address
-- Install dependencies
-- Build the APK
-- Install the APK on the connected device
-
-Generated APK:
-
-```text
-mobile/build/app/outputs/flutter-apk/app-debug.apk
-```
-
-Requirements:
-
-- Phone and PC must be on the same network
-- Backend must be running
-- Port **8081** must be allowed through Windows Firewall
-
----
-
-## Run Backend Manually
-
-```powershell
-cd backend
-
-$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
-
-.\mvnw.cmd spring-boot:run
-```
-
-Backend URL:
-
-```text
-http://127.0.0.1:8081
-```
-
-API URL:
-
-```text
-http://127.0.0.1:8081/api
-```
-
-Stop the backend:
-
-```text
-Ctrl + C
-```
-
----
-
-## Run Flutter Manually
-
-Install dependencies:
-
-```powershell
-cd mobile
-flutter pub get
-```
-
-### Chrome
-
-```powershell
-flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
-### Android Device
-
-```powershell
-adb reverse tcp:8081 tcp:8081
-
-flutter run -d DEVICE_ID --dart-define=API_BASE_URL=http://127.0.0.1:8081/api
-```
-
----
-
-## Testing
 
 ### Flutter Analyze
 
@@ -320,22 +185,6 @@ Make sure USB debugging is enabled and authorized.
 
 ---
 
-### Backend Does Not Start
-
-Check that `backend/.env` exists and contains:
-
-```properties
-SUPABASE_DB_PASSWORD=YOUR_SUPABASE_PASSWORD
-```
-
-Backend logs:
-
-```text
-backend/backend.out.log
-backend/backend.err.log
-```
-
----
 
 ### Flutter Build Directory Locked
 
@@ -612,7 +461,7 @@ $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
 
 ```powershell
 # Proje klasörüne geç
-cd "C:\Users\ecehv\OneDrive\Desktop\SS projesi\dayanisma-app"
+cd "C:\Users\exp_name\\Desktop\SS projesi\dayanisma-app"
 
 # Vesta terminalini aç
 .\dev-shell.cmd
